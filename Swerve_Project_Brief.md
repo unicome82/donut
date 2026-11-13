@@ -1,10 +1,12 @@
 # Swerve — 프로젝트 제작 명세서
 
-> 버전 1.2 | 2026-11-04 | Claude Code 개발용 기준 문서
+> 버전 1.3 | 2026-11-13 | Claude Code 개발용 기준 문서
+>
+> **v1.3 변경:** 배포를 **GitHub Pages**로 변경(공개 저장소 전제) · 관련 비용·트래픽 추정 수정
 >
 > **v1.2 변경:** 서비스명을 Outube → **Swerve**로 변경(YouTube 브랜딩 가이드라인 대응)
 >
-> **v1.1 변경:** 로그인 없는 서비스로 확정(로그인은 필요 시 후속 도입) · 배포를 Cloudflare Pages로 변경 · 영상 재생 방식 확정 · 예상 경비 추가
+> **v1.1 변경:** 로그인 없는 서비스로 확정(로그인은 필요 시 후속 도입) · 영상 재생 방식 확정 · 예상 경비 추가
 
 ## 1. 서비스 개요
 
@@ -61,7 +63,7 @@
 - 중복 노출 최소화, 채널·분야 쏠림 완화
 - 북마크 및 사용자 설정 localStorage 저장
 - 공식 임베드 플레이어 재생, 임베드 불가 시 YouTube 앱/웹으로 열기
-- GitHub Actions 정기 수집 → JSON 생성·커밋 → Cloudflare Pages 자동 배포
+- GitHub Actions 정기 수집 → JSON 생성·커밋 → GitHub Pages 자동 배포
 - 로딩·오류·데이터 없음·오래된 데이터 상태 표시
 
 **후속**
@@ -85,12 +87,12 @@
 |---|---|---|
 | UI | React + TypeScript + Vite | 타입 안정성, SPA |
 | 스타일 | SCSS | `_reset`, `_variables`, `_mixins`, `main` |
-| 라우팅 | React Router | Cloudflare Pages SPA 새로고침 대응(`_redirects` 등) |
+| 라우팅 | React Router | GitHub Pages SPA 새로고침 대응(`404.html` 대체 등), Vite `base` 경로 설정 |
 | 추천 | TypeScript 순수 함수 | UI와 로직 분리 |
 | 영상 데이터 | YouTube Data API v3 | `videos.list`의 `chart=mostPopular` 등 공식 엔드포인트 |
 | 정기 수집 | GitHub Actions | Secrets로 API 키 관리, 스케줄 지연 가능 |
 | 데이터 | 정적 JSON + localStorage | 초기 DB 불필요 |
-| 배포 | Cloudflare Pages | private 저장소 연동 무료, 정적 트래픽 무제한 |
+| 배포 | GitHub Pages | 무료 플랜은 공개 저장소 전제, GitHub Actions로 배포 |
 | 영상 재생 | YouTube 공식 임베드 플레이어 | 임베드 불가 시 YouTube 앱/웹 링크 |
 | 앱 확장 | PWA → Capacitor | 웹 소스 재사용, 네이티브 빌드/심사 별도 |
 
@@ -205,7 +207,7 @@ swerve/
 
 ### Phase 06 — 자동 수집·배포
 
-> GitHub Actions로 수집 스크립트를 정기 실행하고 유효한 JSON을 생성하도록 구성해줘. 실패 시 데이터 손상 방지, 실행 로그, 갱신 시점 표시를 추가하고 Cloudflare Pages(Git 연동 자동 배포) 배포 흐름을 설정해줘.
+> GitHub Actions로 수집 스크립트를 정기 실행하고 유효한 JSON을 생성하도록 구성해줘. 실패 시 데이터 손상 방지, 실행 로그, 갱신 시점 표시를 추가하고 GitHub Pages(GitHub Actions 배포) 배포 흐름을 설정해줘.
 
 ### Phase 07 — 실제 데이터 연결
 
@@ -217,7 +219,7 @@ swerve/
 
 ### Phase 09 — PWA 및 모바일 최적화
 
-> 모바일 브라우저와 홈 화면 설치를 고려해 PWA를 적용하고 아이콘·manifest·캐시 정책을 설정해줘. Cloudflare Pages의 SPA 라우팅(새로고침·딥링크) 문제를 처리해.
+> 모바일 브라우저와 홈 화면 설치를 고려해 PWA를 적용하고 아이콘·manifest·캐시 정책을 설정해줘. GitHub Pages의 SPA 라우팅(새로고침·딥링크) 문제를 처리해.
 
 ### Phase 10 — 피드백 기반 취향 개선(후속)
 
@@ -264,16 +266,16 @@ swerve/
 | 항목 | 비용 | 근거 |
 |---|---|---|
 | YouTube Data API | 0원 | 무료 10,000 units/일. `videos.list` 1회 1 unit → 10개국 × 15분야 × 매시간 ≈ 3,600 units/일 |
-| GitHub Actions | 0원 | private 저장소 무료 2,000분/월. 매시간 1분 수집 ≈ 720분/월 |
-| Cloudflare Pages | 0원 | private 저장소 연동 가능, 정적 트래픽 무제한 |
+| GitHub Actions | 0원 | 공개 저장소는 표준 러너 무료 |
+| GitHub Pages | 0원 | 공개 저장소 무료. 권장 한도: 월 전송량 100GB, 사이트 1GB |
 | 영상 재생·썸네일 | 0원 | 공식 임베드/YouTube 서버에서 제공, API 할당량 소모 없음 |
 | 도메인(선택) | 연 $10~20 | `.com` 기준 |
 
 ### 트래픽 추정
 
 - 방문 1회당 자체 전송량 약 **0.5MB**(앱 번들 ~200KB, 재방문 시 캐시 + JSON 100~300KB). 썸네일·영상은 YouTube 부담.
-- 월 100만 명 × 3회 방문 ≈ **1.5TB/월** → Cloudflare Pages 기준 **0원**.
-- 참고: GitHub Pages(월 100GB 권장 한도 ≈ 20만 회 방문)는 대규모·상업적 운영에 부적합.
+- GitHub Pages 권장 한도 월 100GB ≈ **약 20만 회 방문/월**까지 **0원**.
+- 그 이상의 트래픽이나 상업적 운영 단계에서는 다른 정적 호스팅으로 이전을 검토한다(정적 파일 구조라 이전 부담이 작다).
 - 데이터는 사전 수집 JSON이므로 **사용자 수가 늘어도 API 비용은 증가하지 않는다.**
 
 ### 확장 시 추가 비용
@@ -289,7 +291,7 @@ swerve/
 
 | 시나리오 | 비용 |
 |---|---|
-| 최소 (Cloudflare Pages, 도메인 없음) | **0원** |
+| 최소 (GitHub Pages, 도메인 없음) | **0원** |
 | 도메인 사용 | 약 **$1~2/월** |
 | 앱 출시까지 | 위 + 연 $99 + 최초 $25 |
 
@@ -298,7 +300,7 @@ swerve/
 - [ ] Swerve 상표·도메인·스토어 이름 중복 검토
 - [ ] YouTube API 약관, 데이터 캐싱/삭제/표시, 공식 플레이어 정책 확인
 - [ ] API 할당량, 갱신 주기, 오류 복구 검토
-- [ ] Cloudflare Pages 이용 조건 및 개인정보 처리방침(기기 내 저장 안내) 검토
+- [ ] GitHub Pages 이용 조건(사용 한도·상업적 이용 제한) 및 개인정보 처리방침(기기 내 저장 안내) 검토
 - [ ] (로그인 도입 시) Google OAuth 권한·검증·개인정보 처리방침
 - [ ] 모바일 반응형, 접근성, PWA, 저장 데이터 삭제 기능 확인
 - [ ] 정식 앱 출시 시 Apple/Google 스토어 정책 확인
