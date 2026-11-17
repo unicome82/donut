@@ -159,6 +159,30 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
       expect(state.completedOrders).toBe(level.targetOrders);
       expect(level).toEqual(original);
     });
+    it('레벨 ' + level.id + '는 6~10종이며 여섯 대기열의 미주문 도넛이 쌓였다가 후속 주문에 소비된다', () => {
+      expect(level.donutTypes).toHaveLength(level.id + 5);
+      expect(new Set(level.queues.flat().map(token => token.type)).size).toBe(level.donutTypes.length);
+      expect(new Set(level.orders.flatMap(order => Object.keys(order.items))).size).toBe(level.donutTypes.length);
+      let state = createGame(level);
+      const waitingIds: string[] = [];
+      for (let queue = 0; queue < 6; queue += 1) {
+        const token = state.queues[queue]?.[0];
+        if (!token) throw new Error('대기열 앞 도넛 누락');
+        expect(state.orders.some(order => (order?.remaining[token.type] ?? 0) > 0)).toBe(false);
+        waitingIds.push(token.id);
+        state = select(state, level, queue).state;
+        expect(state.tray).toHaveLength(queue + 1);
+        expect(state.completedOrders).toBe(0);
+      }
+      const consumedIds: string[] = [];
+      for (const queue of (solutions[level.id] ?? []).slice(6)) {
+        const result = select(state, level, queue);
+        for (const event of result.events) if (event.type === 'consumed') consumedIds.push(event.donutId);
+        state = result.state;
+      }
+      expect(state.status).toBe('clear');
+      for (const id of waitingIds) expect(consumedIds).toContain(id);
+    });
     it('레벨 ' + level.id + '의 여러 선택 경로에서 토큰과 주문 수량을 보존한다', () => {
       for (let seed = 1; seed <= 20; seed += 1) {
         let n = seed;
