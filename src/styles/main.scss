@@ -103,3 +103,39 @@ button { border: 0; background: none; touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Whole-lane interaction and turn feedback. */
+.queue-column { position: relative; width: 100%; height: 100%; transition: background .16s, box-shadow .16s; cursor: pointer; }
+.queue-column:not(:disabled):hover { background: #e5d8c5; box-shadow: inset 0 0 0 1px #cba77c; }
+.queue-column:not(:disabled):active { background: #dec8a9; }
+.queue-column:focus-visible { outline: 3px solid #527f70; outline-offset: 1px; }
+.queue-column:disabled { cursor: default; }
+.queue-column:disabled .queue-front { opacity: .6; }
+.queue-front { pointer-events: none; animation: queue-arrive .2s ease-out; }
+.queue-back { pointer-events: none; }
+.game-page[aria-busy='true'] .queue-column { cursor: wait; }
+.game-page[aria-busy='true'] .queue-column .queue-front { opacity: 1; }
+.order-card { animation: order-arrive .3s cubic-bezier(.2,.9,.3,1.2); }
+.tray-slots li { animation: slot-arrive .25s ease-out; }
+.tray--expanded { animation: expand-glow .6s ease-out; }
+.result-panel { animation: result-arrive .4s cubic-bezier(.2,.9,.3,1.2); }
+.result-stars { animation: stars-arrive .6s cubic-bezier(.2,.9,.3,1.3); }
+.game-status--blocked .result-panel, .game-status--gameover .result-panel { animation: gentle-shake .32s ease-out; }
+.primary-button:not(:disabled):active, .expand-button:not(:disabled):active { transform: scale(.96); }
+.flying-donut { position: fixed; z-index: 100; width: 20px; height: 21px; pointer-events: none; filter: drop-shadow(0 3px 3px #72502b44); }
+.flying-donut .donut { width: 100%; height: 100%; }
+.effect-particle { position: fixed; z-index: 101; width: 5px; height: 5px; border-radius: 50%; pointer-events: none; }
+.confetti { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; }
+.confetti span { position: absolute; top: -16px; width: 7px; height: 12px; border-radius: 2px; animation: confetti-fall 1.7s ease-in forwards; }
+@keyframes queue-arrive { from { transform: translateY(6px) scale(.8); opacity: .3; } to { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes order-arrive { from { opacity: .25; transform: translateY(-5px) scale(.95); } to { opacity: 1; transform: none; } }
+@keyframes slot-arrive { from { transform: scale(.8); } to { transform: scale(1); } }
+@keyframes expand-glow { 30% { box-shadow: 0 0 0 5px #a8d8c866; } to { box-shadow: 0 0 0 0 #a8d8c800; } }
+@keyframes result-arrive { from { opacity: 0; transform: translateY(15px) scale(.9); } to { opacity: 1; transform: none; } }
+@keyframes stars-arrive { from { opacity: 0; transform: scale(.4) rotate(-12deg); } to { opacity: 1; transform: none; } }
+@keyframes gentle-shake { 25% { transform: translateX(-4px); } 60% { transform: translateX(4px); } to { transform: none; } }
+@keyframes confetti-fall { 0% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translate(35px, 100dvh) rotate(540deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .confetti, .effect-particle, .flying-donut { display: none; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

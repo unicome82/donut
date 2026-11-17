@@ -3,11 +3,13 @@ import { Donut } from './Donut/Donut';
 import { donutThemes } from './Donut/donutThemes';
 export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[][]; disabled: boolean; onSelect: (queueIndex: number, expectedDonutId: string) => void }) {
   const depth = Math.max(1, ...queues.map(queue => queue.length));
-  const rows = `44px repeat(${Math.max(0, depth - 1)}, minmax(0, 22px))`;
-  return <section className="queue-section" aria-label="도넛 대기열 — 맨 앞 도넛 선택">
-    <div className="queue-grid">{queues.map((queue, i) => <div className="queue-column" key={i} style={{ gridTemplateRows: depth === 1 ? '44px' : rows }}>
-      {queue.map((donut, depth) => depth === 0 ? <button className="queue-front" key={donut.id} disabled={disabled} onClick={() => onSelect(i, donut.id)} aria-label={`${i + 1}번 대기열 ${donutThemes[donut.type].name} 도넛 선택`}><Donut type={donut.type} /></button> : <div className={`queue-back queue-back--${depth}`} key={donut.id}><Donut type={donut.type} /></div>)}
-      {queue.length === 0 && <span className="queue-empty" aria-label={`${i + 1}번 대기열 비어 있음`}>—</span>}
-    </div>)}</div>
+  return <section className="queue-section" aria-label="도넛 대기열 — 세로줄 어디서나 맨 위 도넛 선택">
+    <div className="queue-grid">{queues.map((queue, i) => <button type="button" className="queue-column" key={i}
+      style={{ gridTemplateRows: depth === 1 ? '44px' : `44px repeat(${depth - 1}, minmax(0, 22px))` }}
+      disabled={disabled || !queue.length} onClick={() => { const front = queue[0]; if (front) onSelect(i, front.id); }}
+      aria-label={`${i + 1}번 대기열, ${queue[0] ? `${donutThemes[queue[0].type].name} 도넛 선택, ${queue.length}개 남음` : '비어 있음'}`}>
+      {queue.map((donut, position) => <span className={position === 0 ? 'queue-front' : 'queue-back'} key={donut.id} data-token-id={donut.id}><Donut type={donut.type} /></span>)}
+      {queue.length === 0 && <span className="queue-empty">—</span>}
+    </button>)}</div>
   </section>;
 }
