@@ -126,3 +126,22 @@ progress::-moz-progress-bar { background: var(--primary); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Playable prototype states */
+.play-guide { font-size: 11px; color: #796453; line-height: 1.7; text-align: center; padding: 14px 0 0; }
+.queue-front:not(:disabled):hover { transform: translateY(-3px); }
+.queue-front:not(:disabled):active { transform: scale(.92); }
+.queue-front:disabled { opacity: .5; }
+.queue-front:focus-visible { border-radius: 50%; }
+.expand-button { min-height: 44px; }
+.expand-button:disabled { opacity: .5; }
+.order-items { flex-wrap: wrap; padding: 8px 0; }
+.order-items li { flex-shrink: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.result-panel { border: 1px solid #e4c3b0; background: #fff1e2; padding: 24px 20px 12px; border-radius: 18px; margin-top: 18px; text-align: center; }
+.result-panel h2 { font-size: 21px; letter-spacing: -.8px; margin-top: 10px; }
+.result-panel > p:not(.eyebrow):not(.result-stars) { color: #846d57; font-size: 12px; line-height: 1.8; margin-top: 12px; }
+.result-panel .result-stars { color: #b77c24; font-size: 30px; letter-spacing: 7px; margin-top: 14px; }
+.result-actions { display: grid; gap: 4px; }
+.result-actions .primary-button { margin-top: 18px; }
+.result-actions .secondary-button { margin-top: 4px; }
