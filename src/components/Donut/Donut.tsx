@@ -4,7 +4,6 @@ const decorations = [[27, 27, -20], [48, 18, 20], [73, 28, 50], [81, 49, -15], [
 export function Donut({ type, className = '' }: { type: DonutType; className?: string }) {
   const theme = donutThemes[type];
   return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
-    <g transform="translate(33.333333 34.666667) scale(0.33333333)">
     <ellipse cx="50" cy="95" rx="31" ry="5" fill="#6c4230" opacity=".09" />
     <path d="M50 5a45 45 0 1 1 0 90 45 45 0 0 1 0-90m0 31a14 14 0 1 0 0 28 14 14 0 0 0 0-28" fill="#d89e60" fillRule="evenodd" />
     <path d="M50 6C74 6 92 23 93 46S76 90 51 90 8 74 7 49 25 6 50 6m0 29a15 15 0 1 0 0 30 15 15 0 0 0 0-30" fill="#edbc7f" fillRule="evenodd" />
@@ -16,7 +15,6 @@ export function Donut({ type, className = '' }: { type: DonutType; className?: s
         : theme.pattern === 'chunks' ? <rect key={i} x={x-3} y={y-3} width="6" height="6" rx="1" transform={`rotate(${rotation} ${x} ${y})`} stroke="none" />
         : theme.pattern === 'dots' || theme.pattern === 'berries' ? <circle key={i} cx={x} cy={y} r={theme.pattern === 'berries' ? 3.5 : 1.5} stroke="none" />
         : <rect key={i} x={x-3} y={y-1.2} width="7" height="2.5" rx="1.25" transform={`rotate(${rotation} ${x} ${y})`} stroke="none" />)}
-    </g>
     </g>
   </svg>;
 }
