@@ -9,7 +9,6 @@ export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[
       disabled={disabled || !queue.length} onClick={() => { const front = queue[0]; if (front) onSelect(i, front.id); }}
       aria-label={`${i + 1}번 대기열, ${queue[0] ? `${itemNames[queue[0].type]} 선택, ${queue.length}개 남음` : '비어 있음'}`}>
       {queue.map((donut, position) => <span className={position === 0 ? 'queue-front' : 'queue-back'} key={donut.id} data-token-id={donut.id}><Donut type={donut.type} /></span>)}
-      {queue.length === 0 && <span className="queue-empty">—</span>}
     </button>)}</div>
   </section>;
 }

@@ -110,11 +110,11 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
+      {status === 'blocked' && <button type="button" className="expand-button" aria-label="2칸 늘리기" onClick={() => act({ type: 'EXPAND_TRAY' })}><span aria-hidden="true">+2</span> 늘리기</button>}
       <div className="result-actions">
-        {status === 'blocked' && <button className="primary-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
-        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>}
+        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>레벨 선택</button>}
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
