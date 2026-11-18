@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { ShopArt } from '../components/ShopArt';
 import { ShopAwning } from '../components/ShopAwning';
 import { Icon } from '../components/Icon';
@@ -76,17 +77,26 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
     gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 도넛을 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
-  const illustratedResult = failed || status === 'clear';
+  const [presentedClear, setPresentedClear] = useState<GameState | null>(null);
+  const waitingForGoodbye = status === 'clear' && presentedClear !== state;
+  const showResult = !playing && !waitingForGoodbye;
+  const illustratedResult = showResult && (failed || status === 'clear');
   const stars = status === 'clear' ? getStars(state) : 0;
   const lastLevel = state.levelId === levels[levels.length - 1]?.id;
   useEffect(() => {
-    if (state.status !== 'playing') resultHeading.current?.focus();
-  }, [state.status]);
-  return <main className={`game-page game-status--${state.status}`} ref={root}>
+    if (state.status !== 'clear') return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = setTimeout(() => setPresentedClear(state), reduceMotion ? 0 : CUSTOMER_GOODBYE_MS);
+    return () => clearTimeout(timer);
+  }, [state]);
+  useEffect(() => {
+    if (showResult) resultHeading.current?.focus();
+  }, [showResult, status]);
+  return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {illustratedResult && <ShopAwning />}
     <GameHeader level={state.levelId} completed={state.completedOrders} target={level.targetOrders} onBack={onLevels} />
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
-    {!playing && <section className="result-panel" aria-labelledby="result-heading">
+    {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
       </div>}
@@ -107,11 +117,11 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
         {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>}
       </div>
     </section>}
-    {(playing || state.status === 'clear') && <div className="game-board">
+    {(playing || waitingForGoodbye) && <div className="game-board">
     <OrderBoard orders={state.orders} definitions={level.orders} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} expandUsed={state.expandUsed} disabled={!playing} onExpand={() => { void act({ type: 'EXPAND_TRAY' }); }} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
-    {state.status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
+    {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
   </main>;
 }

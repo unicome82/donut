@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
+import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { DonutBox } from './DonutBox';
 import { Customer } from './Customer';
@@ -39,16 +40,17 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
       container.append(leaving);
       animations.push(leaving.animate([
         { transform: 'translateX(0)', opacity: 1 },
-        { transform: 'translateX(0)', opacity: 1, offset: .56 },
+        { transform: 'translateX(0)', opacity: 1, offset: .76 },
         { transform: 'translateX(-22px)', opacity: 0 },
-      ], { duration: 300, easing: 'ease-in', fill: 'both' }));
+      ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-in', fill: 'both' }));
     }
-    animations.push(current.animate([
+    const arriving = current.querySelector('.customer-scene') ?? current;
+    animations.push(arriving.animate([
       { transform: 'translateX(22px)', opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: 160, delay: leaving ? 210 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    ], { duration: 160, delay: leaving ? CUSTOMER_GOODBYE_MS - 80 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, 520);
+    const timeout = setTimeout(cleanup, CUSTOMER_GOODBYE_MS + 200);
     cancel.current = () => { clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [order]);
