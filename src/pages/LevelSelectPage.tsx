@@ -6,7 +6,7 @@ export function LevelSelectPage({ onBack, onGame, stars }: { onBack: () => void;
   const nextLevel = levels.find(level => isUnlocked(level.id, stars) && !stars[level.id]);
   return <main className="level-page">
     <header className="level-hero">
-      <button className="icon-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
+      <button className="icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
       <h1 lang="en">Level Select</h1>
     </header>
     <div className="level-list">{levels.map(level => {

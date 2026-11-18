@@ -67,6 +67,11 @@
   color: #904a36;
 }
 .icon-button:disabled { opacity: .35; }
+.back-button {
+  background: #fff9f3ed;
+  color: #865335;
+  box-shadow: 0 2px 7px #71492b30;
+}
 .donut { display: block; width: 100%; height: auto; }
 .donut--widened { scale: 1.18 1; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -155,15 +160,10 @@
   background: #9bdbfa url('../assets/game/level-select.webp') center center / cover no-repeat;
   mask-image: linear-gradient(#000 73%, transparent 100%);
 }
-.level-hero .icon-button {
+.level-hero .back-button {
   position: absolute;
   top: max(14px, calc(env(safe-area-inset-top) + 8px));
   left: max(14px, env(safe-area-inset-left));
-  width: 38px;
-  height: 38px;
-  background: #fff9f3ed;
-  color: #865335;
-  box-shadow: 0 2px 7px #71492b30;
 }
 .level-hero h1 {
   position: relative;
@@ -223,7 +223,11 @@
   gap: var(--gap);
   padding-top: max(8px, env(safe-area-inset-top));
 }
-.game-status--playing { padding-bottom: 0; overflow: clip; }
+.game-status--playing {
+  background-image: url('../assets/game/cafe-playing.webp');
+  padding-bottom: 0;
+  overflow: clip;
+}
 .game-page:has(> .shop-awning) { padding-top: 0; }
 .game-page > .shop-awning { flex: none; }
 .game-header {
@@ -331,7 +335,6 @@
   height: 7px;
   background: #fffdf9;
 }
-.customer-greeting { color: #a63759; font: 400 22px / 1 var(--level-script); }
 .order-items {
   display: flex;
   flex-wrap: wrap;

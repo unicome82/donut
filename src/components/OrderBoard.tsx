@@ -1,5 +1,5 @@
 import displayShelf from '../assets/game/display-shelf.webp';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
@@ -8,52 +8,42 @@ import { levels } from '../game/levels';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
 const ARRIVAL_DURATION = 160;
-const GREETING_DURATION = 450;
+const FIRST_ARRIVAL_STAGGER = 130;
+const BUBBLE_FADE_DURATION = 180;
 const ORDER_PREVIEW_DURATION = 250;
 
 function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
-  const greetedOrder = useRef<string | undefined>(undefined);
-  const [revealedOrder, setRevealedOrder] = useState<string>();
   const orderId = order?.definitionId;
 
-  useEffect(() => {
-    const replacingCustomer = Boolean(greetedOrder.current && greetedOrder.current !== orderId);
-    greetedOrder.current = orderId;
-    if (!orderId) return;
-    const animateArrival = typeof root.current?.animate === 'function'
-      && document.visibilityState === 'visible'
-      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const leadIn = animateArrival ? ARRIVAL_DURATION + (replacingCustomer ? CUSTOMER_GOODBYE_MS : 0) : 0;
-    const timer = setTimeout(() => setRevealedOrder(orderId), leadIn + GREETING_DURATION);
-    return () => clearTimeout(timer);
-  }, [orderId]);
-  useEffect(() => {
-    if (!orderId || revealedOrder !== orderId) return;
-    const timer = setTimeout(() => onOrderReady(orderId), ORDER_PREVIEW_DURATION);
-    return () => clearTimeout(timer);
-  }, [onOrderReady, orderId, revealedOrder]);
-  useEffect(() => () => cancel.current?.(), []);
+  useLayoutEffect(() => () => {
+    cancel.current?.();
+    previous.current = null;
+  }, []);
   useLayoutEffect(() => {
     const container = root.current;
     const current = container?.querySelector<HTMLElement>('.customer-visit');
     if (!container || !current) return;
     const old = previous.current;
-    const changed = old && old.id !== order?.definitionId;
-    previous.current = { id: order?.definitionId, node: current.cloneNode(true) as HTMLElement };
-    if (!changed && old) return;
+    previous.current = { id: orderId, node: current.cloneNode(true) as HTMLElement };
+    if (old?.id === orderId) return;
     cancel.current?.();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !current.animate || document.visibilityState !== 'visible') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !current.animate || document.visibilityState !== 'visible') {
+      if (orderId) {
+        const ready = setTimeout(() => onOrderReady(orderId), ORDER_PREVIEW_DURATION);
+        cancel.current = () => clearTimeout(ready);
+      }
+      return;
+    }
     const animations: Animation[] = [];
     let leaving: HTMLElement | undefined;
-    if (changed && old.id) {
+    if (old?.id) {
       leaving = old.node;
       leaving.classList.add('customer-leaving');
       leaving.setAttribute('aria-hidden', 'true');
       const bubble = leaving.querySelector<HTMLElement>('.speech-bubble');
-      if (bubble) bubble.style.visibility = 'hidden';
       const scene = leaving.querySelector('.customer-scene');
       if (scene) {
         const hearts = document.createElement('span');
@@ -68,32 +58,42 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: A
         scene.append(hearts);
       }
       container.append(leaving);
+      if (bubble) {
+        animations.push(bubble.animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: BUBBLE_FADE_DURATION, easing: 'ease-out', fill: 'both',
+        }));
+      }
       animations.push(leaving.animate([
         { transform: 'translateX(0)', opacity: 1 },
         { transform: 'translateX(0)', opacity: 1, offset: .76 },
         { transform: 'translateX(-22px)', opacity: 0 },
       ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-in', fill: 'both' }));
     }
-    const departureDuration = leaving ? CUSTOMER_GOODBYE_MS : 0;
-    const arriving = current.querySelector('.customer-scene') ?? current;
-    animations.push(arriving.animate([
-      { transform: 'translateX(22px)', opacity: 0 },
-      { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: ARRIVAL_DURATION, delay: departureDuration, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
-    const nextBubble = current.querySelector('.speech-bubble');
-    if (order && nextBubble) {
-      animations.push(nextBubble.animate(
-        [{ visibility: 'hidden' }, { visibility: 'hidden' }],
-        { duration: departureDuration + ARRIVAL_DURATION, fill: 'backwards' },
-      ));
+    const arrivalDelay = leaving ? CUSTOMER_GOODBYE_MS : old ? 0 : slot * FIRST_ARRIVAL_STAGGER;
+    let animationDuration = leaving ? CUSTOMER_GOODBYE_MS : 0;
+    let ready: ReturnType<typeof setTimeout> | undefined;
+    if (orderId) {
+      const scene = current.querySelector('.customer-scene');
+      const bubble = current.querySelector('.speech-bubble');
+      const fadeDelay = arrivalDelay + ARRIVAL_DURATION;
+      if (scene) animations.push(scene.animate([
+        { transform: 'translateX(22px)', opacity: 0 },
+        { transform: 'translateX(0)', opacity: 1 },
+      ], { duration: ARRIVAL_DURATION, delay: arrivalDelay, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+      if (bubble) animations.push(bubble.animate([
+        { opacity: 0, visibility: 'hidden' },
+        { opacity: 1, visibility: 'visible' },
+      ], { duration: BUBBLE_FADE_DURATION, delay: fadeDelay, easing: 'ease-out', fill: 'both' }));
+      animationDuration = fadeDelay + BUBBLE_FADE_DURATION;
+      ready = setTimeout(() => onOrderReady(orderId), animationDuration + ORDER_PREVIEW_DURATION);
     }
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, departureDuration + ARRIVAL_DURATION + 100);
-    cancel.current = () => { clearTimeout(timeout); cleanup(); };
+    const timeout = setTimeout(cleanup, animationDuration + 100);
+    cancel.current = () => { clearTimeout(ready); clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
-  }, [order]);
+  }, [onOrderReady, order, orderId, slot]);
   return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
-    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble">{revealedOrder === orderId ? <ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul> : <span className="customer-greeting" lang="en">Hi!</span>}</div></> : null}</div>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : null}</div>
   </article>;
 }
 export function OrderBoard({ orders, levelId, onOrderReady }: { orders: Array<ActiveOrder | null>; levelId: number; onOrderReady: (id: string) => void }) {
