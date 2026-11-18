@@ -271,6 +271,12 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
 });
 
 describe('세션 진행', () => {
+  it('게임 시작 직후 첫 주문과 대기열 선두에 크루아상과 아이스 아메리카노가 있다', () => {
+    const { game } = reduceSession(createSession(), { type: 'START', levelId: 1 });
+    expect(game.orders[0]?.remaining).toMatchObject({ croissant: 2, americano: 1 });
+    expect(game.queues.map(queue => queue[0]?.type)).toEqual(expect.arrayContaining(['croissant', 'americano']));
+  });
+
   it('잠긴 레벨과 범위 밖 레벨 진입을 막는다', () => {
     const session = createSession();
     expect(reduceSession(session, { type: 'START', levelId: 5 })).toBe(session);

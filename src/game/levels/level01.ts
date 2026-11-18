@@ -3,10 +3,10 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level01: LevelDefinition = {
   "id": 1,
-  "revision": 6,
+  "revision": 7,
   "donutTypes": [
-    "strawberry",
-    "chocolate",
+    "croissant",
+    "americano",
     "vanilla",
     "matcha",
     "blueberry",
@@ -72,27 +72,27 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q0-p2",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q0-p3",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q0-p4",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q0-p5",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q0-p6",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q0-p7",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q8-p11",
@@ -122,11 +122,11 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q9-p0",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p1",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q1-p0",
@@ -134,23 +134,23 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q9-p2",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p3",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p4",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p5",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p6",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q1-p1",
@@ -198,45 +198,45 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q9-p7",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p8",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p9",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p10",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p11",
-        "type": "strawberry"
+        "type": "croissant"
       },
       {
         "id": "l1-r4-q9-p12",
-        "type": "strawberry"
+        "type": "croissant"
       }
     ],
     [
       {
         "id": "l1-r4-q2-p0",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q2-p1",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q2-p2",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q2-p3",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q2-p4",
@@ -270,11 +270,11 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q3-p0",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q3-p1",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q3-p2",
@@ -362,15 +362,15 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q5-p0",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q5-p1",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q5-p2",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l1-r4-q5-p3",
@@ -531,8 +531,8 @@ export const level01: LevelDefinition = {
       "id": "l1-o1",
       "sequence": 1,
       "items": {
-        "strawberry": 2,
-        "chocolate": 1
+        "croissant": 2,
+        "americano": 1
       }
     },
     {
@@ -546,7 +546,7 @@ export const level01: LevelDefinition = {
       "id": "l1-o3",
       "sequence": 3,
       "items": {
-        "strawberry": 5,
+        "croissant": 5,
         "vanilla": 2
       }
     },
@@ -554,7 +554,7 @@ export const level01: LevelDefinition = {
       "id": "l1-o4",
       "sequence": 4,
       "items": {
-        "chocolate": 8
+        "americano": 8
       }
     },
     {
