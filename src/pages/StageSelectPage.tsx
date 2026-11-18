@@ -14,46 +14,49 @@ export function StageSelectPage({ onBack, onGame, stars }: { onBack: () => void;
   const currentStage = getCurrentStage(stars);
   const currentRow = Math.floor(stageOptions.findIndex(stage => stage.id === currentStage) / columns);
   const list = useRef<HTMLDivElement>(null);
-  const [viewport, setViewport] = useState({ top: currentRow * rowHeight, height: rowHeight });
-  const padding = Math.max(0, (viewport.height - rowHeight) / 2);
-  const firstRow = Math.max(0, Math.floor((viewport.top - padding) / rowHeight) - overscan);
-  const lastRow = Math.min(rowCount, Math.ceil((viewport.top + viewport.height - padding) / rowHeight) + overscan);
+  const [viewport, setViewport] = useState({ top: currentRow * rowHeight, height: 0 });
+  const firstRow = Math.min(rowCount - 1, Math.max(0, Math.floor(viewport.top / rowHeight) - overscan));
+  const lastRow = Math.max(firstRow + 1, Math.min(rowCount, Math.ceil((viewport.top + viewport.height) / rowHeight) + overscan));
 
   useLayoutEffect(() => {
     const element = list.current;
     if (!element) return;
-    const observer = new ResizeObserver(() => {
-      setViewport({ top: element.scrollTop, height: element.clientHeight });
+    const measure = () => setViewport({
+      top: -element.getBoundingClientRect().top,
+      height: window.innerHeight,
     });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  useLayoutEffect(() => {
-    const element = list.current;
-    if (!element) return;
-    element.scrollTop = currentRow * rowHeight;
-  }, [currentRow, viewport.height]);
+    const rowTop = window.scrollY + element.getBoundingClientRect().top + currentRow * rowHeight;
+    window.scrollTo(0, rowTop - (window.innerHeight - rowHeight) / 2);
+    measure();
+    window.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('scroll', measure);
+      window.removeEventListener('resize', measure);
+      window.scrollTo(0, 0);
+    };
+  }, [currentRow]);
 
   function goToProgress() {
     const element = list.current;
     if (!element) return;
-    element.scrollTop = currentRow * rowHeight;
-    setViewport({ top: element.scrollTop, height: element.clientHeight });
+    const rowTop = window.scrollY + element.getBoundingClientRect().top + currentRow * rowHeight;
+    window.scrollTo(0, rowTop - (window.innerHeight - rowHeight) / 2);
     element.focus({ preventScroll: true });
   }
 
   return <main className="stage-page">
-    <header className="stage-hero">
+    <div className="stage-back">
       <button className="icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
+    </div>
+    <header className="stage-hero">
       <h1 lang="en">Stage Select</h1>
     </header>
     <div className="stage-navigation">
       <button type="button" className="secondary-button" onClick={goToProgress}>내 진행 위치</button>
     </div>
-    <div ref={list} className="stage-scroll" tabIndex={0} aria-label="스테이지 목록" role="region"
-      onScroll={event => setViewport({ top: event.currentTarget.scrollTop, height: event.currentTarget.clientHeight })}>
-      <div className="stage-list" style={{ gridAutoRows: rowHeight, paddingTop: padding + firstRow * rowHeight, paddingBottom: padding + (rowCount - lastRow) * rowHeight }}>
+    <div ref={list} className="stage-list" tabIndex={-1} aria-label="스테이지 목록" role="region"
+      style={{ gridAutoRows: rowHeight, paddingTop: firstRow * rowHeight, paddingBottom: (rowCount - lastRow) * rowHeight }}>
         {stageOptions.slice(firstRow * columns, lastRow * columns).map(stage => {
           const practice = stage.id === practiceStage.id;
           const unlocked = isUnlocked(stage.id, stars);
@@ -69,7 +72,6 @@ export function StageSelectPage({ onBack, onGame, stars }: { onBack: () => void;
             </span> : <span className="stage-lock"><Icon name="lock" /></span>}
           </button>;
         })}
-      </div>
     </div>
   </main>;
 }
