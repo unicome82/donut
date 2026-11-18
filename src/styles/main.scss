@@ -9,7 +9,7 @@
   --secondary-text: #76452d;
   --level-script: Lobster, 'Brush Script MT', cursive;
   --level-script-size: clamp(27px, 7vw, 33px);
-  --page-height: 100dvh;
+  --page-height: max(100dvh, var(--ios-full-height, 0px));
   --safe-top: env(safe-area-inset-top, 0px);
   --button-stack-gap: clamp(13px, 2dvh, 18px);
   --gutter: clamp(10px, 4vw, 18px);
@@ -19,7 +19,7 @@
 }
 
 @media (display-mode: standalone) {
-  :root { --page-height: max(100dvh, 100lvh, 100vh); }
+  :root { --page-height: max(100dvh, 100lvh, 100vh, var(--ios-full-height, 0px)); }
   :root:has(.start-page) { background-color: #c5e9ff; }
   :root:has(.level-page) { background-color: #fff4f7; }
   :root:has(.game-page) { background-color: #fae2d2; }
