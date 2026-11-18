@@ -19,8 +19,8 @@ import { createEffects } from '../effects/turnEffects';
 const TRAY_PICKUP_DELAY = 200;
 const PICKUP_INTERVAL = 200;
 
-interface Props { state: GameState; score: number; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
-export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
+interface Props { state: GameState; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
+export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -128,11 +128,11 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
-    {(!showResult || status !== 'clear') && <GameHeader level={state.levelId} score={score} onBack={onLevels} />}
-    <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
+    {(!showResult || status !== 'clear') && <GameHeader level={state.levelId} onBack={onLevels} />}
+    <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
-        {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><img src={rewardStar} alt="" draggable={false} /></span>)}
+        {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
       {failed && <Customer sequence={status === 'blocked' ? 4 : 2} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>

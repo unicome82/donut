@@ -1,3 +1,4 @@
+import rewardStar from '../assets/game/reward-star.webp';
 import { Icon } from '../components/Icon';
 import { levels, practiceLevel } from '../game/levels';
 import { isUnlocked } from '../game/session';
@@ -18,7 +19,7 @@ export function LevelSelectPage({ onBack, onGame, stars }: { onBack: () => void;
         aria-label={`레벨 ${level.id}, ${description}`} onClick={() => onGame(level.id)} disabled={!unlocked}>
         <span className="level-index" lang="en">Level {String(level.id).padStart(2, '0')}</span>
         {unlocked ? <span className="level-stars" aria-hidden="true">
-          {[0, 1, 2].map(index => <span key={index} className={index < score ? 'level-star--earned' : undefined}><Icon name="star" /></span>)}
+          {[0, 1, 2].map(index => <span key={index} className={index < score ? undefined : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
         </span> : <span className="level-lock"><Icon name="lock" /></span>}
       </button>;
     })}

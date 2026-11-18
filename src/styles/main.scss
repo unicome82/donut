@@ -6,6 +6,7 @@
   --border: #efd7c1;
   --text: #512b20;
   --pink: #d83261;
+  --secondary-text: #76452d;
   --level-script: Lobster, 'Brush Script MT', cursive;
   --level-script-size: clamp(27px, 7vw, 33px);
   --gutter: clamp(10px, 4vw, 18px);
@@ -42,7 +43,15 @@
   line-height: 1.2;
 }
 .primary-button { color: white; background: linear-gradient(#e94873, #cb2b57); box-shadow: 0 3px #ac204640; }
-.secondary-button { color: #164d3a; background: linear-gradient(#e1f4e9, #c6e8d8); box-shadow: 0 2px #86b8a926; }
+.secondary-button {
+  color: var(--secondary-text);
+  background: linear-gradient(var(--secondary-top, #fff), var(--secondary-bottom, #fff6ef));
+  border: 1px solid #fffdf9;
+  box-shadow: inset 0 1px #fff, inset 0 -2px #a66b4318, 0 2px #d6a3807a, 0 4px 7px #a46a4938;
+}
+.secondary-button:not(:disabled):active {
+  box-shadow: inset 0 2px 3px #a66b432e, 0 1px #d6a3807a, 0 2px 4px #a46a4926;
+}
 .primary-button:not(:disabled):active, .secondary-button:not(:disabled):active { transform: translateY(2px); }
 .icon-button {
   display: grid;
@@ -107,9 +116,9 @@
   margin-bottom: max(clamp(20px, 8dvh, 64px), env(safe-area-inset-bottom));
 }
 .level-button {
-  --button-depth: #529b92;
-  background: linear-gradient(120deg, #a6efd6, #ace5ff 54%, #ddd1ff);
-  color: #21464c;
+  --button-depth: #c76c6f;
+  background: linear-gradient(120deg, #ffdb9e, #ffbc9d 49%, #ffa9cb);
+  color: #70352e;
   border: 2px solid #fffdf4;
   min-height: 58px;
   font-family: var(--level-script);
@@ -124,11 +133,9 @@
   box-shadow: inset 0 2px 4px #2d15365c, inset 0 -2px 1px #2d153633, 0 1px var(--button-depth), 0 3px 5px #371d2e35;
 }
 .start-actions .secondary-button {
-  background: rgb(255 255 255 / .74);
+  --secondary-top: rgb(255 255 255 / .88);
+  --secondary-bottom: rgb(255 247 240 / .72);
   backdrop-filter: blur(8px);
-  color: #563829;
-  border: 1px solid #ffffff9e;
-  box-shadow: 0 3px 7px #371d2e2c;
 }
 
 .level-page {
@@ -198,8 +205,8 @@
 .level-option:disabled { color: #98776a; }
 .level-index { font-size: clamp(14px, 4.4vw, 22px); font-weight: 800; white-space: nowrap; }
 .level-stars { display: flex; gap: 2px; }
-.level-stars svg { width: clamp(16px, 4.8vw, 24px); height: auto; color: #b77e76; fill: #f4d9d4; }
-.level-stars .level-star--earned svg { color: #ca6c13; fill: #ffbd39; }
+.level-stars img { display: block; width: clamp(16px, 4.8vw, 24px); height: auto; }
+.star--unearned img { filter: grayscale(.85); opacity: .28; }
 .level-practice-label { color: #8a6254; font-size: 12px; }
 .level-lock { color: #b2988f; }
 .level-lock svg { width: clamp(18px, 5vw, 24px); height: auto; }
@@ -237,20 +244,6 @@
   text-shadow: 0 2px 2px #422137, 0 0 8px #422137a8;
   white-space: nowrap;
 }
-.score-count {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  justify-self: end;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: #fffdf8;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.score-count svg { width: 19px; height: 19px; fill: #ffc45c; color: #98602a; }
-.score-count strong { font-size: 16px; }
 .game-board {
   display: grid;
   flex: 1;
@@ -470,7 +463,6 @@
   padding-bottom: max(clamp(12px, 6dvh, 46px), env(safe-area-inset-bottom));
 }
 .game-status--clear .result-panel {
-  --clear-text: #76452d;
   flex: 0 1 auto;
   align-content: safe center;
   gap: clamp(8px, 1.7dvh, 14px);
@@ -487,7 +479,6 @@
   filter: drop-shadow(0 2px 2px #b480363d);
   animation: clear-scale-in 520ms cubic-bezier(.22,.72,.26,1) var(--star-delay, 300ms) both;
 }
-.result-stars > :not(.result-star--earned) img { filter: grayscale(.85); opacity: .28; }
 .result-stars > :nth-child(2) { --star-delay: 510ms; }
 .result-stars > :nth-child(3) { --star-delay: 720ms; }
 @keyframes clear-scale-in {
@@ -496,7 +487,7 @@
   100% { opacity: 1; scale: 1; }
 }
 .result-panel .clear-title {
-  color: var(--clear-text);
+  color: var(--secondary-text);
   font-family: var(--level-script);
   font-size: clamp(34px, 10vw, 48px);
   line-height: 1.05;
@@ -516,12 +507,6 @@
 }
 .game-status--clear .result-actions > :nth-child(2) { --action-delay: 550ms; }
 .game-status--clear .result-actions > :nth-child(3) { --action-delay: 670ms; }
-.game-status--clear .result-actions .secondary-button {
-  border: 1px solid #fffaf4;
-  background: #fff;
-  color: var(--clear-text);
-  box-shadow: 0 3px 5px #b8784d30;
-}
 .result-character { object-fit: contain; width: min(65%, 192px); height: clamp(60px, 21dvh, 170px); }
 .result-tray { display: flex; align-items: center; justify-content: center; gap: 3px; width: min(100%, 205px); min-height: 38px; padding: 4px 6px 7px; }
 .result-tray .donut { width: min(15%, 25px); }
