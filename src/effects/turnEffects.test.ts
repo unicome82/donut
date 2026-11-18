@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createEffects, MATCH_DURATION, MOVE_DURATION } from './turnEffects';
 import { createGame } from '../game/engine';
-import { level01 } from '../game/levels/level01';
+import { stage01 } from '../game/stages/stage01';
 
 function scene(reduced = false) {
   const calls: KeyframeAnimationOptions[] = [];
@@ -24,7 +24,7 @@ function scene(reduced = false) {
       return { finished: Promise.resolve(), cancel() { lifecycle.push('cancel'); }, finish() { /* already finished */ } };
     }
   }
-  const state = createGame(level01);
+  const state = createGame(stage01);
   const source = new FakeElement(); source.dataset.tokenId = state.queues[0]?.[0]?.id ?? '';
   const tray = new FakeElement();
   const order = new FakeElement();

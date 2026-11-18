@@ -4,7 +4,7 @@ import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
 import { itemNames } from './Donut/donutThemes';
-import { levels } from '../game/levels';
+import { stages } from '../game/stages';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
 const ARRIVAL_DURATION = 160;
@@ -96,8 +96,8 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: A
     <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : null}</div>
   </article>;
 }
-export function OrderBoard({ orders, levelId, onOrderReady }: { orders: Array<ActiveOrder | null>; levelId: number; onOrderReady: (id: string) => void }) {
-  const portraitOffset = levels.filter(level => level.id < levelId).reduce((total, level) => total + level.targetOrders, 0);
+export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
+  const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
   return <section className="order-section" aria-label="손님 주문">
     <div className="order-grid">
       {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} />)}

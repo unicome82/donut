@@ -1,5 +1,8 @@
+import { solutions as generatedSolutions } from './generated.json';
+
 // Test-only zero-based queue choices.
 export const solutions: Record<number, number[]> = {
+  ...generatedSolutions,
   "1": [
     5,
     5,

@@ -10,7 +10,7 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getLevel, levels } from '../game/levels';
+import { getStage, stages } from '../game/stages';
 import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -19,8 +19,8 @@ import { createEffects } from '../effects/turnEffects';
 const TRAY_PICKUP_DELAY = 200;
 const PICKUP_INTERVAL = 200;
 
-interface Props { state: GameState; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
-export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
+interface Props { state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
+export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -56,13 +56,13 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       nextPickupAt.current = 0;
     }
     const current = latest.current;
-    const currentLevel = getLevel(current.levelId);
+    const currentStage = getStage(current.stageId);
     const committedAction: GameAction = action.type === 'SELECT_DONUT' ? { ...action, type: 'QUEUE_DONUT' } : action;
     const result = action.type === 'SELECT_DONUT'
-      ? selectDonut(current, currentLevel, action.queueIndex, action.expectedDonutId, true)
-      : action.type === 'TRAY_READY' ? matchTray(current, currentLevel, action.donutId, true)
-      : action.type === 'PICKUP_TRAY' ? pickupTray(current, currentLevel, action.readyOrders)
-      : action.type === 'EXPAND_TRAY' ? expandTray(current, currentLevel) : null;
+      ? selectDonut(current, currentStage, action.queueIndex, action.expectedDonutId, true)
+      : action.type === 'TRAY_READY' ? matchTray(current, currentStage, action.donutId, true)
+      : action.type === 'PICKUP_TRAY' ? pickupTray(current, currentStage, action.readyOrders)
+      : action.type === 'EXPAND_TRAY' ? expandTray(current, currentStage) : null;
     if (!result) { dispatch(action); return; }
     if (result.state === current || !root.current) return;
     if (action.type === 'TRAY_READY') {
@@ -83,7 +83,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
     });
     void feedback.catch(() => undefined).finally(() => {
       if (!activeEffects.current.delete(effects)) return;
-      if (!mounted.current || !moved || latest.current.levelId !== current.levelId) {
+      if (!mounted.current || !moved || latest.current.stageId !== current.stageId) {
         effects.cleanup();
         return;
       }
@@ -96,7 +96,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       // Start the pickup delay when the real token becomes visible in the tray.
       const timer = setTimeout(() => {
         matchTimers.current.delete(timer);
-        if (mounted.current && latest.current.levelId === current.levelId) act({ type: 'TRAY_READY', donutId: moved.donutId });
+        if (mounted.current && latest.current.stageId === current.stageId) act({ type: 'TRAY_READY', donutId: moved.donutId });
       }, TRAY_PICKUP_DELAY);
       matchTimers.current.add(timer);
     });
@@ -108,7 +108,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   const resultTitles = {
     ready: '다시 도전해요',
     paused: '다시 도전해요',
-    clear: 'Level Clear!',
+    clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
     gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
@@ -117,7 +117,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   const waitingForGoodbye = status === 'clear' && presentedClear !== state;
   const showResult = !playing && !waitingForGoodbye;
   const stars = status === 'clear' ? getStars(state) : 0;
-  const lastLevel = state.levelId === levels[levels.length - 1]?.id;
+  const lastStage = state.stageId === stages[stages.length - 1]?.id;
   useEffect(() => {
     if (state.status !== 'clear') return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -128,7 +128,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
-    {(!showResult || status !== 'clear') && <GameHeader level={state.levelId} onBack={onLevels} />}
+    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
@@ -136,7 +136,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>}
       {status === 'gameover' && <Customer sequence={2} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : status === 'blocked' ? 'tray-full-title' : undefined}>
-        {status === 'clear' && lastLevel ? 'All Levels Clear!' : resultTitles[status]}
+        {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
@@ -144,14 +144,14 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
-        {status === 'blocked' && <button type="button" className="primary-button level-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
-        {status === 'clear' && !lastLevel && <button className="primary-button level-button" onClick={onNext}><span>Level {String(state.levelId + 1).padStart(2, '0')}</span></button>}
+        {status === 'blocked' && <button type="button" className="primary-button stage-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
+        {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
-        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>{status === 'clear' && <Icon name="list" />}레벨 선택</button>}
+        {status !== 'blocked' && <button className="secondary-button" onClick={onStages}>{status === 'clear' && <Icon name="list" />}스테이지 선택</button>}
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard orders={state.orders} levelId={state.levelId} onOrderReady={onOrderReady} />
+    <OrderBoard orders={state.orders} stageId={state.stageId} onOrderReady={onOrderReady} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

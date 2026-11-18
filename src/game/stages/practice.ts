@@ -1,7 +1,7 @@
 import { BASE_TRAY_CAPACITY, QUEUE_COUNT } from '../constants';
-import type { LevelDefinition } from '../types';
+import type { StageDefinition } from '../types';
 
-export const practiceLevel: LevelDefinition = {
+export const practiceStage: StageDefinition = {
   id: 0,
   revision: 2,
   donutTypes: ['strawberry', 'chocolate'],

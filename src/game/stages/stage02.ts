@@ -1,7 +1,8 @@
-import type { LevelDefinition } from '../types';
+import { BASE_TRAY_CAPACITY } from '../constants';
+import type { StageDefinition } from '../types';
 
 // Fixed clustered runs; witness solutions are replayed in engine tests.
-export const level02: LevelDefinition = {
+export const stage02: StageDefinition = {
   "id": 2,
   "revision": 8,
   "donutTypes": [
@@ -15,7 +16,7 @@ export const level02: LevelDefinition = {
     "berryScone"
   ],
   "targetOrders": 10,
-  "trayCapacity": 40,
+  "trayCapacity": BASE_TRAY_CAPACITY,
   "queues": [
     [
       {
