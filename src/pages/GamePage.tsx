@@ -1,3 +1,4 @@
+import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
@@ -82,13 +83,16 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     });
     void feedback.catch(() => undefined).finally(() => {
       if (!activeEffects.current.delete(effects)) return;
-      effects.cleanup();
-      if (!mounted.current || !moved || latest.current.levelId !== current.levelId) return;
+      if (!mounted.current || !moved || latest.current.levelId !== current.levelId) {
+        effects.cleanup();
+        return;
+      }
       flushSync(() => setInFlight(previous => {
         const next = new Set(previous);
         next.delete(moved.donutId);
         return next;
       }));
+      effects.cleanup();
       // Start the pickup delay when the real token becomes visible in the tray.
       const timer = setTimeout(() => {
         matchTimers.current.delete(timer);
@@ -129,10 +133,10 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
-        {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
+        {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
       {failed && <Customer sequence={status === 'blocked' ? 4 : 2} className="result-character" />}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'level-badge clear-title' : undefined}>
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>
         {status === 'clear' && lastLevel ? 'All Levels Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && <div className="result-desserts" aria-hidden="true">

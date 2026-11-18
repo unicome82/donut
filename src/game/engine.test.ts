@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createGame, expandTray, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, isUnlocked, reduceSession } from './session';
-import { levels } from './levels';
+import { levels, practiceLevel } from './levels';
 import { solutions } from './levels/solutions';
 import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
 import { validateLevel } from './validation';
@@ -300,6 +300,20 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
 });
 
 describe('세션 진행', () => {
+  it('테스트 레벨은 손님 한 명의 디저트 하나로 완료되며 일반 진행에 영향을 주지 않는다', () => {
+    const initial = createSession();
+    const practice = reduceSession(initial, { type: 'START', levelId: practiceLevel.id });
+    const queueIndex = practice.game.queues.findIndex(queue => queue.length > 0);
+    const front = practice.game.queues[queueIndex]?.[0];
+    if (!front) throw new Error('테스트 디저트가 없습니다.');
+    expect(practice.game.orders.filter(Boolean)).toHaveLength(1);
+    const cleared = reduceSession(practice, { type: 'GAME', action: { type: 'SELECT_DONUT', queueIndex, expectedDonutId: front.id } });
+    expect(cleared.game.status).toBe('clear');
+    expect(getStars(cleared.game)).toBe(3);
+    expect(cleared.score).toBe(initial.score);
+    expect(cleared.stars).toEqual(initial.stars);
+  });
+
   it('게임 시작 직후 첫 주문과 대기열 선두에 크루아상과 초코 아이스크림가 있다', () => {
     const { game } = reduceSession(createSession(), { type: 'START', levelId: 1 });
     expect(game.orders[0]?.remaining).toMatchObject({ croissant: 2, chocolateIceCream: 1 });

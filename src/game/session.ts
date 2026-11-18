@@ -1,5 +1,5 @@
 import { createGame, getStars } from './engine';
-import { getLevel, levels } from './levels';
+import { getLevel, levels, practiceLevel } from './levels';
 import { reduceGame, type GameAction } from './reducer';
 import type { GameState } from './types';
 
@@ -21,6 +21,7 @@ export function createSession(): SessionState {
   return { screen: 'start', game: createGame(getLevel(1)), stars: {}, score: 0 };
 }
 export function isUnlocked(id: number, stars: Record<number, number>): boolean {
+  if (id === practiceLevel.id) return true;
   return levels.some(level => level.id === id) && (id === 1 || (stars[id - 1] ?? 0) > 0);
 }
 export function reduceSession(state: SessionState, action: SessionAction): SessionState {
@@ -33,6 +34,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       if (state.screen !== 'game') return state;
       const game = reduceGame(state.game, action.action, getLevel(state.game.levelId));
       if (game === state.game) return state;
+      if (game.levelId === practiceLevel.id) return { ...state, game };
       const stars = game.status === 'clear'
         ? { ...state.stars, [game.levelId]: Math.max(state.stars[game.levelId] ?? 0, getStars(game)) }
         : state.stars;

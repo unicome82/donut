@@ -1,5 +1,5 @@
 import { Icon } from '../components/Icon';
-import { levels } from '../game/levels';
+import { levels, practiceLevel } from '../game/levels';
 import { isUnlocked } from '../game/session';
 
 export function LevelSelectPage({ onBack, onGame, stars }: { onBack: () => void; onGame: (id: number) => void; stars: Record<number, number> }) {
@@ -21,6 +21,11 @@ export function LevelSelectPage({ onBack, onGame, stars }: { onBack: () => void;
           {[0, 1, 2].map(index => <span key={index} className={index < score ? 'level-star--earned' : undefined}><Icon name="star" /></span>)}
         </span> : <span className="level-lock"><Icon name="lock" /></span>}
       </button>;
-    })}</div>
+    })}
+      <button type="button" className="level-option" aria-label="Level 00 테스트" onClick={() => onGame(practiceLevel.id)}>
+        <span className="level-index" lang="en">Level 00</span>
+        <span className="level-practice-label">테스트</span>
+      </button>
+    </div>
   </main>;
 }

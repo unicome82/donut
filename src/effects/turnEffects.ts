@@ -1,7 +1,7 @@
 import type { GameEvent } from '../game/engine';
 import type { GameState } from '../game/types';
 
-export const MOVE_DURATION = 75;
+export const MOVE_DURATION = 135;
 export const MATCH_DURATION = 160;
 
 export function createEffects() {
@@ -33,26 +33,50 @@ export function createEffects() {
   function tokenElement(root: HTMLElement, id: string) {
     return Array.from(root.querySelectorAll<HTMLElement>('[data-token-id]')).find(el => el.dataset.tokenId === id);
   }
-  async function fly(origin: HTMLElement, target: Element, via?: Element) {
+  async function fly(origin: HTMLElement, target: Element, via?: Element, landing?: () => Element | null) {
     const artwork = origin.querySelector('img, svg');
     if (!artwork || disposed || reduceMotion()) return;
     const from = artwork.getBoundingClientRect();
-    const to = target.getBoundingClientRect();
+    if (!from.width || !from.height) return;
     const ghost = document.createElement('span');
     ghost.className = 'flying-donut'; ghost.setAttribute('aria-hidden', 'true');
     ghost.append(artwork.cloneNode(true));
     ghost.style.left = `${from.x}px`; ghost.style.top = `${from.y}px`;
     ghost.style.width = `${from.width}px`; ghost.style.height = `${from.height}px`;
     document.body.append(ghost); elements.add(ghost);
-    const x = to.x + to.width / 2 - (from.x + from.width / 2);
-    const y = to.y + to.height / 2 - (from.y + from.height / 2);
-    const frames: Keyframe[] = [{ transform: 'translate(0,0)', opacity: 1 }];
+
+    // The source is captured before React replaces it. Measure the real tray art after it commits.
+    if (landing) await Promise.resolve();
+    if (disposed) return;
+    const landedArt = landing?.();
+    const to = (landedArt ?? target).getBoundingClientRect();
+    const x = to.x + (to.width - from.width) / 2 - from.x;
+    const y = to.y + (to.height - from.height) / 2 - from.y;
+    const endScaleX = landedArt ? to.width / from.width : 1;
+    const endScaleY = landedArt ? to.height / from.height : 1;
+    const end = `translate(${x}px,${y}px) scale(${endScaleX},${endScaleY})`;
+    const frames: Keyframe[] = [{ transform: 'translate(0,0) scale(1)' }];
     if (via) {
       const middle = via.getBoundingClientRect();
-      frames.push({ transform: `translate(${middle.x + middle.width / 2 - from.x - from.width / 2}px,${middle.y + middle.height / 2 - from.y - from.height / 2}px)`, opacity: 1, offset: .5 });
+      frames.push({ transform: `translate(${middle.x + middle.width / 2 - from.x - from.width / 2}px,${middle.y + middle.height / 2 - from.y - from.height / 2}px)`, offset: .5 });
+    } else if (landing) {
+      const arc = Math.min(16, Math.abs(x) * .055);
+      frames.push({
+        transform: `translate(${x * .65}px,${y * .65 - arc}px) scale(${(1 + endScaleX) / 2},${(1 + endScaleY) / 2})`,
+        offset: .56,
+      });
     }
-    frames.push({ transform: `translate(${x}px,${y}px)`, opacity: 1 });
+    frames.push({ transform: end });
     await animate(ghost, frames, via ? MATCH_DURATION : MOVE_DURATION);
+
+    // An earlier pickup can compact the tray while this dessert is still in flight.
+    const latest = landing?.()?.getBoundingClientRect();
+    if (landedArt && latest && Math.hypot(latest.x - to.x, latest.y - to.y) > 1) {
+      await animate(ghost, [
+        { transform: end },
+        { transform: `translate(${x + latest.x - to.x}px,${y + latest.y - to.y}px) scale(${endScaleX},${endScaleY})` },
+      ], 65);
+    }
   }
   async function play(root: HTMLElement, before: GameState, events: GameEvent[]) {
     if (reduceMotion()) return;
@@ -70,7 +94,13 @@ export function createEffects() {
       const origin = tokenElement(root, moved.donutId);
       const match = events.find(event => event.type === 'consumed' && event.donutId === moved.donutId);
       const target = match?.type === 'consumed' ? targetOrder(match.orderId) : null;
-      if (origin && traySlot) jobs.push(fly(origin, target ?? traySlot, target ? traySlot : undefined));
+      if (origin && traySlot) {
+        const landing = target ? undefined : () => {
+          const tray = root.querySelector<HTMLElement>('.tray');
+          return tray ? tokenElement(tray, moved.donutId)?.querySelector('img, svg') ?? null : null;
+        };
+        jobs.push(fly(origin, target ?? traySlot, target ? traySlot : undefined, landing));
+      }
     }
     // Match existing tray tokens concurrently. Feedback never adds a second input lock.
     for (const event of events) {

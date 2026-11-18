@@ -3,7 +3,7 @@ import { BASE_TRAY_CAPACITY, QUEUE_COUNT, MAX_ORDER_QUANTITY } from './constants
 export function validateLevel(level: LevelDefinition): string[] {
   const errors: string[] = [];
   const validPositive = (n: number) => Number.isInteger(n) && n > 0;
-  if (!validPositive(level.id) || !validPositive(level.revision)) errors.push('레벨 ID와 revision은 양의 정수여야 합니다.');
+  if (!Number.isInteger(level.id) || level.id < 0 || !validPositive(level.revision)) errors.push('레벨 ID는 0 이상의 정수이고 revision은 양의 정수여야 합니다.');
   if (!validPositive(level.targetOrders) || level.orders.length !== level.targetOrders) errors.push('목표 주문 수가 일치하지 않습니다.');
   if (level.queues.length !== QUEUE_COUNT) errors.push(`대기열은 ${QUEUE_COUNT}개여야 합니다.`);
   if (level.trayCapacity !== BASE_TRAY_CAPACITY) errors.push('기본 트레이는 40칸이어야 합니다.');
