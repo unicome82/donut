@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
-import { ShopArt } from '../components/ShopArt';
+import { Customer } from '../components/Customer';
 import { ShopAwning } from '../components/ShopAwning';
 import { Icon } from '../components/Icon';
 import { Donut } from '../components/Donut/Donut';
@@ -100,7 +100,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
       </div>}
-      {failed && <ShopArt art={status === 'blocked' ? 'tray-full' : 'try-again'} className="result-character" />}
+      {failed && <Customer sequence={status === 'blocked' ? 10 : 2} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{status === 'clear' && lastLevel ? '전체 클리어!' : resultTitles[status]}</h2>
       {status === 'clear' && <>
         <Donut type="strawberry" className="result-donut" />
@@ -118,7 +118,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard orders={state.orders} />
+    <OrderBoard orders={state.orders} levelId={state.levelId} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} expandUsed={state.expandUsed} disabled={!playing} onExpand={() => { void act({ type: 'EXPAND_TRAY' }); }} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

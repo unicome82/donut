@@ -229,7 +229,6 @@
 .order-items strong { font-size: clamp(12px, 4vw, 16px); font-variant-numeric: tabular-nums; }
 .customer-scene { position: relative; grid-row: 2; width: min(100%, 145px); height: 100%; }
 .customer-scene .customer { position: absolute; bottom: 0; left: 14%; width: 72%; height: 100%; object-fit: contain; object-position: center bottom; }
-.customer[data-mirrored=true] { transform: scaleX(-1); }
 .order-delivery { position: absolute; left: 50%; bottom: 16%; width: 1px; height: 1px; pointer-events: none; }
 .customer-leaving { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .customer-hearts { position: absolute; left: 4px; top: 0; color: #cc3f68; animation: customer-thanks .3s ease-out both; font-size: 18px; }
