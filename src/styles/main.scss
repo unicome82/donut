@@ -195,7 +195,7 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.score-count > span { font-size: 11px; font-weight: 700; }
+.score-count svg { width: 19px; height: 19px; fill: #ffc45c; color: #98602a; }
 .score-count strong { font-size: 16px; }
 .game-board {
   display: grid;
@@ -277,9 +277,11 @@
   gap: 2px 3px;
 }
 .order-items li { display: flex; flex: none; align-items: center; gap: 1px; }
-.order-items .donut { width: clamp(21px, 5.65vw, 28px); }
+.order-items:has(> li:nth-child(2):last-child) { flex-direction: column; flex-wrap: nowrap; }
+.order-items .donut { width: clamp(25px, 7vw, 33px); }
+.order-items:has(> li:nth-child(3)) .donut { width: clamp(20px, 5.6vw, 26px); }
 .order-items strong {
-  font-size: clamp(19px, 4.9vw, 25px);
+  font-size: clamp(14px, 4vw, 18px);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -468,18 +470,17 @@
 
 @media (max-width: 360px) {
   .order-items { column-gap: 2px; }
-  .order-items .donut { width: 18px; }
 }
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
   .app-shell { width: min(100%, 820px); }
   .start-actions { width: min(86%, 230px); margin-bottom: max(16px, env(safe-area-inset-bottom)); }
   .start-poster { object-fit: contain; mask-image: none; }
   .level-list { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: none; }
-  .game-board { grid-template-rows: clamp(112px, 32dvh, 146px) auto minmax(0, 1fr); }
+  .game-board { grid-template-rows: clamp(131px, 39dvh, 166px) auto minmax(0, 1fr); }
   .order-grid { max-width: 360px; margin-inline: auto; padding-bottom: 30px; }
-  .display-shelf { height: 55px; width: min(100%, 360px); }
-  .order-items .donut { width: 22px; }
-  .order-items strong { font-size: 20px; }
+  .display-shelf { height: 49px; width: min(100%, 360px); }
+  .order-items .donut { width: 26px; }
+  .order-items strong { font-size: 16px; }
   .queue-column { --queue-head: 33px; --queue-step: 22px; }
   .queue-front .donut, .queue-back .donut { width: 31px; }
   .result-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; max-height: 100%; }
