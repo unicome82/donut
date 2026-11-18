@@ -219,10 +219,10 @@
 .level-stars { display: flex; gap: 2px; }
 .level-stars img { display: block; width: clamp(16px, 4.8vw, 24px); height: auto; }
 .star--unearned img { filter: grayscale(.85); opacity: .28; }
-.level-option--next .star--unearned img {
-  filter: grayscale(1) brightness(.62);
-  opacity: .46;
+.level-stars .star--unearned img {
+  filter: grayscale(1) sepia(.45) saturate(1.6) hue-rotate(300deg) brightness(.68);
 }
+.level-option--next .star--unearned img { opacity: .38; }
 .level-practice-label { color: #8a6254; font-size: 12px; }
 .level-lock { color: #b2988f; }
 .level-lock svg { width: clamp(18px, 5vw, 24px); height: auto; }
