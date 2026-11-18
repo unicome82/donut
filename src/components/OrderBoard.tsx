@@ -44,13 +44,22 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
         { transform: 'translateX(-22px)', opacity: 0 },
       ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-in', fill: 'both' }));
     }
+    const arrivalDuration = 160;
+    const departureDuration = leaving ? CUSTOMER_GOODBYE_MS : 0;
     const arriving = current.querySelector('.customer-scene') ?? current;
     animations.push(arriving.animate([
       { transform: 'translateX(22px)', opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: 160, delay: leaving ? CUSTOMER_GOODBYE_MS - 80 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    ], { duration: arrivalDuration, delay: departureDuration, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    const nextBubble = current.querySelector('.speech-bubble');
+    if (leaving && nextBubble) {
+      animations.push(nextBubble.animate(
+        [{ visibility: 'hidden' }, { visibility: 'hidden' }],
+        { duration: departureDuration + arrivalDuration, fill: 'backwards' },
+      ));
+    }
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, CUSTOMER_GOODBYE_MS + 200);
+    const timeout = setTimeout(cleanup, departureDuration + arrivalDuration + 100);
     cancel.current = () => { clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [order]);
