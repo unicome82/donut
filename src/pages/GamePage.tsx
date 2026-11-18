@@ -134,8 +134,8 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      {failed && <Customer sequence={status === 'blocked' ? 4 : 2} className="result-character" />}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>
+      {status === 'gameover' && <Customer sequence={2} className="result-character" />}
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : status === 'blocked' ? 'tray-full-title' : undefined}>
         {status === 'clear' && lastLevel ? 'All Levels Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
@@ -144,7 +144,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
-        {status === 'blocked' && <button type="button" className="primary-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
+        {status === 'blocked' && <button type="button" className="primary-button level-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastLevel && <button className="primary-button level-button" onClick={onNext}><span>Level {String(state.levelId + 1).padStart(2, '0')}</span></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>{status === 'clear' && <Icon name="list" />}레벨 선택</button>}
