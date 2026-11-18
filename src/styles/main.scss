@@ -209,7 +209,7 @@
 .speech-bubble::before, .speech-bubble::after {
   content: '';
   position: absolute;
-  left: calc(50% - 11px);
+  left: calc(50% - 5px);
   bottom: -7px;
   width: 13px;
   height: 8px;
@@ -217,7 +217,7 @@
   clip-path: polygon(0 0, 100% 0, 35% 100%);
 }
 .speech-bubble::after {
-  left: calc(50% - 10px);
+  left: calc(50% - 4px);
   bottom: -5px;
   width: 10px;
   height: 7px;
@@ -228,28 +228,11 @@
 .order-items .donut { width: clamp(16px, 5vw, 25px); }
 .order-items strong { font-size: clamp(12px, 4vw, 16px); font-variant-numeric: tabular-nums; }
 .customer-scene { position: relative; grid-row: 2; width: min(100%, 145px); height: 100%; }
-.customer-scene .customer { position: absolute; bottom: 0; left: 0; width: 72%; height: 100%; object-fit: contain; object-position: center bottom; }
+.customer-scene .customer { position: absolute; bottom: 0; left: 14%; width: 72%; height: 100%; object-fit: contain; object-position: center bottom; }
 .customer[data-mirrored=true] { transform: scaleX(-1); }
-.donut-box { position: absolute; bottom: 0; right: 0; width: 59%; height: clamp(25px, 5.8dvh, 47px); }
-.box-art { display: block; width: 100%; height: 100%; }
-.box-front { position: absolute; inset: 0; pointer-events: none; }
-.box-lid { transform-origin: center bottom; }
-.box-inside {
-  position: absolute;
-  left: 11%;
-  right: 14%;
-  top: 42%;
-  height: 24%;
-  display: grid;
-  grid-template: repeat(2, minmax(0, 1fr)) / repeat(6, minmax(0, 1fr));
-  place-items: center;
-  transform: rotate(4deg);
-}
-.box-donut { display: grid; place-items: center; align-self: center; justify-self: center; width: 175%; height: 0; }
-.box-donut .donut { width: 100%; transform: translateY(-50%) scaleY(.68); }
+.order-delivery { position: absolute; left: 50%; bottom: 16%; width: 1px; height: 1px; pointer-events: none; }
 .customer-leaving { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .customer-hearts { position: absolute; left: 4px; top: 0; color: #cc3f68; animation: customer-thanks .3s ease-out both; font-size: 18px; }
-.customer-satisfied .box-lid { transform: scaleY(.48) translateY(10%); }
 .sold-sign {
   position: relative;
   grid-row: 1 / -1;
@@ -377,8 +360,8 @@
   transform: rotate(-3deg);
 }
 .result-panel .result-order-count strong { display: block; font-size: 25px; }
-.result-character, .result-box { object-fit: contain; width: min(65%, 192px); height: clamp(60px, 21dvh, 170px); }
-.result-box { height: clamp(48px, 16dvh, 145px); }
+.result-character { object-fit: contain; width: min(65%, 192px); height: clamp(60px, 21dvh, 170px); }
+.result-donut { width: clamp(44px, 12dvh, 100px); }
 .result-tray { display: flex; align-items: center; justify-content: center; gap: 3px; width: min(100%, 205px); min-height: 38px; padding: 4px 6px 7px; }
 .result-tray .donut { width: min(15%, 25px); }
 .result-actions { display: grid; width: min(100%, 260px); gap: 8px; }
@@ -407,8 +390,8 @@
   .result-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; max-height: 100%; }
   .result-actions { grid-column: 2; grid-row: 1 / span 4; align-self: center; }
   .result-panel > :not(.result-actions) { grid-column: 1; }
-  .result-panel:not(:has(img)) { grid-template-columns: 1fr; }
-  .result-panel:not(:has(img)) .result-actions { grid-area: auto; }
+  .result-panel:not(:has(.result-character, .result-stars)) { grid-template-columns: 1fr; }
+  .result-panel:not(:has(.result-character, .result-stars)) .result-actions { grid-area: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

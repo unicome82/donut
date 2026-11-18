@@ -63,7 +63,7 @@ export function createEffects() {
     for (const event of events) if (event.type === 'orderAdded') slots.set(event.orderId, event.slot);
     const targetOrder = (id: string) => {
       const card = root.querySelector(`[data-order-slot="${slots.get(id)}"]`);
-      return card?.querySelector('.donut-box') ?? card;
+      return card?.querySelector('.order-delivery') ?? card;
     };
     const jobs: Promise<unknown>[] = [];
     if (moved) {
@@ -78,7 +78,6 @@ export function createEffects() {
         const target = targetOrder(event.orderId);
         if (target) {
           burst(target);
-          jobs.push(animate(target, [{ transform: 'scale(1)' }, { transform: 'scale(1.025)', offset: .5 }, { transform: 'scale(1)' }], MOVE_DURATION));
           if (event.donutId !== moved?.donutId) {
             const origin = tokenElement(root, event.donutId);
             if (origin) jobs.push(fly(origin, target));

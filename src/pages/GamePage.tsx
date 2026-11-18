@@ -103,7 +103,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       {failed && <ShopArt art={status === 'blocked' ? 'tray-full' : 'try-again'} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{status === 'clear' && lastLevel ? '전체 클리어!' : resultTitles[status]}</h2>
       {status === 'clear' && <>
-        <ShopArt art="order-complete" className="result-box" />
+        <Donut type="strawberry" className="result-donut" />
         <p className="result-order-count">주문 완료 <strong>{state.completedOrders} / {level.targetOrders}</strong></p>
       </>}
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
@@ -118,7 +118,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard orders={state.orders} definitions={level.orders} />
+    <OrderBoard orders={state.orders} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} expandUsed={state.expandUsed} disabled={!playing} onExpand={() => { void act({ type: 'EXPAND_TRAY' }); }} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
