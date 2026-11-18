@@ -68,6 +68,14 @@
 .donut { display: block; width: 100%; height: auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
+@font-face {
+  font-family: Lobster;
+  src: url('../assets/fonts/lobster-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 .start-page {
   container-type: inline-size;
   position: relative;
@@ -97,8 +105,33 @@
   width: min(86%, 306px);
   margin-bottom: max(clamp(20px, 8dvh, 64px), env(safe-area-inset-bottom));
 }
-.start-actions .primary-button { background: var(--start-button); color: white; border: 2px solid #fffdf4; min-height: 53px; font-size: 19px; box-shadow: 0 4px 9px #371d2e42; }
-.start-actions .secondary-button { background: #fff9f1; color: #563829; border: 1px solid #fff; box-shadow: 0 3px 7px #371d2e38; }
+.start-actions .primary-button {
+  --button-depth: color-mix(in srgb, var(--start-button), #261328 38%);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--start-button), #fff 32%) 0%,
+    var(--start-button) 52%,
+    var(--button-depth) 100%);
+  color: white;
+  border: 2px solid #fffdf4;
+  min-height: 58px;
+  font-family: Lobster, 'Brush Script MT', cursive;
+  font-size: clamp(27px, 7vw, 33px);
+  font-weight: 400;
+  line-height: 1;
+  text-shadow: 0 2px 2px #3715288a;
+  box-shadow: inset 0 2px 1px #fff6, inset 0 -4px 1px #2d15363b, 0 3px var(--button-depth), 0 8px 12px #371d2e40;
+}
+.start-actions .primary-button:active {
+  box-shadow: inset 0 2px 4px #2d15365c, inset 0 -2px 1px #2d153633, 0 1px var(--button-depth), 0 3px 5px #371d2e35;
+}
+.start-actions .secondary-button {
+  background: #fff9f1b8;
+  color: #563829;
+  border: 1px solid #ffffff9e;
+  box-shadow: 0 3px 7px #371d2e2c;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
 
 .header-row, .game-header { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .header-row { justify-content: space-between; margin-block: 14px 10px; }
