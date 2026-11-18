@@ -170,6 +170,7 @@
   padding-top: max(8px, env(safe-area-inset-top));
   background: #fae2d2 url('../assets/game/cafe.webp') center top / cover no-repeat;
 }
+.game-status--playing { padding-bottom: 0; overflow: clip; }
 .game-page:has(> .shop-awning) { padding-top: 0; }
 .game-page > .shop-awning { flex: none; }
 .game-header { flex: none; }
@@ -387,7 +388,7 @@
   filter: drop-shadow(1px 1px 0 #a9653e60);
 }
 
-.queue-section { overflow-y: auto; min-width: 0; scrollbar-width: thin; scrollbar-color: #d79283 transparent; }
+.queue-section { overflow: clip; min-width: 0; min-height: 0; }
 .queue-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; min-height: 100%; }
 .queue-column {
   --queue-head: clamp(30px, 9vw, 42px);
@@ -397,9 +398,10 @@
   justify-items: center;
   align-items: center;
   min-width: 0;
-  padding: 2px 1px 8px;
+  padding: 2px 1px 0;
   border: 1px solid #f0dac3;
-  border-radius: 9px;
+  border-bottom: 0;
+  border-radius: 9px 9px 0 0;
   background: linear-gradient(#ffedda, #fff9ed);
 }
 .queue-column:focus-visible { outline-offset: -3px; }
