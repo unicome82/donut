@@ -231,7 +231,38 @@
 .customer-scene .customer { position: absolute; bottom: 0; left: 14%; width: 72%; height: 100%; object-fit: contain; object-position: center bottom; }
 .order-delivery { position: absolute; left: 50%; bottom: 16%; width: 1px; height: 1px; pointer-events: none; }
 .customer-leaving { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.customer-hearts { position: absolute; left: 4px; top: 0; color: #cc3f68; animation: customer-thanks .3s ease-out both; font-size: 18px; }
+.customer-hearts {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.customer-hearts > span {
+  --heart-x: 0px;
+  --heart-y: -18px;
+  --heart-tilt: 0deg;
+  position: absolute;
+  color: #dc3867;
+  font-size: 17px;
+  line-height: 1;
+  text-shadow: 0 1px 1px #97254c44, 0 0 3px #fff9ee;
+  animation: customer-thanks .66s cubic-bezier(.18,.72,.32,1) both;
+}
+.customer-hearts .customer-heart--center { color: #c82e59; font-size: 25px; }
+.customer-hearts :is(.customer-heart--left, .customer-heart--right) { animation-delay: .055s; }
+.customer-hearts .customer-heart--left { --heart-x: -25px; --heart-tilt: -20deg; --heart-y: -12px; }
+.customer-hearts .customer-heart--right { --heart-x: 25px; --heart-tilt: 20deg; --heart-y: -12px; }
+.customer-hearts .customer-heart--spark-left, .customer-hearts .customer-heart--spark-right {
+  --heart-y: -27px;
+  color: #bc7110;
+  font-size: 12px;
+  animation-duration: .49s;
+  animation-delay: .11s;
+}
+.customer-hearts .customer-heart--spark-left { --heart-x: -37px; }
+.customer-hearts .customer-heart--spark-right { --heart-x: 37px; }
 .sold-sign {
   position: relative;
   grid-row: 1 / -1;
@@ -371,7 +402,12 @@
 .confetti { position: fixed; inset: 0; z-index: 90; overflow: hidden; pointer-events: none; }
 .confetti span { position: absolute; top: -16px; width: 7px; height: 12px; border-radius: 2px; animation: confetti-fall 1.7s ease-in forwards; }
 @keyframes result-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@keyframes customer-thanks { from { opacity: 0; transform: translateY(5px) scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes customer-thanks {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.35); }
+  28% { opacity: 1; transform: translate(-50%, -50%) translate(var(--heart-x), var(--heart-y)) rotate(var(--heart-tilt)) scale(1.2); }
+  65% { opacity: 1; transform: translate(-50%, -50%) translate(var(--heart-x), calc(var(--heart-y) - 2px)) rotate(var(--heart-tilt)) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--heart-x), calc(var(--heart-y) - 5px)) rotate(var(--heart-tilt)) scale(.85); }
+}
 @keyframes confetti-fall { 85% { opacity: 1; } 100% { transform: translate(35px, 100dvh) rotate(540deg); opacity: 0; } }
 
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {

@@ -32,7 +32,14 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
       const scene = leaving.querySelector('.customer-scene');
       if (scene) {
         const hearts = document.createElement('span');
-        hearts.className = 'customer-hearts'; hearts.textContent = '♥ ♥';
+        hearts.className = 'customer-hearts';
+        hearts.setAttribute('aria-hidden', 'true');
+        for (const [direction, glyph] of [['left', '♥'], ['center', '♥'], ['right', '♥'], ['spark-left', '✦'], ['spark-right', '✦']] as const) {
+          const particle = document.createElement('span');
+          particle.className = `customer-heart--${direction}`;
+          particle.textContent = glyph;
+          hearts.append(particle);
+        }
         scene.append(hearts);
       }
       container.append(leaving);
