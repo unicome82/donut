@@ -1,9 +1,9 @@
+import clearDesserts from '../assets/game/clear-desserts.webp';
 import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Customer } from '../components/Customer';
-import { ShopAwning } from '../components/ShopAwning';
 import { Icon } from '../components/Icon';
 import { Donut } from '../components/Donut/Donut';
 import { GameHeader } from '../components/GameHeader';
@@ -128,7 +128,6 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
-    {showResult && failed && <ShopAwning />}
     {(!showResult || status !== 'clear') && <GameHeader level={state.levelId} score={score} onBack={onLevels} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
@@ -139,17 +138,13 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>
         {status === 'clear' && lastLevel ? 'All Levels Clear!' : resultTitles[status]}
       </h2>
-      {status === 'clear' && <div className="result-desserts" aria-hidden="true">
-        <Donut type="blueberryCupcake" />
-        <Donut type="cake" />
-        <Donut type="chocolateIceCream" />
-      </div>}
+      {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
-      {status === 'blocked' && <button type="button" className="expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
       <div className="result-actions">
+        {status === 'blocked' && <button type="button" className="primary-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastLevel && <button className="primary-button level-button" onClick={onNext}><span>Level {String(state.levelId + 1).padStart(2, '0')}</span></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>{status === 'clear' && <Icon name="list" />}레벨 선택</button>}

@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { memo, useId } from 'react';
 import type { DonutType } from '../../game/types';
 import { donutThemes } from './donutThemes';
 const decorations = [[27, 27, -20], [48, 18, 20], [73, 28, 50], [81, 49, -15], [71, 73, 40], [47, 81, -20], [25, 68, 30], [18, 47, 65]] as const;
@@ -19,7 +19,7 @@ const narrowDesserts = new Set<DonutType>([
 ]);
 const menuImages = import.meta.glob<string>('../../assets/menu/*.webp', { eager: true, import: 'default', query: '?url&no-inline' });
 
-export function Donut({ type, className = '', useMenuArt = true }: { type: DonutType; className?: string; useMenuArt?: boolean }) {
+export const Donut = memo(function Donut({ type, className = '', useMenuArt = true }: { type: DonutType; className?: string; useMenuArt?: boolean }) {
   const glaze = useId();
   const image = menuImages[`../../assets/menu/${type}.webp`];
   if (useMenuArt && image) {
@@ -47,4 +47,4 @@ export function Donut({ type, className = '', useMenuArt = true }: { type: Donut
         <path key={x} d={toppingShapes[theme.pattern]} transform={`translate(${x} ${y}) rotate(${rotation})`} />)}
     </g>
   </svg>;
-}
+});

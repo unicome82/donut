@@ -97,19 +97,32 @@ function updateStatus(state: GameState, level: LevelDefinition, events: GameEven
 export function selectDonut(state: GameState, level: LevelDefinition, queueIndex: number, expectedDonutId: string, deferMatch = false): TransitionResult {
   const front = Number.isInteger(queueIndex) ? state.queues[queueIndex]?.[0] : undefined;
   if (state.status !== 'playing' || state.levelId !== level.id || !front || front.id !== expectedDonutId || state.tray.length >= state.trayCapacity) return { state, events: [] };
+  const events: GameEvent[] = [{ type: 'moved', donutId: front.id, queueIndex }];
+  if (deferMatch) {
+    const queues = state.queues.slice();
+    queues[queueIndex] = queues[queueIndex]!.slice(1);
+    return {
+      state: {
+        ...state,
+        queues,
+        tray: [...state.tray, front],
+        transitionId: state.transitionId + 1,
+        pendingMatchIds: [...(state.pendingMatchIds ?? []), front.id],
+      },
+      events,
+    };
+  }
   const next = structuredClone(state);
   next.queues[queueIndex]?.shift();
   next.tray.push({ ...front });
   next.transitionId += 1;
-  const events: GameEvent[] = [{ type: 'moved', donutId: front.id, queueIndex }];
-  if (deferMatch) next.pendingMatchIds = [...(next.pendingMatchIds ?? []), front.id];
-  else settle(next, level, events);
+  settle(next, level, events);
   return { state: next, events };
 }
 
 export function matchTray(state: GameState, level: LevelDefinition, donutId: string, deferPickup = false): TransitionResult {
   if (state.status !== 'playing' || !state.pendingMatchIds?.includes(donutId) || state.levelId !== level.id) return { state, events: [] };
-  const next = structuredClone(state);
+  const next = deferPickup ? { ...state } : structuredClone(state);
   next.pendingMatchIds = next.pendingMatchIds?.filter(id => id !== donutId);
   next.transitionId += 1;
   const events: GameEvent[] = [];
