@@ -66,10 +66,24 @@ function settle(state: GameState, level: LevelDefinition, events: GameEvent[]): 
     }
     if (!changed) break;
   }
+  updateStatus(state, level, events);
+}
+
+// Find the oldest matchable token. An older token with no active order can wait in the tray.
+function firstPickup(state: GameState) {
+  const orders = state.orders.filter((order): order is ActiveOrder => order !== null)
+    .sort((a, b) => a.sequence - b.sequence);
+  for (const [index, token] of state.tray.entries()) {
+    const order = orders.find(candidate => (candidate.remaining[token.type] ?? 0) > 0);
+    if (order) return { index, token, order };
+  }
+}
+
+function updateStatus(state: GameState, level: LevelDefinition, events: GameEvent[]) {
   if (state.completedOrders === level.targetOrders) {
     state.status = 'clear';
     events.push({ type: 'levelCleared' });
-  } else if (state.pendingMatchIds?.length) {
+  } else if (state.pendingMatchIds?.length || firstPickup(state)) {
     state.status = 'playing';
   } else if (state.queues.every(queue => queue.length === 0)) {
     state.status = 'gameover';
@@ -93,13 +107,43 @@ export function selectDonut(state: GameState, level: LevelDefinition, queueIndex
   return { state: next, events };
 }
 
-export function matchTray(state: GameState, level: LevelDefinition, donutId: string): TransitionResult {
+export function matchTray(state: GameState, level: LevelDefinition, donutId: string, deferPickup = false): TransitionResult {
   if (state.status !== 'playing' || !state.pendingMatchIds?.includes(donutId) || state.levelId !== level.id) return { state, events: [] };
   const next = structuredClone(state);
   next.pendingMatchIds = next.pendingMatchIds?.filter(id => id !== donutId);
   next.transitionId += 1;
   const events: GameEvent[] = [];
-  settle(next, level, events);
+  if (deferPickup) updateStatus(next, level, events);
+  else settle(next, level, events);
+  return { state: next, events };
+}
+
+export function pickupTray(state: GameState, level: LevelDefinition, readyOrders: readonly string[]): TransitionResult {
+  const pickup = state.status === 'playing' && state.levelId === level.id ? firstPickup(state) : undefined;
+  if (!pickup || state.pendingMatchIds?.includes(pickup.token.id) || !readyOrders.includes(pickup.order.definitionId)) {
+    return { state, events: [] };
+  }
+
+  const next = structuredClone(state);
+  const slot = state.orders.indexOf(pickup.order);
+  const order = next.orders[slot]!;
+  const { token, index } = pickup;
+  next.tray.splice(index, 1);
+  order.remaining[token.type] = (order.remaining[token.type] ?? 0) - 1;
+  next.transitionId += 1;
+  const events: GameEvent[] = [{ type: 'consumed', donutId: token.id, orderId: order.definitionId }];
+
+  if (!Object.values(order.remaining).some(count => count > 0)) {
+    next.completedOrders += 1;
+    events.push({ type: 'orderCompleted', orderId: order.definitionId });
+    const replacement = orderFrom(level, next.nextOrderIndex);
+    next.orders[slot] = replacement;
+    if (replacement) {
+      next.nextOrderIndex += 1;
+      events.push({ type: 'orderAdded', orderId: replacement.definitionId, slot });
+    }
+  }
+  updateStatus(next, level, events);
   return { state: next, events };
 }
 

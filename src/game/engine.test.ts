@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, expandTray, getStars, selectDonut, matchTray } from './engine';
+import { createGame, expandTray, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, isUnlocked, reduceSession } from './session';
 import { levels } from './levels';
@@ -46,6 +46,28 @@ describe('자동 매칭과 상태 전이', () => {
     const readySecond = matchTray(readyFirst, level, '0-1').state;
     expect(readySecond.tray).toHaveLength(0);
     expect(readySecond.completedOrders).toBe(1);
+  });
+  it('가장 먼저 담은 매칭 디저트부터 한 개씩 전달하고 새 손님의 준비를 기다린다', () => {
+    const level = fixture([{ chocolate: 1 }, { strawberry: 1 }, { strawberry: 1 }, { strawberry: 1 }, { chocolate: 1 }]);
+    const initial = createGame(level);
+    initial.tray = [
+      { id: 'unmatched', type: 'vanilla' },
+      { id: 'first', type: 'chocolate' },
+      { id: 'second', type: 'strawberry' },
+      { id: 'replacement', type: 'chocolate' },
+    ];
+    initial.pendingMatchIds = ['first'];
+    const readyOrders = ['o0', 'o1', 'o2', 'o3'];
+    expect(pickupTray(initial, level, readyOrders).state).toBe(initial);
+
+    const landed = matchTray(initial, level, 'first', true).state;
+    expect(landed.tray).toEqual(initial.tray);
+    const first = pickupTray(landed, level, readyOrders);
+    expect(first.events.filter(event => event.type === 'consumed').map(event => event.donutId)).toEqual(['first']);
+    const second = pickupTray(first.state, level, readyOrders);
+    expect(second.events.filter(event => event.type === 'consumed').map(event => event.donutId)).toEqual(['second']);
+    expect(pickupTray(second.state, level, readyOrders).state).toBe(second.state);
+    expect(pickupTray(second.state, level, [...readyOrders, 'o4']).state.tray.map(token => token.id)).toEqual(['unmatched']);
   });
   it('40칸이 차도 준비 중인 도넛이 있으면 실패 판정을 기다린다', () => {
     const level = fixture([{ strawberry: 2 }]);
@@ -224,7 +246,14 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
         if (!front) throw new Error('해법의 대기열이 비었습니다.');
         state = selectDonut(state, level, q, front.id, true).state;
         expect(state.tray.some(token => token.id === front.id)).toBe(true);
-        state = matchTray(state, level, front.id).state;
+        state = matchTray(state, level, front.id, true).state;
+        const orderIds = level.orders.map(order => order.id);
+        for (;;) {
+          const pickup = pickupTray(state, level, orderIds);
+          if (pickup.state === state) break;
+          expect(pickup.events.filter(event => event.type === 'consumed')).toHaveLength(1);
+          state = pickup.state;
+        }
       }
       expect(state.status).toBe('clear');
     });

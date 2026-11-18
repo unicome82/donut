@@ -133,17 +133,10 @@
   box-shadow: 0 3px 7px #371d2e2c;
 }
 
-@font-face {
-  font-family: Allura;
-  src: url('../assets/fonts/allura-level-select.woff') format('woff');
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
 .level-page {
   min-height: 100dvh;
   padding-bottom: max(20px, env(safe-area-inset-bottom));
-  background: linear-gradient(#fff0ed, #fff9f7 62%);
+  background: linear-gradient(#fbe0e7, #fce8ee 42%, #fff4f7);
 }
 .level-hero {
   width: 100%;
@@ -176,7 +169,7 @@
   position: relative;
   display: inline-block;
   color: #fff;
-  font: 400 clamp(42px, 12vw, 60px) / 1 Allura, 'Brush Script MT', cursive;
+  font: 400 clamp(35px, 10.7vw, 52px) / 1 var(--level-script);
   text-shadow: 0 2px 5px #206c9e60;
 }
 .level-hero h1::after {

@@ -9,8 +9,9 @@ import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
 const ARRIVAL_DURATION = 160;
 const GREETING_DURATION = 450;
+const ORDER_PREVIEW_DURATION = 250;
 
-function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | null; slot: number; portraitOffset: number }) {
+function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
@@ -29,6 +30,11 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
     const timer = setTimeout(() => setRevealedOrder(orderId), leadIn + GREETING_DURATION);
     return () => clearTimeout(timer);
   }, [orderId]);
+  useEffect(() => {
+    if (!orderId || revealedOrder !== orderId) return;
+    const timer = setTimeout(() => onOrderReady(orderId), ORDER_PREVIEW_DURATION);
+    return () => clearTimeout(timer);
+  }, [onOrderReady, orderId, revealedOrder]);
   useEffect(() => () => cancel.current?.(), []);
   useLayoutEffect(() => {
     const container = root.current;
@@ -90,11 +96,11 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
     <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble">{revealedOrder === orderId ? <ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul> : <span className="customer-greeting" lang="en">Hi!</span>}</div></> : null}</div>
   </article>;
 }
-export function OrderBoard({ orders, levelId }: { orders: Array<ActiveOrder | null>; levelId: number }) {
+export function OrderBoard({ orders, levelId, onOrderReady }: { orders: Array<ActiveOrder | null>; levelId: number; onOrderReady: (id: string) => void }) {
   const portraitOffset = levels.filter(level => level.id < levelId).reduce((total, level) => total + level.targetOrders, 0);
   return <section className="order-section" aria-label="손님 주문">
     <div className="order-grid">
-      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} />)}
+      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} />)}
     </div>
     <img className="display-shelf" src={displayShelf} alt="" aria-hidden="true" draggable={false} />
   </section>;

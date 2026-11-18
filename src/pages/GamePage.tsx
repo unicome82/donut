@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Customer } from '../components/Customer';
@@ -10,12 +10,13 @@ import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
 import { getLevel, levels } from '../game/levels';
-import { getStars, selectDonut, expandTray, matchTray } from '../game/engine';
+import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { createEffects } from '../effects/turnEffects';
 
 const TRAY_PICKUP_DELAY = 200;
+const PICKUP_INTERVAL = 200;
 
 interface Props { state: GameState; score: number; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
 export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
@@ -26,6 +27,17 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
   useLayoutEffect(() => { latest.current = state; }, [state]);
   const activeEffects = useRef(new Set<ReturnType<typeof createEffects>>());
   const mounted = useRef(true);
+  const [readyOrders, setReadyOrders] = useState<string[]>([]);
+  const nextPickupAt = useRef(0);
+  const onOrderReady = useCallback((id: string) => {
+    setReadyOrders(previous => previous.includes(id) ? previous : [...previous, id]);
+  }, []);
+  const pickup = useEffectEvent(() => act({ type: 'PICKUP_TRAY', readyOrders }));
+  useEffect(() => {
+    if (state.status !== 'playing' || !state.tray.length || !readyOrders.length) return;
+    const timer = setTimeout(() => pickup(), Math.max(0, nextPickupAt.current - performance.now()));
+    return () => clearTimeout(timer);
+  }, [state, readyOrders]);
   const [inFlight, setInFlight] = useState<ReadonlySet<string>>(new Set());
   useEffect(() => {
     mounted.current = true;
@@ -40,16 +52,24 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       for (const effect of activeEffects.current) effect.cleanup();
       activeEffects.current.clear();
       setInFlight(new Set());
+      setReadyOrders([]);
+      nextPickupAt.current = 0;
     }
     const current = latest.current;
     const currentLevel = getLevel(current.levelId);
     const committedAction: GameAction = action.type === 'SELECT_DONUT' ? { ...action, type: 'QUEUE_DONUT' } : action;
     const result = action.type === 'SELECT_DONUT'
       ? selectDonut(current, currentLevel, action.queueIndex, action.expectedDonutId, true)
-      : action.type === 'MATCH_TRAY' ? matchTray(current, currentLevel, action.donutId)
+      : action.type === 'TRAY_READY' ? matchTray(current, currentLevel, action.donutId, true)
+      : action.type === 'PICKUP_TRAY' ? pickupTray(current, currentLevel, action.readyOrders)
       : action.type === 'EXPAND_TRAY' ? expandTray(current, currentLevel) : null;
     if (!result) { dispatch(action); return; }
     if (result.state === current || !root.current) return;
+    if (action.type === 'TRAY_READY') {
+      dispatch(action);
+      return;
+    }
+    if (action.type === 'PICKUP_TRAY') nextPickupAt.current = performance.now() + PICKUP_INTERVAL;
     const effects = createEffects();
     activeEffects.current.add(effects);
     const moved = result.events.find(event => event.type === 'moved');
@@ -73,7 +93,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       // Start the pickup delay when the real token becomes visible in the tray.
       const timer = setTimeout(() => {
         matchTimers.current.delete(timer);
-        if (mounted.current && latest.current.levelId === current.levelId) act({ type: 'MATCH_TRAY', donutId: moved.donutId });
+        if (mounted.current && latest.current.levelId === current.levelId) act({ type: 'TRAY_READY', donutId: moved.donutId });
       }, TRAY_PICKUP_DELAY);
       matchTimers.current.add(timer);
     });
@@ -130,7 +150,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard orders={state.orders} levelId={state.levelId} />
+    <OrderBoard orders={state.orders} levelId={state.levelId} onOrderReady={onOrderReady} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

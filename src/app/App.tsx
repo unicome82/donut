@@ -14,7 +14,7 @@ export function App() {
       ? <StartPage level={currentLevel} onGame={() => dispatch({ type: 'START', levelId: currentLevel })} onLevels={() => dispatch({ type: 'LEVELS' })} />
       : screen === 'levels'
         ? <LevelSelectPage stars={stars} onBack={() => dispatch({ type: 'HOME' })} onGame={levelId => dispatch({ type: 'START', levelId })} />
-        : <GamePage state={game} score={score} dispatch={action => dispatch({ type: 'GAME', action })} onLevels={() => dispatch({ type: 'LEVELS' })} onNext={() => dispatch({ type: 'START', levelId: game.levelId + 1 })} />
+        : <GamePage key={game.levelId} state={game} score={score} dispatch={action => dispatch({ type: 'GAME', action })} onLevels={() => dispatch({ type: 'LEVELS' })} onNext={() => dispatch({ type: 'START', levelId: game.levelId + 1 })} />
     }
   </div>;
 }
