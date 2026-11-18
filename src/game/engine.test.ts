@@ -4,7 +4,7 @@ import { reduceGame } from './reducer';
 import { createSession, isUnlocked, reduceSession } from './session';
 import { levels } from './levels';
 import { solutions } from './levels/solutions';
-import { BASE_TRAY_CAPACITY, TRAY_EXPANSION } from './constants';
+import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
 import { validateLevel } from './validation';
 import type { DonutType, GameState, LevelDefinition, OrderDefinition } from './types';
 
@@ -13,7 +13,7 @@ function fixture(items: OrderDefinition['items'][]): LevelDefinition {
   return {
     id: 1, revision: 1, donutTypes: types, targetOrders: items.length, trayCapacity: BASE_TRAY_CAPACITY,
     orders: items.map((item, i) => ({ id: 'o' + i, sequence: i + 1, items: item })),
-    queues: Array.from({ length: 6 }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanilla' }))),
+    queues: Array.from({ length: QUEUE_COUNT }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanilla' }))),
   };
 }
 function select(state: GameState, level: LevelDefinition, queue: number) {
@@ -27,7 +27,7 @@ function tray(type: DonutType, count: number) {
 
 describe('자동 매칭과 상태 전이', () => {
   it('연속 두 입력은 새 맨 앞 ID로 각각 처리하고 이전 ID 중복만 무시한다', () => {
-    const level = fixture([{ strawberry: 20 }]);
+    const level = fixture([{ strawberry: 16 }]);
     const initial = createGame(level);
     const first = select(initial, level, 2).state;
     const second = select(first, level, 2).state;
@@ -109,7 +109,7 @@ describe('자동 매칭과 상태 전이', () => {
     state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
     const blocked = select(state, level, 2).state;
     expect(reduceGame(blocked, { type: 'DECLINE_EXPAND' }, level).status).toBe('gameover');
-    for (const index of [-1, 0.5, 6, NaN]) expect(selectDonut(state, level, index, 'bad').state).toBe(state);
+    for (const index of [-1, 0.5, QUEUE_COUNT, NaN]) expect(selectDonut(state, level, index, 'bad').state).toBe(state);
     expect(selectDonut(state, level, 0, '0-1').state).toBe(state);
     expect(selectDonut({ ...state, status: 'clear' }, level, 0, '0-0').events).toEqual([]);
   });
@@ -173,6 +173,11 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
     it('레벨 ' + level.id + '는 다양한 종류가 연속 묶음으로 쌓이고 20칸을 사용한다', () => {
       expect(level.donutTypes).toHaveLength(level.id + 9);
       expect(level.trayCapacity).toBe(20);
+      expect(level.queues).toHaveLength(10);
+      const quantities = level.orders.flatMap(order => Object.values(order.items));
+      expect(Math.max(...quantities)).toBeLessThanOrEqual(16);
+      expect(Math.max(...level.orders.map(order => Object.values(order.items).reduce((sum, n) => sum + n, 0)))).toBeLessThanOrEqual(16);
+      expect(new Set(quantities).size).toBeGreaterThanOrEqual(4);
       expect(new Set(level.queues.flat().map(token => token.type)).size).toBe(level.donutTypes.length);
       expect(new Set(level.orders.flatMap(order => Object.keys(order.items))).size).toBe(level.donutTypes.length);
       expect(level.queues.every(queue => queue.some((token, index) => index >= 2 && token.type === queue[index - 1]?.type && token.type === queue[index - 2]?.type))).toBe(true);

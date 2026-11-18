@@ -5,9 +5,14 @@ describe('고정 레벨 데이터 계약', () => {
   it('레벨1의 구조와 종류별 공급량이 유효하다', () => expect(validateLevel(level01)).toEqual([]));
   it('중복 토큰 ID와 공급 부족을 감지한다', () => {
     const invalid = structuredClone(level01);
-    invalid.queues = Array.from({ length: 6 }, () => [{ id: 'duplicate', type: 'vanilla' as const }]);
+    invalid.queues = Array.from({ length: 10 }, () => [{ id: 'duplicate', type: 'vanilla' as const }]);
     expect(validateLevel(invalid)).toContain('도넛 ID가 비어 있거나 중복됩니다.');
     expect(validateLevel(invalid)).toContain('strawberry 공급이 부족합니다.');
+  });
+  it('총수량 16개를 넘는 주문을 거부한다', () => {
+    const invalid = structuredClone(level01);
+    invalid.orders[0] = { id: 'oversized', sequence: 1, items: { strawberry: 16, chocolate: 1 } };
+    expect(validateLevel(invalid)).toContain('주문 총수량은 16개 이하여야 합니다.');
   });
   it('잘못된 주문 수량과 순번을 감지한다', () => {
     const invalid = structuredClone(level01);

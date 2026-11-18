@@ -187,3 +187,40 @@ button { border: 0; background: none; touch-action: manipulation; }
   .speech-bubble .order-items { gap: 3px; }
   .speech-bubble .order-items .donut { width: 16px; height: 17px; }
 }
+
+/* Ten compact lanes, pastry boxes, and a thank-you before departure. */
+.queue-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); width: min(100%, 360px); }
+.queue-column { min-width: 0; }
+.customer-scene { position: relative; width: 43px; height: 52px; flex: 0 0 43px; align-self: end; }
+.customer-scene .customer { position: absolute; left: 3px; top: 0; }
+.donut-box { position: absolute; bottom: 0; left: 0; width: 43px; height: 23px; }
+.box-lid { position: absolute; inset: -8px 0 auto; height: 12px; border: 1px solid #d4a5b4; border-radius: 4px 4px 0 0; background: #ffe8ef; transform: skewX(-8deg); }
+.box-inside { position: absolute; inset: 0 0 5px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); border: 1px solid #d4a5b4; background: #fff8f4; padding: 1px 3px; }
+.box-donut { display: grid; place-items: center; }
+.box-donut .donut { width: 8px; height: 8px; }
+.box-front { position: absolute; inset: auto -1px 0; height: 8px; border: 1px solid #d4a5b4; border-radius: 0 0 3px 3px; background: #f3bccb; color: #a45370; text-align: center; font-size: 7px; line-height: 7px; }
+.customer-hearts { display: block; color: #e35d89; font-size: 18px; letter-spacing: 2px; text-align: center; animation: customer-thanks .36s ease-out both; }
+.customer-satisfied .speech-bubble { display: grid; place-items: center; background: #fff0f5; }
+.customer-satisfied .box-lid { transform: translateY(8px) skewX(0); transition: transform .15s; }
+.speech-bubble { max-width: calc(100% - 47px); }
+.game-board, .result-panel { grid-column: 1; grid-row: 2; }
+.result-panel { position: relative; z-index: 5; }
+.game-status--clear .result-panel { animation: result-arrive .25s .7s both; }
+.game-status--clear .game-board { pointer-events: none; }
+.tray { background: #f5faf7; border-color: #c9ddd2; box-shadow: inset 0 1px 0 #fff, 0 2px 6px #4265520a; }
+.tray-slots li { background: #e4f0e8; border-color: #ccdfd3; }
+.slot-dot { background: #a9c4b3; }
+.tray-count { color: #567663; }
+@keyframes customer-thanks { 0% { opacity: 0; transform: translateY(5px) scale(.6); } 65% { opacity: 1; transform: translateY(-2px) scale(1.12); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@media (max-width: 360px) {
+  .customer-scene { width: 35px; flex-basis: 35px; height: 45px; }
+  .donut-box { width: 35px; height: 21px; }
+  .speech-bubble { max-width: calc(100% - 39px); }
+  .speech-bubble .order-items { gap: 2px; }
+  .speech-bubble .order-items .donut { width: 14px; height: 15px; }
+  .speech-bubble .order-items strong { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .customer-hearts { animation: none; }
+  .game-status--clear .result-panel { animation: none; }
+}

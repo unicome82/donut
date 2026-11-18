@@ -61,7 +61,10 @@ export function createEffects() {
     const slots = new Map<string, number>();
     before.orders.forEach((order, index) => { if (order) slots.set(order.definitionId, index); });
     for (const event of events) if (event.type === 'orderAdded') slots.set(event.orderId, event.slot);
-    const targetOrder = (id: string) => root.querySelector(`[data-order-slot="${slots.get(id)}"]`);
+    const targetOrder = (id: string) => {
+      const card = root.querySelector(`[data-order-slot="${slots.get(id)}"]`);
+      return card?.querySelector('.donut-box') ?? card;
+    };
     const jobs: Promise<unknown>[] = [];
     if (moved) {
       const origin = tokenElement(root, moved.donutId);

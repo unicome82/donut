@@ -57,7 +57,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   return <main className={`game-page game-status--${state.status}`} ref={root}>
     <GameHeader level={state.levelId} completed={state.completedOrders} target={level.targetOrders} onBack={() => { if (playing) dispatch({ type: 'PAUSE' }); else onLevels(); }} onPause={() => dispatch({ type: 'PAUSE' })} canPause={playing} />
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
-    {!playing ? <section className="result-panel" aria-labelledby="result-heading">
+    {!playing && <section className="result-panel" aria-labelledby="result-heading">
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{state.status === 'clear' ? (lastLevel ? '전체 클리어!' : '레벨 클리어!') : state.status === 'blocked' ? '트레이가 가득 찼어요' : state.status === 'paused' ? '잠깐 쉬어가요' : '다시 도전해요'}</h2>
       {state.status === 'clear' && <p className="result-stars" aria-label={getStars(state) + '성'}>{'★'.repeat(getStars(state))}{'☆'.repeat(3 - getStars(state))}</p>}
       {state.status === 'blocked' && <p>무료 +2칸 확장해 계속할 수 있어요.</p>}
@@ -69,8 +69,9 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
           <button className="secondary-button" onClick={onLevels}>레벨 선택</button>
         </>}
       </div>
-    </section> : <div className="game-board">
-    <OrderBoard orders={state.orders} />
+    </section>}
+    {(playing || state.status === 'clear') && <div className="game-board">
+    <OrderBoard orders={state.orders} definitions={level.orders} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} expandUsed={state.expandUsed} disabled={!playing} onExpand={() => { void act({ type: 'EXPAND_TRAY' }); }} />
     <DonutQueue queues={state.queues} disabled={!playing} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

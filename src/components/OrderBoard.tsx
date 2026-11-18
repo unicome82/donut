@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Donut } from './Donut/Donut';
+import { DonutBox } from './DonutBox';
 import { Customer } from './Customer';
 import { donutThemes } from './Donut/donutThemes';
-import { DONUT_TYPES, type ActiveOrder } from '../game/types';
+import { DONUT_TYPES, type ActiveOrder, type OrderDefinition } from '../game/types';
 
-function CustomerOrder({ order, slot }: { order: ActiveOrder | null; slot: number }) {
+function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null; slot: number; definition: OrderDefinition | undefined }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
@@ -25,25 +26,37 @@ function CustomerOrder({ order, slot }: { order: ActiveOrder | null; slot: numbe
       leaving = old.node;
       leaving.classList.add('customer-leaving');
       leaving.setAttribute('aria-hidden', 'true');
+      const bubble = leaving.querySelector('.speech-bubble');
+      if (bubble) {
+        const hearts = document.createElement('span');
+        hearts.className = 'customer-hearts'; hearts.textContent = '♥ ♥';
+        bubble.replaceChildren(hearts);
+      }
+      leaving.querySelectorAll<HTMLElement>('.box-donut').forEach(donut => { donut.style.opacity = '1'; });
+      leaving.classList.add('customer-satisfied');
       container.append(leaving);
       animations.push(leaving.animate([
         { transform: 'translateX(0)', opacity: 1 },
+        { transform: 'translateX(0)', opacity: 1, offset: .72 },
         { transform: 'translateX(-22px)', opacity: 0 },
-      ], { duration: 120, easing: 'ease-in', fill: 'both' }));
+      ], { duration: 480, easing: 'ease-in', fill: 'both' }));
     }
     animations.push(current.animate([
       { transform: 'translateX(22px)', opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: 160, delay: leaving ? 120 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    ], { duration: 160, delay: leaving ? 480 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, 450);
+    const timeout = setTimeout(cleanup, 850);
     cancel.current = () => { clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [order]);
+  const total = Object.values(definition?.items ?? order?.remaining ?? {}).reduce((sum, count) => sum + count, 0);
+  const remaining = Object.values(order?.remaining ?? {}).reduce((sum, count) => sum + count, 0);
+  const types = DONUT_TYPES.filter(type => (definition?.items[type] ?? order?.remaining[type] ?? 0) > 0);
   return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : '손님 대기 중'}>
-    <div className="customer-visit">{order ? <><Customer sequence={order.sequence} /><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${donutThemes[type].name} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : <span className="empty-order">✓</span>}</div>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence} /><DonutBox types={types} received={Math.max(0, total - remaining)} total={total} /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${donutThemes[type].name} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : <span className="empty-order">✓</span>}</div>
   </article>;
 }
-export function OrderBoard({ orders }: { orders: Array<ActiveOrder | null> }) {
-  return <section className="order-section" aria-label="손님 주문"><div className="order-grid">{orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} />)}</div></section>;
+export function OrderBoard({ orders, definitions }: { orders: Array<ActiveOrder | null>; definitions: OrderDefinition[] }) {
+  return <section className="order-section" aria-label="손님 주문"><div className="order-grid">{orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} definition={definitions.find(definition => definition.id === order?.definitionId)} />)}</div></section>;
 }
