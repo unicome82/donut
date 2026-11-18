@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import type { DonutType } from '../../game/types';
-import { donutThemes } from './donutThemes';
+import { MenuArtwork } from './MenuArtwork';
+import { donutThemes, menuNames } from './donutThemes';
 const decorations = [[27, 27, -20], [48, 18, 20], [73, 28, 50], [81, 49, -15], [71, 73, 40], [47, 81, -20], [25, 68, 30], [18, 47, 65]] as const;
 const toppingShapes = {
   sprinkles: 'M-5 0H5',
@@ -15,8 +16,11 @@ const toppingShapes = {
 };
 const solidPatterns = new Set(['chunks', 'leaves', 'stars', 'dots']);
 export function Donut({ type, className = '' }: { type: DonutType; className?: string }) {
-  const theme = donutThemes[type];
   const glaze = useId();
+  if (type in menuNames) return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
+    <MenuArtwork type={type as keyof typeof menuNames} />
+  </svg>;
+  const theme = donutThemes[type as keyof typeof donutThemes];
   return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id={glaze} x2="0%" y2="100%">

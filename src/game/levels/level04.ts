@@ -3,11 +3,11 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level04: LevelDefinition = {
   "id": 4,
-  "revision": 6,
+  "revision": 7,
   "donutTypes": [
-    "strawberry",
+    "cake",
     "chocolate",
-    "vanilla",
+    "latte",
     "matcha",
     "blueberry",
     "orange",
@@ -20,7 +20,7 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q8-p0",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q0-p0",
@@ -132,49 +132,49 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q8-p9",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q8-p10",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q8-p11",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q8-p12",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q8-p13",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q8-p14",
-        "type": "vanilla"
+        "type": "latte"
       }
     ],
     [
       {
         "id": "l4-r4-q9-p0",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q9-p1",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q9-p2",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q9-p3",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q9-p4",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q1-p0",
@@ -194,11 +194,11 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q1-p4",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q1-p5",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q9-p5",
@@ -206,7 +206,7 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q1-p6",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q1-p7",
@@ -266,27 +266,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q9-p11",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q9-p12",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q9-p13",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q9-p14",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q9-p15",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q9-p16",
-        "type": "strawberry"
+        "type": "cake"
       }
     ],
     [
@@ -304,27 +304,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q2-p3",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p4",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p5",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p6",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p7",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p8",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q2-p9",
@@ -418,27 +418,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q3-p10",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q3-p11",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q3-p12",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q3-p13",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q3-p14",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q3-p15",
-        "type": "vanilla"
+        "type": "latte"
       }
     ],
     [
@@ -460,19 +460,19 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q4-p4",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q4-p5",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q4-p6",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q4-p7",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q4-p8",
@@ -522,11 +522,11 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q5-p0",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q5-p1",
-        "type": "vanilla"
+        "type": "latte"
       },
       {
         "id": "l4-r4-q5-p2",
@@ -542,15 +542,15 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q5-p5",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q5-p6",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q5-p7",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q5-p8",
@@ -620,27 +620,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q6-p10",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q6-p11",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q6-p12",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q6-p13",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q6-p14",
-        "type": "strawberry"
+        "type": "cake"
       },
       {
         "id": "l4-r4-q6-p15",
-        "type": "strawberry"
+        "type": "cake"
       }
     ],
     [
@@ -719,7 +719,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o1",
       "sequence": 1,
       "items": {
-        "strawberry": 2,
+        "cake": 2,
         "chocolate": 1
       }
     },
@@ -727,15 +727,15 @@ export const level04: LevelDefinition = {
       "id": "l4-o2",
       "sequence": 2,
       "items": {
-        "vanilla": 4
+        "latte": 4
       }
     },
     {
       "id": "l4-o3",
       "sequence": 3,
       "items": {
-        "strawberry": 5,
-        "vanilla": 2
+        "cake": 5,
+        "latte": 2
       }
     },
     {
@@ -764,7 +764,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o7",
       "sequence": 7,
       "items": {
-        "vanilla": 2,
+        "latte": 2,
         "mint": 3
       }
     },
@@ -773,7 +773,7 @@ export const level04: LevelDefinition = {
       "sequence": 8,
       "items": {
         "orange": 4,
-        "strawberry": 4
+        "cake": 4
       }
     },
     {
@@ -789,7 +789,7 @@ export const level04: LevelDefinition = {
       "items": {
         "matcha": 12,
         "blueberry": 2,
-        "strawberry": 2
+        "cake": 2
       }
     },
     {
@@ -804,7 +804,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o12",
       "sequence": 12,
       "items": {
-        "vanilla": 1,
+        "latte": 1,
         "mint": 4
       }
     },
@@ -821,7 +821,7 @@ export const level04: LevelDefinition = {
       "sequence": 14,
       "items": {
         "blueberry": 10,
-        "vanilla": 2
+        "latte": 2
       }
     }
   ]

@@ -74,7 +74,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
     paused: '다시 도전해요',
     clear: '레벨 클리어!',
     blocked: '트레이가 가득 찼어요',
-    gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 도넛을 모두 사용했어요',
+    gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
   const [presentedClear, setPresentedClear] = useState<GameState | null>(null);
@@ -109,7 +109,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
-      {status === 'blocked' && <p>트레이를 확장하면<br />도넛을 2개 더 담을 수 있어요!</p>}
+      {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
         {status === 'blocked' && <button className="primary-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}

@@ -3,15 +3,15 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level05: LevelDefinition = {
   "id": 5,
-  "revision": 6,
+  "revision": 7,
   "donutTypes": [
-    "strawberry",
+    "strawberryMilk",
     "chocolate",
     "vanilla",
     "matcha",
     "blueberry",
     "orange",
-    "lemon",
+    "pudding",
     "mint"
   ],
   "targetOrders": 16,
@@ -20,35 +20,35 @@ export const level05: LevelDefinition = {
     [
       {
         "id": "l5-r4-q8-p0",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p1",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p2",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p3",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p4",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q0-p0",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p5",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q0-p1",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p6",
@@ -56,7 +56,7 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q0-p2",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q8-p7",
@@ -84,7 +84,7 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q8-p10",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q0-p6",
@@ -178,27 +178,27 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q1-p6",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p7",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p8",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p9",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q1-p10",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q1-p11",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p4",
@@ -210,39 +210,39 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q1-p12",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q1-p13",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q1-p14",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q1-p15",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p16",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p17",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p18",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p19",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q1-p20",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q9-p6",
@@ -258,27 +258,27 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q9-p9",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p10",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p11",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p12",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p13",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q9-p14",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       }
     ],
     [
@@ -354,19 +354,19 @@ export const level05: LevelDefinition = {
     [
       {
         "id": "l5-r4-q3-p0",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q3-p1",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q3-p2",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q3-p3",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q3-p4",
@@ -498,15 +498,15 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q5-p4",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q5-p5",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q5-p6",
-        "type": "lemon"
+        "type": "pudding"
       },
       {
         "id": "l5-r4-q5-p7",
@@ -526,27 +526,27 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q5-p11",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q5-p12",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q5-p13",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q5-p14",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q5-p15",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q5-p16",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       }
     ],
     [
@@ -608,23 +608,23 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q6-p14",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q6-p15",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q6-p16",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q6-p17",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q6-p18",
-        "type": "strawberry"
+        "type": "strawberryMilk"
       },
       {
         "id": "l5-r4-q6-p19",
@@ -751,7 +751,7 @@ export const level05: LevelDefinition = {
       "id": "l5-o1",
       "sequence": 1,
       "items": {
-        "strawberry": 2,
+        "strawberryMilk": 2,
         "chocolate": 1
       }
     },
@@ -766,7 +766,7 @@ export const level05: LevelDefinition = {
       "id": "l5-o3",
       "sequence": 3,
       "items": {
-        "strawberry": 5,
+        "strawberryMilk": 5,
         "vanilla": 2
       }
     },
@@ -789,7 +789,7 @@ export const level05: LevelDefinition = {
       "sequence": 6,
       "items": {
         "orange": 3,
-        "lemon": 2
+        "pudding": 2
       }
     },
     {
@@ -806,7 +806,7 @@ export const level05: LevelDefinition = {
       "sequence": 8,
       "items": {
         "orange": 8,
-        "strawberry": 4
+        "strawberryMilk": 4
       }
     },
     {
@@ -836,7 +836,7 @@ export const level05: LevelDefinition = {
       "id": "l5-o12",
       "sequence": 12,
       "items": {
-        "lemon": 4,
+        "pudding": 4,
         "vanilla": 4
       }
     },
@@ -852,7 +852,7 @@ export const level05: LevelDefinition = {
       "id": "l5-o14",
       "sequence": 14,
       "items": {
-        "strawberry": 14,
+        "strawberryMilk": 14,
         "blueberry": 2
       }
     },

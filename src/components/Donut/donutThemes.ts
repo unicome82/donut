@@ -7,7 +7,16 @@ interface DonutTheme {
   pattern: 'sprinkles' | 'chunks' | 'drizzle' | 'leaves' | 'stars' | 'rings' | 'crosses' | 'chevrons' | 'dots';
 }
 
-export const donutThemes: Record<DonutType, DonutTheme> = {
+export const menuNames = {
+  croissant: '크루아상',
+  cake: '조각 케이크',
+  pudding: '푸딩',
+  americano: '아이스 아메리카노',
+  latte: '아이스 라테',
+  strawberryMilk: '아이스 딸기우유',
+};
+
+export const donutThemes: Record<Exclude<DonutType, keyof typeof menuNames>, DonutTheme> = {
   strawberry: { name: '딸기', icing: '#ff70ae', topping: '#fff4eb', pattern: 'sprinkles' },
   chocolate: { name: '초콜릿', icing: '#562419', topping: '#ffc295', pattern: 'chunks' },
   vanilla: { name: '바닐라', icing: '#fff6e9', topping: '#683e30', pattern: 'drizzle' },
@@ -23,3 +32,8 @@ export const donutThemes: Record<DonutType, DonutTheme> = {
   coffee: { name: '커피', icing: '#785044', topping: '#f5d0a0', pattern: 'dots' },
   sprinkle: { name: '스프링클', icing: '#f7edde', topping: '#ed8b9f', pattern: 'sprinkles' },
 };
+
+export const itemNames = {
+  ...Object.fromEntries(Object.entries(donutThemes).map(([type, theme]) => [type, `${theme.name} 도넛`])),
+  ...menuNames,
+} as Record<DonutType, string>;

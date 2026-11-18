@@ -3,11 +3,11 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level03: LevelDefinition = {
   "id": 3,
-  "revision": 6,
+  "revision": 7,
   "donutTypes": [
     "strawberry",
-    "chocolate",
-    "vanilla",
+    "americano",
+    "croissant",
     "matcha",
     "blueberry",
     "orange",
@@ -52,15 +52,15 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q8-p4",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q8-p5",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q8-p6",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q0-p4",
@@ -338,7 +338,7 @@ export const level03: LevelDefinition = {
     [
       {
         "id": "l3-r4-q3-p0",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q3-p1",
@@ -388,19 +388,19 @@ export const level03: LevelDefinition = {
     [
       {
         "id": "l3-r4-q4-p0",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q4-p1",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q4-p2",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q4-p3",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q4-p4",
@@ -436,27 +436,27 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q4-p12",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q4-p13",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q4-p14",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q4-p15",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q4-p16",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q4-p17",
-        "type": "vanilla"
+        "type": "croissant"
       }
     ],
     [
@@ -474,15 +474,15 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q5-p3",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q5-p4",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q5-p5",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q5-p6",
@@ -548,23 +548,23 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q6-p6",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q6-p7",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q6-p8",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q6-p9",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q6-p10",
-        "type": "chocolate"
+        "type": "americano"
       },
       {
         "id": "l3-r4-q6-p11",
@@ -614,15 +614,15 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q7-p5",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q7-p6",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q7-p7",
-        "type": "vanilla"
+        "type": "croissant"
       },
       {
         "id": "l3-r4-q7-p8",
@@ -668,14 +668,14 @@ export const level03: LevelDefinition = {
       "sequence": 1,
       "items": {
         "strawberry": 2,
-        "chocolate": 1
+        "americano": 1
       }
     },
     {
       "id": "l3-o2",
       "sequence": 2,
       "items": {
-        "vanilla": 4
+        "croissant": 4
       }
     },
     {
@@ -683,14 +683,14 @@ export const level03: LevelDefinition = {
       "sequence": 3,
       "items": {
         "strawberry": 5,
-        "vanilla": 2
+        "croissant": 2
       }
     },
     {
       "id": "l3-o4",
       "sequence": 4,
       "items": {
-        "chocolate": 8
+        "americano": 8
       }
     },
     {
@@ -712,7 +712,7 @@ export const level03: LevelDefinition = {
       "id": "l3-o7",
       "sequence": 7,
       "items": {
-        "vanilla": 1,
+        "croissant": 1,
         "mint": 2
       }
     },
@@ -745,7 +745,7 @@ export const level03: LevelDefinition = {
       "sequence": 11,
       "items": {
         "lemon": 13,
-        "vanilla": 3
+        "croissant": 3
       }
     },
     {
