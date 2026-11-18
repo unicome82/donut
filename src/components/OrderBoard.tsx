@@ -3,6 +3,7 @@ import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
 import { itemNames } from './Donut/donutThemes';
+import { levels } from '../game/levels';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
 function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | null; slot: number; portraitOffset: number }) {
@@ -65,5 +66,6 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
   </article>;
 }
 export function OrderBoard({ orders, levelId }: { orders: Array<ActiveOrder | null>; levelId: number }) {
-  return <section className="order-section" aria-label="손님 주문"><div className="order-grid">{orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={(levelId - 1) * 8} />)}</div></section>;
+  const portraitOffset = levels.filter(level => level.id < levelId).reduce((total, level) => total + level.targetOrders, 0);
+  return <section className="order-section" aria-label="손님 주문"><div className="order-grid">{orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} />)}</div></section>;
 }

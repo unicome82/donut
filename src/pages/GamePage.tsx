@@ -100,7 +100,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
       </div>}
-      {failed && <Customer sequence={status === 'blocked' ? 10 : 2} className="result-character" />}
+      {failed && <Customer sequence={status === 'blocked' ? 4 : 2} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{status === 'clear' && lastLevel ? '전체 클리어!' : resultTitles[status]}</h2>
       {status === 'clear' && <>
         <Donut type="strawberry" className="result-donut" />
