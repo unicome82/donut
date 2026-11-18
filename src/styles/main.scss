@@ -77,24 +77,16 @@
   display: grid;
   justify-items: center;
   align-items: end;
-  background: #fff1e7;
-}
-.start-page::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -30px;
-  background: var(--start-poster) center / cover no-repeat;
-  filter: blur(30px);
+  background: var(--start-backdrop, #fff1e7);
 }
 .start-poster {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(100%, 66.6667dvh);
-  height: auto;
-  transform: translate(-50%, -50%);
-  mask-image: linear-gradient(transparent, #000 16px, #000 calc(100% - 16px), transparent);
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: min(100%, 188cqw);
+  object-fit: cover;
+  object-position: center top;
+  mask-image: linear-gradient(#000 calc(100% - 20px), transparent);
   pointer-events: none;
 }
 .start-actions {
@@ -103,7 +95,7 @@
   display: grid;
   gap: 9px;
   width: min(86%, 306px);
-  margin-bottom: max(20px, env(safe-area-inset-bottom), calc((100dvh - 150cqw) / 2 + 14px));
+  margin-bottom: max(clamp(20px, 8dvh, 64px), env(safe-area-inset-bottom));
 }
 .start-actions .primary-button { background: var(--start-button); color: white; border: 2px solid #fffdf4; min-height: 53px; font-size: 19px; box-shadow: 0 4px 9px #371d2e42; }
 .start-actions .secondary-button { background: #fff9f1; color: #563829; border: 1px solid #fff; box-shadow: 0 3px 7px #371d2e38; }
@@ -416,8 +408,8 @@
 
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
   .app-shell { width: min(100%, 820px); }
-  .start-actions { width: min(86%, 230px); }
-  .start-poster { mask-image: linear-gradient(90deg, transparent, #000 16px, #000 calc(100% - 16px), transparent); }
+  .start-actions { width: min(86%, 230px); margin-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .start-poster { object-fit: contain; mask-image: none; }
   .level-list { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: none; }
   .game-board { grid-template-rows: clamp(78px, 27dvh, 125px) auto minmax(0, 1fr); }
   .order-grid { grid-template: 1fr / repeat(4, minmax(0, 1fr)); }
