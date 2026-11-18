@@ -229,9 +229,9 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
       expect(state.status).toBe('clear');
     });
     it('레벨 ' + level.id + '는 다양한 종류가 연속 묶음으로 쌓이고 40칸을 사용한다', () => {
-      expect(level.donutTypes).toHaveLength(level.id + 9);
+      expect(level.donutTypes).toHaveLength(8);
       expect(level.trayCapacity).toBe(40);
-      expect(level.queues).toHaveLength(10);
+      expect(level.queues).toHaveLength(QUEUE_COUNT);
       const quantities = level.orders.flatMap(order => Object.values(order.items));
       expect(Math.max(...quantities)).toBeLessThanOrEqual(16);
       expect(Math.max(...level.orders.map(order => Object.values(order.items).reduce((sum, n) => sum + n, 0)))).toBeLessThanOrEqual(16);

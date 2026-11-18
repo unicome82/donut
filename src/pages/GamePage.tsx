@@ -111,7 +111,7 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />도넛을 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
-        {status === 'blocked' && <button className="primary-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>트레이 확장 +2</button>}
+        {status === 'blocked' && <button className="primary-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>}

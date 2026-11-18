@@ -5,7 +5,7 @@ export function validateLevel(level: LevelDefinition): string[] {
   const validPositive = (n: number) => Number.isInteger(n) && n > 0;
   if (!validPositive(level.id) || !validPositive(level.revision)) errors.push('레벨 ID와 revision은 양의 정수여야 합니다.');
   if (!validPositive(level.targetOrders) || level.orders.length !== level.targetOrders) errors.push('목표 주문 수가 일치하지 않습니다.');
-  if (level.queues.length !== QUEUE_COUNT) errors.push('대기열은 10개여야 합니다.');
+  if (level.queues.length !== QUEUE_COUNT) errors.push(`대기열은 ${QUEUE_COUNT}개여야 합니다.`);
   if (level.trayCapacity !== BASE_TRAY_CAPACITY) errors.push('기본 트레이는 40칸이어야 합니다.');
   if (!level.donutTypes.length || new Set(level.donutTypes).size !== level.donutTypes.length || level.donutTypes.some(t => !DONUT_TYPES.includes(t))) errors.push('도넛 종류 설정이 올바르지 않습니다.');
   const ids = new Set<string>();

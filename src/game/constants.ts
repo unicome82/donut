@@ -1,4 +1,4 @@
-export const QUEUE_COUNT = 10;
+export const QUEUE_COUNT = 8;
 export const ORDER_SLOTS = 4;
 export const BASE_TRAY_CAPACITY = 40;
 export const TRAY_EXPANSION = 2;

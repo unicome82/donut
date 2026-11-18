@@ -3,45 +3,79 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level05: LevelDefinition = {
   "id": 5,
-  "revision": 5,
+  "revision": 6,
   "donutTypes": [
     "strawberry",
     "chocolate",
     "vanilla",
     "matcha",
     "blueberry",
-    "caramel",
-    "lemon",
-    "sprinkle",
-    "mint",
     "orange",
-    "raspberry",
-    "sesame",
-    "coconut",
-    "coffee"
+    "lemon",
+    "mint"
   ],
   "targetOrders": 16,
   "trayCapacity": 40,
   "queues": [
     [
       {
+        "id": "l5-r4-q8-p0",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p1",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p2",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p3",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p4",
+        "type": "strawberry"
+      },
+      {
         "id": "l5-r4-q0-p0",
-        "type": "raspberry"
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p5",
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q0-p1",
-        "type": "raspberry"
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p6",
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q0-p2",
-        "type": "raspberry"
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q8-p7",
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q0-p3",
-        "type": "coconut"
+        "type": "vanilla"
+      },
+      {
+        "id": "l5-r4-q8-p8",
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q0-p4",
+        "type": "blueberry"
+      },
+      {
+        "id": "l5-r4-q8-p9",
         "type": "blueberry"
       },
       {
@@ -49,28 +83,56 @@ export const level05: LevelDefinition = {
         "type": "blueberry"
       },
       {
+        "id": "l5-r4-q8-p10",
+        "type": "strawberry"
+      },
+      {
         "id": "l5-r4-q0-p6",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q0-p7",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q0-p8",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q0-p9",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q0-p10",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q0-p11",
-        "type": "caramel"
+        "type": "orange"
+      },
+      {
+        "id": "l5-r4-q8-p11",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q8-p12",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q8-p13",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q8-p14",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q8-p15",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q8-p16",
+        "type": "chocolate"
       }
     ],
     [
@@ -85,6 +147,22 @@ export const level05: LevelDefinition = {
       {
         "id": "l5-r4-q1-p2",
         "type": "mint"
+      },
+      {
+        "id": "l5-r4-q9-p0",
+        "type": "matcha"
+      },
+      {
+        "id": "l5-r4-q9-p1",
+        "type": "matcha"
+      },
+      {
+        "id": "l5-r4-q9-p2",
+        "type": "matcha"
+      },
+      {
+        "id": "l5-r4-q9-p3",
+        "type": "chocolate"
       },
       {
         "id": "l5-r4-q1-p3",
@@ -123,6 +201,14 @@ export const level05: LevelDefinition = {
         "type": "strawberry"
       },
       {
+        "id": "l5-r4-q9-p4",
+        "type": "chocolate"
+      },
+      {
+        "id": "l5-r4-q9-p5",
+        "type": "chocolate"
+      },
+      {
         "id": "l5-r4-q1-p12",
         "type": "strawberry"
       },
@@ -157,32 +243,68 @@ export const level05: LevelDefinition = {
       {
         "id": "l5-r4-q1-p20",
         "type": "lemon"
+      },
+      {
+        "id": "l5-r4-q9-p6",
+        "type": "orange"
+      },
+      {
+        "id": "l5-r4-q9-p7",
+        "type": "orange"
+      },
+      {
+        "id": "l5-r4-q9-p8",
+        "type": "orange"
+      },
+      {
+        "id": "l5-r4-q9-p9",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q9-p10",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q9-p11",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q9-p12",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q9-p13",
+        "type": "strawberry"
+      },
+      {
+        "id": "l5-r4-q9-p14",
+        "type": "strawberry"
       }
     ],
     [
       {
         "id": "l5-r4-q2-p0",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p1",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p2",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p3",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p4",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p5",
-        "type": "caramel"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q2-p6",
@@ -206,45 +328,45 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q2-p11",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q2-p12",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q2-p13",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q2-p14",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q2-p15",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q2-p16",
-        "type": "sprinkle"
+        "type": "vanilla"
       }
     ],
     [
       {
         "id": "l5-r4-q3-p0",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q3-p1",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q3-p2",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q3-p3",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q3-p4",
@@ -294,43 +416,43 @@ export const level05: LevelDefinition = {
     [
       {
         "id": "l5-r4-q4-p0",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p1",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p2",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p3",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p4",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p5",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p6",
-        "type": "sprinkle"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q4-p7",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q4-p8",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q4-p9",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q4-p10",
@@ -404,27 +526,27 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q5-p11",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q5-p12",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q5-p13",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q5-p14",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q5-p15",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q5-p16",
-        "type": "raspberry"
+        "type": "strawberry"
       }
     ],
     [
@@ -446,23 +568,23 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q6-p4",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p5",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p6",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p7",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p8",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p9",
@@ -486,47 +608,47 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q6-p14",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q6-p15",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q6-p16",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q6-p17",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q6-p18",
-        "type": "raspberry"
+        "type": "strawberry"
       },
       {
         "id": "l5-r4-q6-p19",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p20",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p21",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p22",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p23",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q6-p24",
-        "type": "sesame"
+        "type": "blueberry"
       }
     ],
     [
@@ -552,35 +674,35 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q7-p5",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p6",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p7",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p8",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p9",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p10",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p11",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p12",
-        "type": "sesame"
+        "type": "blueberry"
       },
       {
         "id": "l5-r4-q7-p13",
@@ -600,159 +722,27 @@ export const level05: LevelDefinition = {
       },
       {
         "id": "l5-r4-q7-p17",
-        "type": "coconut"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q7-p18",
-        "type": "coconut"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q7-p19",
-        "type": "coconut"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q7-p20",
-        "type": "coconut"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q7-p21",
-        "type": "coconut"
+        "type": "vanilla"
       },
       {
         "id": "l5-r4-q7-p22",
-        "type": "coconut"
-      }
-    ],
-    [
-      {
-        "id": "l5-r4-q8-p0",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p1",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p2",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p3",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p4",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p5",
-        "type": "raspberry"
-      },
-      {
-        "id": "l5-r4-q8-p6",
-        "type": "sesame"
-      },
-      {
-        "id": "l5-r4-q8-p7",
-        "type": "sesame"
-      },
-      {
-        "id": "l5-r4-q8-p8",
-        "type": "sesame"
-      },
-      {
-        "id": "l5-r4-q8-p9",
-        "type": "sesame"
-      },
-      {
-        "id": "l5-r4-q8-p10",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q8-p11",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q8-p12",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q8-p13",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q8-p14",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q8-p15",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q8-p16",
-        "type": "coffee"
-      }
-    ],
-    [
-      {
-        "id": "l5-r4-q9-p0",
-        "type": "matcha"
-      },
-      {
-        "id": "l5-r4-q9-p1",
-        "type": "matcha"
-      },
-      {
-        "id": "l5-r4-q9-p2",
-        "type": "matcha"
-      },
-      {
-        "id": "l5-r4-q9-p3",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q9-p4",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q9-p5",
-        "type": "coffee"
-      },
-      {
-        "id": "l5-r4-q9-p6",
-        "type": "orange"
-      },
-      {
-        "id": "l5-r4-q9-p7",
-        "type": "orange"
-      },
-      {
-        "id": "l5-r4-q9-p8",
-        "type": "orange"
-      },
-      {
-        "id": "l5-r4-q9-p9",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q9-p10",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q9-p11",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q9-p12",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q9-p13",
-        "type": "strawberry"
-      },
-      {
-        "id": "l5-r4-q9-p14",
-        "type": "strawberry"
+        "type": "vanilla"
       }
     ]
   ],
@@ -798,7 +788,7 @@ export const level05: LevelDefinition = {
       "id": "l5-o6",
       "sequence": 6,
       "items": {
-        "caramel": 3,
+        "orange": 3,
         "lemon": 2
       }
     },
@@ -806,9 +796,9 @@ export const level05: LevelDefinition = {
       "id": "l5-o7",
       "sequence": 7,
       "items": {
-        "sprinkle": 3,
+        "vanilla": 3,
         "mint": 3,
-        "sesame": 2
+        "blueberry": 2
       }
     },
     {
@@ -816,21 +806,21 @@ export const level05: LevelDefinition = {
       "sequence": 8,
       "items": {
         "orange": 8,
-        "raspberry": 4
+        "strawberry": 4
       }
     },
     {
       "id": "l5-o9",
       "sequence": 9,
       "items": {
-        "sesame": 16
+        "blueberry": 16
       }
     },
     {
       "id": "l5-o10",
       "sequence": 10,
       "items": {
-        "coffee": 1,
+        "chocolate": 1,
         "matcha": 2
       }
     },
@@ -839,7 +829,7 @@ export const level05: LevelDefinition = {
       "sequence": 11,
       "items": {
         "blueberry": 2,
-        "caramel": 3
+        "orange": 3
       }
     },
     {
@@ -847,7 +837,7 @@ export const level05: LevelDefinition = {
       "sequence": 12,
       "items": {
         "lemon": 4,
-        "sprinkle": 4
+        "vanilla": 4
       }
     },
     {
@@ -862,16 +852,16 @@ export const level05: LevelDefinition = {
       "id": "l5-o14",
       "sequence": 14,
       "items": {
-        "raspberry": 14,
-        "sesame": 2
+        "strawberry": 14,
+        "blueberry": 2
       }
     },
     {
       "id": "l5-o15",
       "sequence": 15,
       "items": {
-        "coconut": 1,
-        "coffee": 2
+        "vanilla": 1,
+        "chocolate": 2
       }
     },
     {

@@ -57,8 +57,8 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
   const total = Object.values(definition?.items ?? order?.remaining ?? {}).reduce((sum, count) => sum + count, 0);
   const remaining = Object.values(order?.remaining ?? {}).reduce((sum, count) => sum + count, 0);
   const types = DONUT_TYPES.filter(type => (definition?.items[type] ?? order?.remaining[type] ?? 0) > 0);
-  return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : '손님 대기 중'}>
-    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence} /><DonutBox types={types} received={Math.max(0, total - remaining)} total={total} /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${donutThemes[type].name} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : <span className="empty-order">✓</span>}</div>
+  return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : '판매완료'}>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence} /><DonutBox types={types} received={Math.max(0, total - remaining)} total={total} /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${donutThemes[type].name} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : <span className="sold-sign">판매완료</span>}</div>
   </article>;
 }
 export function OrderBoard({ orders, definitions }: { orders: Array<ActiveOrder | null>; definitions: OrderDefinition[] }) {
