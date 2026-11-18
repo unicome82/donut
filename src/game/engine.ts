@@ -37,7 +37,7 @@ function settle(state: GameState, level: LevelDefinition, events: GameEvent[]): 
     for (const order of ordered) {
       for (const type of DONUT_TYPES) {
         while ((order.remaining[type] ?? 0) > 0) {
-          const index = state.tray.findIndex(token => token.type === type);
+          const index = state.tray.findIndex(token => token.type === type && !state.pendingMatchIds?.includes(token.id));
           if (index < 0) break;
           const [token] = state.tray.splice(index, 1);
           if (!token) break;
@@ -69,6 +69,8 @@ function settle(state: GameState, level: LevelDefinition, events: GameEvent[]): 
   if (state.completedOrders === level.targetOrders) {
     state.status = 'clear';
     events.push({ type: 'levelCleared' });
+  } else if (state.pendingMatchIds?.length) {
+    state.status = 'playing';
   } else if (state.queues.every(queue => queue.length === 0)) {
     state.status = 'gameover';
   } else if (state.tray.length >= state.trayCapacity) {
@@ -78,7 +80,7 @@ function settle(state: GameState, level: LevelDefinition, events: GameEvent[]): 
   }
 }
 
-export function selectDonut(state: GameState, level: LevelDefinition, queueIndex: number, expectedDonutId: string): TransitionResult {
+export function selectDonut(state: GameState, level: LevelDefinition, queueIndex: number, expectedDonutId: string, deferMatch = false): TransitionResult {
   const front = Number.isInteger(queueIndex) ? state.queues[queueIndex]?.[0] : undefined;
   if (state.status !== 'playing' || state.levelId !== level.id || !front || front.id !== expectedDonutId || state.tray.length >= state.trayCapacity) return { state, events: [] };
   const next = structuredClone(state);
@@ -86,6 +88,17 @@ export function selectDonut(state: GameState, level: LevelDefinition, queueIndex
   next.tray.push({ ...front });
   next.transitionId += 1;
   const events: GameEvent[] = [{ type: 'moved', donutId: front.id, queueIndex }];
+  if (deferMatch) next.pendingMatchIds = [...(next.pendingMatchIds ?? []), front.id];
+  else settle(next, level, events);
+  return { state: next, events };
+}
+
+export function matchTray(state: GameState, level: LevelDefinition, donutId: string): TransitionResult {
+  if (state.status !== 'playing' || !state.pendingMatchIds?.includes(donutId) || state.levelId !== level.id) return { state, events: [] };
+  const next = structuredClone(state);
+  next.pendingMatchIds = next.pendingMatchIds?.filter(id => id !== donutId);
+  next.transitionId += 1;
+  const events: GameEvent[] = [];
   settle(next, level, events);
   return { state: next, events };
 }

@@ -3,7 +3,7 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level01: LevelDefinition = {
   "id": 1,
-  "revision": 4,
+  "revision": 5,
   "donutTypes": [
     "strawberry",
     "chocolate",
@@ -17,7 +17,7 @@ export const level01: LevelDefinition = {
     "orange"
   ],
   "targetOrders": 8,
-  "trayCapacity": 20,
+  "trayCapacity": 40,
   "queues": [
     [
       {

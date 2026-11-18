@@ -12,5 +12,6 @@ export interface GameState {
   levelId: number; levelRevision: number; status: GameStatus;
   orders: Array<ActiveOrder | null>; nextOrderIndex: number;
   queues: DonutToken[][]; tray: DonutToken[]; trayCapacity: number;
+  pendingMatchIds?: string[];
   completedOrders: number; expandUsed: boolean; transitionId: number;
 }

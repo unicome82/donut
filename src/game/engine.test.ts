@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, expandTray, getStars, selectDonut } from './engine';
+import { createGame, expandTray, getStars, selectDonut, matchTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, isUnlocked, reduceSession } from './session';
 import { levels } from './levels';
@@ -26,6 +26,53 @@ function tray(type: DonutType, count: number) {
 }
 
 describe('자동 매칭과 상태 전이', () => {
+  it('주문 도넛도 먼저 트레이에 남고 준비 완료 후에만 소비한다', () => {
+    const level = fixture([{ strawberry: 2 }]);
+    const queued = selectDonut(createGame(level), level, 0, '0-0', true).state;
+    expect(queued.tray.map(token => token.id)).toEqual(['0-0']);
+    expect(queued.orders[0]?.remaining.strawberry).toBe(2);
+    const matched = matchTray(queued, level, '0-0').state;
+    expect(matched.tray).toHaveLength(0);
+    expect(matched.orders[0]?.remaining.strawberry).toBe(1);
+  });
+  it('두 번 연속 올린 도넛은 각각 준비 완료된 뒤 소비한다', () => {
+    const level = fixture([{ strawberry: 2 }, { vanilla: 3 }]);
+    const first = selectDonut(createGame(level), level, 0, '0-0', true).state;
+    const second = selectDonut(first, level, 0, '0-1', true).state;
+    expect(second.tray).toHaveLength(2);
+    const readyFirst = matchTray(second, level, '0-0').state;
+    expect(readyFirst.tray.map(token => token.id)).toEqual(['0-1']);
+    expect(readyFirst.orders[0]?.remaining.strawberry).toBe(1);
+    const readySecond = matchTray(readyFirst, level, '0-1').state;
+    expect(readySecond.tray).toHaveLength(0);
+    expect(readySecond.completedOrders).toBe(1);
+  });
+  it('40칸이 차도 준비 중인 도넛이 있으면 실패 판정을 기다린다', () => {
+    const level = fixture([{ strawberry: 2 }]);
+    const initial = createGame(level);
+    initial.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
+    const queued = selectDonut(initial, level, 0, '0-0', true).state;
+    expect(queued.tray).toHaveLength(40);
+    expect(queued.status).toBe('playing');
+    expect(selectDonut(queued, level, 0, '0-1', true).state).toBe(queued);
+    const matched = matchTray(queued, level, '0-0').state;
+    expect(matched.status).toBe('playing');
+    expect(matched.tray).toHaveLength(39);
+  });
+  it('마지막 준비 도넛도 주문에 없으면 가득 찬 트레이의 확장 기회를 제공한다', () => {
+    const level = fixture([{ strawberry: 2 }]);
+    const initial = createGame(level);
+    initial.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
+    const queued = selectDonut(initial, level, 2, '2-0', true).state;
+    expect(queued.status).toBe('playing');
+    expect(matchTray(queued, level, '2-0').state.status).toBe('blocked');
+  });
+  it('재시작 후 이전 도넛의 준비 완료 액션은 무시한다', () => {
+    const level = fixture([{ strawberry: 2 }]);
+    const initial = createGame(level);
+    expect(matchTray(initial, level, '0-0').state).toBe(initial);
+  });
+
   it('연속 두 입력은 새 맨 앞 ID로 각각 처리하고 이전 ID 중복만 무시한다', () => {
     const level = fixture([{ strawberry: 16 }]);
     const initial = createGame(level);
@@ -170,9 +217,20 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
       expect(state.completedOrders).toBe(level.targetOrders);
       expect(level).toEqual(original);
     });
-    it('레벨 ' + level.id + '는 다양한 종류가 연속 묶음으로 쌓이고 20칸을 사용한다', () => {
+    it('레벨 ' + level.id + '는 트레이 대기 후 매칭하는 실제 플레이 경로에서도 클리어한다', () => {
+      let state = createGame(level);
+      for (const q of solutions[level.id] ?? []) {
+        const front = state.queues[q]?.[0];
+        if (!front) throw new Error('해법의 대기열이 비었습니다.');
+        state = selectDonut(state, level, q, front.id, true).state;
+        expect(state.tray.some(token => token.id === front.id)).toBe(true);
+        state = matchTray(state, level, front.id).state;
+      }
+      expect(state.status).toBe('clear');
+    });
+    it('레벨 ' + level.id + '는 다양한 종류가 연속 묶음으로 쌓이고 40칸을 사용한다', () => {
       expect(level.donutTypes).toHaveLength(level.id + 9);
-      expect(level.trayCapacity).toBe(20);
+      expect(level.trayCapacity).toBe(40);
       expect(level.queues).toHaveLength(10);
       const quantities = level.orders.flatMap(order => Object.values(order.items));
       expect(Math.max(...quantities)).toBeLessThanOrEqual(16);

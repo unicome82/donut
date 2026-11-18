@@ -251,3 +251,9 @@ button { border: 0; background: none; touch-action: manipulation; }
 @keyframes felt-heart { 0% { opacity: 0; transform: translateY(5px) scale(.5); } 60% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { opacity: 1; transform: translateY(-2px) scale(1); } }
 @media (max-width: 360px) { .customer-satisfied .customer-hearts { left: 0; width: 35px; font-size: 14px; } }
 @media (prefers-reduced-motion: reduce) { .customer-satisfied .customer-hearts { animation: none; } }
+
+/* Forty donuts on one open tray; no pause control or input-wide dwell lock. */
+.tray-slots, .tray--expanded .tray-slots { grid-template-columns: repeat(10, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }
+.tray--expanded .tray-slots { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+.game-board { grid-template-rows: clamp(110px, 21dvh, 140px) 140px minmax(0, 1fr); }
+@media (max-height: 520px) and (min-width: 600px) { .game-board { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); } }
