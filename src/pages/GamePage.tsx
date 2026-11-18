@@ -20,7 +20,6 @@ const PICKUP_INTERVAL = 200;
 
 interface Props { state: GameState; score: number; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
 export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
-  const level = getLevel(state.levelId);
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -105,7 +104,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
   const resultTitles = {
     ready: '다시 도전해요',
     paused: '다시 도전해요',
-    clear: '레벨 클리어!',
+    clear: 'Level Clear!',
     blocked: '트레이가 가득 찼어요',
     gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
@@ -126,27 +125,30 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {showResult && failed && <ShopAwning />}
-    <GameHeader level={state.levelId} score={score} onBack={onLevels} />
+    {(!showResult || status !== 'clear') && <GameHeader level={state.levelId} score={score} onBack={onLevels} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
       </div>}
       {failed && <Customer sequence={status === 'blocked' ? 4 : 2} className="result-character" />}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{status === 'clear' && lastLevel ? '전체 클리어!' : resultTitles[status]}</h2>
-      {status === 'clear' && <>
-        <Donut type="strawberry" className="result-donut" />
-        <p className="result-order-count">주문 완료 <strong>{state.completedOrders} / {level.targetOrders}</strong></p>
-      </>}
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'level-badge clear-title' : undefined}>
+        {status === 'clear' && lastLevel ? 'All Levels Clear!' : resultTitles[status]}
+      </h2>
+      {status === 'clear' && <div className="result-desserts" aria-hidden="true">
+        <Donut type="blueberryCupcake" />
+        <Donut type="cake" />
+        <Donut type="chocolateIceCream" />
+      </div>}
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       {status === 'blocked' && <button type="button" className="expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
       <div className="result-actions">
-        {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}
+        {status === 'clear' && !lastLevel && <button className="primary-button level-button" onClick={onNext}><span>Level {String(state.levelId + 1).padStart(2, '0')}</span></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
-        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>레벨 선택</button>}
+        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}>{status === 'clear' && <Icon name="list" />}레벨 선택</button>}
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
