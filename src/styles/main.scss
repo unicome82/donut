@@ -22,6 +22,7 @@
 @media (display-mode: standalone) {
   :root { --page-height: max(100dvh, 100lvh, 100vh, var(--ios-full-height, 0px)); }
   :root:has(.start-page) { background-color: #c5e9ff; }
+  .start-page { --poster-top-gap: 28px; }
   :root:has(.stage-page) { background-color: #fff4f7; }
   :root:has(.game-page) { background-color: #fae2d2; }
 }
@@ -108,22 +109,17 @@
   place-items: end center;
   padding: var(--safe-top) env(safe-area-inset-right) max(clamp(20px, 5dvh, 48px), env(safe-area-inset-bottom)) env(safe-area-inset-left);
   background-color: #c5e9ff;
-  background-size: cover;
-  background-position: center;
 }
-.start-backdrop, .start-poster {
+.start-poster {
   position: absolute;
-  inset: 0;
+  top: calc(var(--safe-top) + var(--poster-top-gap, 20px));
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% - var(--safe-top) - var(--poster-top-gap, 20px));
+  object-fit: fill;
+  object-position: top center;
   pointer-events: none;
 }
-.start-backdrop {
-  background: inherit;
-  filter: blur(24px);
-  transform: scale(1.12);
-}
-.start-poster { object-fit: contain; }
 .start-actions {
   position: relative;
   z-index: 1;
