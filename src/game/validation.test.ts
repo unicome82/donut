@@ -11,7 +11,7 @@ describe('고정 레벨 데이터 계약', () => {
   });
   it('총수량 16개를 넘는 주문을 거부한다', () => {
     const invalid = structuredClone(level01);
-    invalid.orders[0] = { id: 'oversized', sequence: 1, items: { croissant: 16, americano: 1 } };
+    invalid.orders[0] = { id: 'oversized', sequence: 1, items: { croissant: 16, chocolateIceCream: 1 } };
     expect(validateLevel(invalid)).toContain('주문 총수량은 16개 이하여야 합니다.');
   });
   it('잘못된 주문 수량과 순번을 감지한다', () => {

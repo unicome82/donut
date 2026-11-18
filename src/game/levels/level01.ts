@@ -3,16 +3,16 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level01: LevelDefinition = {
   "id": 1,
-  "revision": 8,
+  "revision": 9,
   "donutTypes": [
     "croissant",
-    "americano",
+    "chocolateIceCream",
     "vanillaIceCream",
     "matchaCroffle",
     "blueberryCupcake",
     "cinnamonCroffle",
     "lemonMacaron",
-    "matchaLatte"
+    "strawberryTart"
   ],
   "targetOrders": 8,
   "trayCapacity": 40,
@@ -72,27 +72,27 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q0-p2",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q0-p3",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q0-p4",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q0-p5",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q0-p6",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q0-p7",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q8-p11",
@@ -224,19 +224,19 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q2-p0",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q2-p1",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q2-p2",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q2-p3",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q2-p4",
@@ -270,11 +270,11 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q3-p0",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q3-p1",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q3-p2",
@@ -362,15 +362,15 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q5-p0",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q5-p1",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q5-p2",
-        "type": "americano"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l1-r4-q5-p3",
@@ -490,39 +490,39 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q7-p2",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p3",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p4",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p5",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p6",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p7",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p8",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p9",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       },
       {
         "id": "l1-r4-q7-p10",
-        "type": "matchaLatte"
+        "type": "strawberryTart"
       }
     ]
   ],
@@ -532,7 +532,7 @@ export const level01: LevelDefinition = {
       "sequence": 1,
       "items": {
         "croissant": 2,
-        "americano": 1
+        "chocolateIceCream": 1
       }
     },
     {
@@ -554,7 +554,7 @@ export const level01: LevelDefinition = {
       "id": "l1-o4",
       "sequence": 4,
       "items": {
-        "americano": 8
+        "chocolateIceCream": 8
       }
     },
     {
@@ -578,7 +578,7 @@ export const level01: LevelDefinition = {
       "sequence": 7,
       "items": {
         "vanillaIceCream": 9,
-        "matchaLatte": 3
+        "strawberryTart": 3
       }
     },
     {

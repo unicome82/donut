@@ -3,15 +3,15 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level02: LevelDefinition = {
   "id": 2,
-  "revision": 7,
+  "revision": 8,
   "donutTypes": [
     "strawberry",
     "chocolate",
     "whiteCookie",
     "matchaScone",
     "blueberryTart",
-    "peachAde",
-    "lemonade",
+    "chocolateCupcake",
+    "lemonMacaron",
     "berryScone"
   ],
   "targetOrders": 10,
@@ -68,7 +68,7 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q8-p3",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q0-p9",
@@ -126,11 +126,11 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q1-p0",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q1-p1",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q9-p1",
@@ -154,11 +154,11 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q1-p2",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q1-p3",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q1-p4",
@@ -232,27 +232,27 @@ export const level02: LevelDefinition = {
     [
       {
         "id": "l2-r4-q2-p0",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p1",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p2",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p3",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p4",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p5",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q2-p6",
@@ -322,27 +322,27 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q3-p4",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q3-p5",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q3-p6",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q3-p7",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q3-p8",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q3-p9",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       }
     ],
     [
@@ -380,27 +380,27 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q4-p8",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q4-p9",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q4-p10",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q4-p11",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q4-p12",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       },
       {
         "id": "l2-r4-q4-p13",
-        "type": "lemonade"
+        "type": "lemonMacaron"
       }
     ],
     [
@@ -418,15 +418,15 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q5-p3",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q5-p4",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q5-p5",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q5-p6",
@@ -526,47 +526,47 @@ export const level02: LevelDefinition = {
       },
       {
         "id": "l2-r4-q7-p3",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p4",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p5",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p6",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p7",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p8",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p9",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p10",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p11",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p12",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       },
       {
         "id": "l2-r4-q7-p13",
-        "type": "peachAde"
+        "type": "chocolateCupcake"
       }
     ]
   ],
@@ -613,8 +613,8 @@ export const level02: LevelDefinition = {
       "id": "l2-o6",
       "sequence": 6,
       "items": {
-        "peachAde": 10,
-        "lemonade": 2
+        "chocolateCupcake": 10,
+        "lemonMacaron": 2
       }
     },
     {
@@ -629,7 +629,7 @@ export const level02: LevelDefinition = {
       "id": "l2-o8",
       "sequence": 8,
       "items": {
-        "peachAde": 1,
+        "chocolateCupcake": 1,
         "strawberry": 2
       }
     },
@@ -644,8 +644,8 @@ export const level02: LevelDefinition = {
       "id": "l2-o10",
       "sequence": 10,
       "items": {
-        "peachAde": 4,
-        "lemonade": 2,
+        "chocolateCupcake": 4,
+        "lemonMacaron": 2,
         "strawberry": 2
       }
     }

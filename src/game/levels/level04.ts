@@ -3,14 +3,14 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level04: LevelDefinition = {
   "id": 4,
-  "revision": 8,
+  "revision": 9,
   "donutTypes": [
     "cake",
     "chocolate",
-    "latte",
+    "raspberryMacaron",
     "chocolateCake",
-    "vanillaLatte",
-    "macchiato",
+    "chocolateIceCream",
+    "blueberryTart",
     "strawberryTart",
     "chocolateCupcake"
   ],
@@ -20,7 +20,7 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q8-p0",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q0-p0",
@@ -76,7 +76,7 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q0-p7",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q8-p7",
@@ -88,125 +88,125 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q0-p8",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p9",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p10",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p11",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p12",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p13",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p14",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p15",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p16",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p17",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q0-p18",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q8-p9",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q8-p10",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q8-p11",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q8-p12",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q8-p13",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q8-p14",
-        "type": "latte"
+        "type": "raspberryMacaron"
       }
     ],
     [
       {
         "id": "l4-r4-q9-p0",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q9-p1",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q9-p2",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q9-p3",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q9-p4",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q1-p0",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p1",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p2",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p3",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p4",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q1-p5",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q9-p5",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p6",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q1-p7",
@@ -222,35 +222,35 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q9-p6",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q9-p7",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q1-p10",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q1-p11",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q1-p12",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q1-p13",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q1-p14",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q1-p15",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q9-p8",
@@ -378,31 +378,31 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q3-p0",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q3-p1",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q3-p2",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q3-p3",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q3-p4",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q3-p5",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q3-p6",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q3-p7",
@@ -418,27 +418,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q3-p10",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q3-p11",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q3-p12",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q3-p13",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q3-p14",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q3-p15",
-        "type": "latte"
+        "type": "raspberryMacaron"
       }
     ],
     [
@@ -488,11 +488,11 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q4-p11",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q4-p12",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q4-p13",
@@ -522,11 +522,11 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q5-p0",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q5-p1",
-        "type": "latte"
+        "type": "raspberryMacaron"
       },
       {
         "id": "l4-r4-q5-p2",
@@ -554,27 +554,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q5-p8",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q5-p9",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q5-p10",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q5-p11",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q5-p12",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q5-p13",
-        "type": "macchiato"
+        "type": "blueberryTart"
       }
     ],
     [
@@ -588,35 +588,35 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q6-p2",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p3",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p4",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p5",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p6",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p7",
-        "type": "macchiato"
+        "type": "blueberryTart"
       },
       {
         "id": "l4-r4-q6-p8",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q6-p9",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q6-p10",
@@ -646,27 +646,27 @@ export const level04: LevelDefinition = {
     [
       {
         "id": "l4-r4-q7-p0",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p1",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p2",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p3",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p4",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p5",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p6",
@@ -690,27 +690,27 @@ export const level04: LevelDefinition = {
       },
       {
         "id": "l4-r4-q7-p11",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p12",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p13",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p14",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p15",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       },
       {
         "id": "l4-r4-q7-p16",
-        "type": "vanillaLatte"
+        "type": "chocolateIceCream"
       }
     ]
   ],
@@ -727,7 +727,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o2",
       "sequence": 2,
       "items": {
-        "latte": 4
+        "raspberryMacaron": 4
       }
     },
     {
@@ -735,7 +735,7 @@ export const level04: LevelDefinition = {
       "sequence": 3,
       "items": {
         "cake": 5,
-        "latte": 2
+        "raspberryMacaron": 2
       }
     },
     {
@@ -756,7 +756,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o6",
       "sequence": 6,
       "items": {
-        "macchiato": 1,
+        "blueberryTart": 1,
         "strawberryTart": 2
       }
     },
@@ -764,7 +764,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o7",
       "sequence": 7,
       "items": {
-        "latte": 2,
+        "raspberryMacaron": 2,
         "chocolateCupcake": 3
       }
     },
@@ -772,7 +772,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o8",
       "sequence": 8,
       "items": {
-        "macchiato": 4,
+        "blueberryTart": 4,
         "cake": 4
       }
     },
@@ -780,7 +780,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o9",
       "sequence": 9,
       "items": {
-        "vanillaLatte": 12
+        "chocolateIceCream": 12
       }
     },
     {
@@ -788,7 +788,7 @@ export const level04: LevelDefinition = {
       "sequence": 10,
       "items": {
         "chocolateCake": 12,
-        "vanillaLatte": 2,
+        "chocolateIceCream": 2,
         "cake": 2
       }
     },
@@ -796,7 +796,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o11",
       "sequence": 11,
       "items": {
-        "macchiato": 1,
+        "blueberryTart": 1,
         "strawberryTart": 2
       }
     },
@@ -804,7 +804,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o12",
       "sequence": 12,
       "items": {
-        "latte": 1,
+        "raspberryMacaron": 1,
         "chocolateCupcake": 4
       }
     },
@@ -812,7 +812,7 @@ export const level04: LevelDefinition = {
       "id": "l4-o13",
       "sequence": 13,
       "items": {
-        "macchiato": 6,
+        "blueberryTart": 6,
         "chocolateCake": 2
       }
     },
@@ -820,8 +820,8 @@ export const level04: LevelDefinition = {
       "id": "l4-o14",
       "sequence": 14,
       "items": {
-        "vanillaLatte": 10,
-        "latte": 2
+        "chocolateIceCream": 10,
+        "raspberryMacaron": 2
       }
     }
   ]

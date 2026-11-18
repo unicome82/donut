@@ -14,12 +14,18 @@ const toppingShapes = {
   dots: 'M3 0A3 3 0 1 1-3 0A3 3 0 1 1 3 0Z',
 };
 const solidPatterns = new Set(['chunks', 'leaves', 'stars', 'dots']);
+const narrowDesserts = new Set<DonutType>([
+  'vanillaIceCream', 'chocolateIceCream', 'blueberryCupcake', 'chocolateCupcake', 'cake', 'chocolateCake',
+]);
 const menuImages = import.meta.glob<string>('../../assets/menu/*.webp', { eager: true, import: 'default', query: '?url&no-inline' });
 
 export function Donut({ type, className = '', useMenuArt = true }: { type: DonutType; className?: string; useMenuArt?: boolean }) {
   const glaze = useId();
   const image = menuImages[`../../assets/menu/${type}.webp`];
-  if (useMenuArt && image) return <img className={`donut ${className}`} src={image} alt="" draggable={false} />;
+  if (useMenuArt && image) {
+    const shape = narrowDesserts.has(type) ? 'donut--widened' : '';
+    return <img className={`donut ${shape} ${className}`} src={image} alt="" draggable={false} />;
+  }
   const theme = donutThemes[type as keyof typeof donutThemes];
   return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
     <defs>

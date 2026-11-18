@@ -3,13 +3,13 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level03: LevelDefinition = {
   "id": 3,
-  "revision": 8,
+  "revision": 9,
   "donutTypes": [
     "strawberry",
-    "americano",
+    "vanillaIceCream",
     "croissant",
     "matchaPudding",
-    "blueberryAde",
+    "blueberryCupcake",
     "chocolateCroissant",
     "raspberryMacaron",
     "chocolateCookie"
@@ -64,23 +64,23 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q0-p4",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q0-p5",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q0-p6",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q0-p7",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q0-p8",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q0-p9",
@@ -108,27 +108,27 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q8-p7",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q8-p8",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q8-p9",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q8-p10",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q8-p11",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q8-p12",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       }
     ],
     [
@@ -222,27 +222,27 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q1-p10",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q1-p11",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q1-p12",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q1-p13",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q1-p14",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q1-p15",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q9-p12",
@@ -388,19 +388,19 @@ export const level03: LevelDefinition = {
     [
       {
         "id": "l3-r4-q4-p0",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q4-p1",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q4-p2",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q4-p3",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q4-p4",
@@ -524,15 +524,15 @@ export const level03: LevelDefinition = {
     [
       {
         "id": "l3-r4-q6-p0",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q6-p1",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q6-p2",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q6-p3",
@@ -548,23 +548,23 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q6-p6",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q6-p7",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q6-p8",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q6-p9",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q6-p10",
-        "type": "americano"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l3-r4-q6-p11",
@@ -594,23 +594,23 @@ export const level03: LevelDefinition = {
     [
       {
         "id": "l3-r4-q7-p0",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p1",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p2",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p3",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p4",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p5",
@@ -626,15 +626,15 @@ export const level03: LevelDefinition = {
       },
       {
         "id": "l3-r4-q7-p8",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p9",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p10",
-        "type": "blueberryAde"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l3-r4-q7-p11",
@@ -668,7 +668,7 @@ export const level03: LevelDefinition = {
       "sequence": 1,
       "items": {
         "strawberry": 2,
-        "americano": 1
+        "vanillaIceCream": 1
       }
     },
     {
@@ -690,7 +690,7 @@ export const level03: LevelDefinition = {
       "id": "l3-o4",
       "sequence": 4,
       "items": {
-        "americano": 8
+        "vanillaIceCream": 8
       }
     },
     {
@@ -728,14 +728,14 @@ export const level03: LevelDefinition = {
       "id": "l3-o9",
       "sequence": 9,
       "items": {
-        "blueberryAde": 8
+        "blueberryCupcake": 8
       }
     },
     {
       "id": "l3-o10",
       "sequence": 10,
       "items": {
-        "blueberryAde": 8,
+        "blueberryCupcake": 8,
         "chocolateCroissant": 2,
         "strawberry": 2
       }

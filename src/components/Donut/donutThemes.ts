@@ -30,16 +30,6 @@ export const menuNames = {
   matchaScone: '말차 스콘',
   vanillaIceCream: '바닐라 아이스크림',
   chocolateIceCream: '초코 아이스크림',
-  americano: '아이스 아메리카노',
-  latte: '아이스 카페라테',
-  vanillaLatte: '아이스 바닐라라테',
-  macchiato: '아이스 캐러멜마키아토',
-  mocha: '아이스 카페모카',
-  matchaLatte: '아이스 말차라테',
-  strawberryMilk: '아이스 딸기라테',
-  lemonade: '아이스 레몬에이드',
-  peachAde: '아이스 복숭아에이드',
-  blueberryAde: '아이스 블루베리에이드',
 };
 
 export const donutThemes: Record<Exclude<DonutType, keyof typeof menuNames> | 'strawberry', DonutTheme> = {
