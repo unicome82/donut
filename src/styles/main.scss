@@ -9,6 +9,7 @@
   --secondary-text: #76452d;
   --level-script: Lobster, 'Brush Script MT', cursive;
   --level-script-size: clamp(27px, 7vw, 33px);
+  --page-height: 100dvh;
   --safe-top: env(safe-area-inset-top, 0px);
   --button-stack-gap: clamp(13px, 2dvh, 18px);
   --gutter: clamp(10px, 4vw, 18px);
@@ -17,26 +18,24 @@
   background: #f6ece2;
 }
 
+@media (display-mode: standalone) {
+  :root { --page-height: max(100dvh, 100lvh, 100vh); }
+  :root:has(.start-page) { background-color: #c5e9ff; }
+  :root:has(.level-page) { background-color: #fff4f7; }
+  :root:has(.game-page) { background-color: #fae2d2; }
+}
+
 .app-shell {
   position: relative;
   width: min(100%, 460px);
-  min-height: 100dvh;
+  min-height: var(--page-height);
   margin: 0 auto;
   background: radial-gradient(ellipse at 50% 28%, #fffdf7, var(--background) 70%);
   box-shadow: 0 0 45px #774a2720;
 }
-.app-shell::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: var(--safe-top);
-  z-index: 5;
-  background: #361c3a52;
-  pointer-events: none;
-}
 .game-page {
   position: relative;
-  min-height: 100dvh;
+  min-height: var(--page-height);
   padding-inline: max(var(--gutter), env(safe-area-inset-left), env(safe-area-inset-right));
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
@@ -103,7 +102,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 100dvh;
+  min-height: var(--page-height);
   display: grid;
   justify-items: center;
   align-items: end;
@@ -151,7 +150,7 @@
 }
 
 .level-page {
-  min-height: 100dvh;
+  min-height: var(--page-height);
   padding-bottom: max(20px, env(safe-area-inset-bottom));
   background: linear-gradient(#fbe0e7, #fce8ee 42%, #fff4f7);
 }
@@ -229,7 +228,7 @@
 
 .game-page {
   background: #fae2d2 url('../assets/game/cafe.webp') center top / cover no-repeat;
-  height: 100dvh;
+  height: var(--page-height);
   display: flex;
   flex-direction: column;
   gap: var(--gap);
