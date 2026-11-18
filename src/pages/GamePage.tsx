@@ -1,5 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { ShopArt } from '../components/ShopArt';
+import { ShopAwning } from '../components/ShopAwning';
+import { Icon } from '../components/Icon';
+import { Donut } from '../components/Donut/Donut';
 import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
@@ -62,25 +66,45 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   }
 
   const resultHeading = useRef<HTMLHeadingElement>(null);
-  const playing = state.status === 'playing';
+  const { status } = state;
+  const playing = status === 'playing';
+  const resultTitles = {
+    ready: '다시 도전해요',
+    paused: '다시 도전해요',
+    clear: '레벨 클리어!',
+    blocked: '트레이가 가득 찼어요',
+    gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 도넛을 모두 사용했어요',
+  };
+  const failed = status === 'blocked' || status === 'gameover';
+  const illustratedResult = failed || status === 'clear';
+  const stars = status === 'clear' ? getStars(state) : 0;
   const lastLevel = state.levelId === levels[levels.length - 1]?.id;
   useEffect(() => {
     if (state.status !== 'playing') resultHeading.current?.focus();
   }, [state.status]);
   return <main className={`game-page game-status--${state.status}`} ref={root}>
+    {illustratedResult && <ShopAwning />}
     <GameHeader level={state.levelId} completed={state.completedOrders} target={level.targetOrders} onBack={onLevels} />
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
     {!playing && <section className="result-panel" aria-labelledby="result-heading">
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{state.status === 'clear' ? (lastLevel ? '전체 클리어!' : '레벨 클리어!') : state.status === 'blocked' ? '트레이가 가득 찼어요' : '다시 도전해요'}</h2>
-      {state.status === 'clear' && <p className="result-stars" aria-label={getStars(state) + '성'}>{'★'.repeat(getStars(state))}{'☆'.repeat(3 - getStars(state))}</p>}
-      {state.status === 'blocked' && <p>무료 +2칸 확장해 계속할 수 있어요.</p>}
+      {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
+        {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}
+      </div>}
+      {failed && <ShopArt art={status === 'blocked' ? 'tray-full' : 'try-again'} className="result-character" />}
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1}>{status === 'clear' && lastLevel ? '전체 클리어!' : resultTitles[status]}</h2>
+      {status === 'clear' && <>
+        <ShopArt art="order-complete" className="result-box" />
+        <p className="result-order-count">주문 완료 <strong>{state.completedOrders} / {level.targetOrders}</strong></p>
+      </>}
+      {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
+        {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
+      </div>}
+      {status === 'blocked' && <p>트레이를 확장하면<br />도넛을 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
-        {state.status === 'blocked' ? <><button className="primary-button" onClick={() => { void act({ type: 'EXPAND_TRAY' }); }}>무료 +2칸 확장</button><button className="secondary-button" onClick={() => dispatch({ type: 'DECLINE_EXPAND' })}>종료</button></>
-        : <>
-          {state.status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨</button>}
-          <button className={state.status === 'gameover' ? 'primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}>다시 하기</button>
-          <button className="secondary-button" onClick={onLevels}>레벨 선택</button>
-        </>}
+        {status === 'blocked' && <button className="primary-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>트레이 확장 +2</button>}
+        {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}
+        <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
+        {status !== 'blocked' && <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>}
       </div>
     </section>}
     {(playing || state.status === 'clear') && <div className="game-board">

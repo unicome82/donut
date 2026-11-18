@@ -26,7 +26,8 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
       leaving = old.node;
       leaving.classList.add('customer-leaving');
       leaving.setAttribute('aria-hidden', 'true');
-      leaving.querySelector('.speech-bubble')?.remove();
+      const bubble = leaving.querySelector<HTMLElement>('.speech-bubble');
+      if (bubble) bubble.style.visibility = 'hidden';
       const scene = leaving.querySelector('.customer-scene');
       if (scene) {
         const hearts = document.createElement('span');
@@ -38,16 +39,16 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
       container.append(leaving);
       animations.push(leaving.animate([
         { transform: 'translateX(0)', opacity: 1 },
-        { transform: 'translateX(0)', opacity: 1, offset: .72 },
+        { transform: 'translateX(0)', opacity: 1, offset: .56 },
         { transform: 'translateX(-22px)', opacity: 0 },
-      ], { duration: 480, easing: 'ease-in', fill: 'both' }));
+      ], { duration: 300, easing: 'ease-in', fill: 'both' }));
     }
     animations.push(current.animate([
       { transform: 'translateX(22px)', opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: 160, delay: leaving ? 480 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    ], { duration: 160, delay: leaving ? 210 : 0, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, 850);
+    const timeout = setTimeout(cleanup, 520);
     cancel.current = () => { clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [order]);

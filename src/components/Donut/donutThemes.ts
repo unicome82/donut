@@ -10,9 +10,9 @@ export const donutThemes: Record<DonutType, DonutTheme> = {
   lemon: { name: '레몬', icing: '#efd17d', topping: '#fff9e5', pattern: 'chunks' },
   mint: { name: '민트', icing: '#54c7bd', topping: '#244d47', pattern: 'chunks' },
   orange: { name: '오렌지', icing: '#ed873d', topping: '#fff3c4', pattern: 'drizzle' },
-  raspberry: { name: '라즈베리', icing: '#c5446c', topping: '#fff0c9', pattern: 'dots' },
+  raspberry: { name: '라즈베리', icing: '#c5446c', topping: '#fff0c9', pattern: 'berries' },
   sesame: { name: '흑임자', icing: '#68717c', topping: '#e5dfcd', pattern: 'sprinkles' },
   coconut: { name: '코코넛', icing: '#f5f1ec', topping: '#a5ccd7', pattern: 'chunks' },
-  coffee: { name: '커피', icing: '#ad795c', topping: '#f5d0a0', pattern: 'berries' },
+  coffee: { name: '커피', icing: '#785044', topping: '#f5d0a0', pattern: 'dots' },
   sprinkle: { name: '스프링클', icing: '#f7edde', topping: '#ed8b9f', pattern: 'sprinkles' },
 };
