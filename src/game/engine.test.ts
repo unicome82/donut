@@ -303,7 +303,7 @@ describe('세션 진행', () => {
   it('테스트 레벨은 손님 한 명의 디저트 하나로 완료되며 일반 진행에 영향을 주지 않는다', () => {
     const initial = createSession();
     const practice = reduceSession(initial, { type: 'START', levelId: practiceLevel.id });
-    const queueIndex = practice.game.queues.findIndex(queue => queue.length > 0);
+    const queueIndex = practice.game.queues.findIndex(queue => queue[0]?.type === 'strawberry');
     const front = practice.game.queues[queueIndex]?.[0];
     if (!front) throw new Error('테스트 디저트가 없습니다.');
     expect(practice.game.orders.filter(Boolean)).toHaveLength(1);
@@ -312,6 +312,24 @@ describe('세션 진행', () => {
     expect(getStars(cleared.game)).toBe(3);
     expect(cleared.score).toBe(initial.score);
     expect(cleared.stars).toEqual(initial.stars);
+  });
+
+  it('테스트 레벨에서 40칸과 확장된 42칸을 모두 채울 수 있다', () => {
+    let state = createGame(practiceLevel);
+    function fillTray() {
+      while (state.status === 'playing') {
+        const column = state.queues.findIndex(queue => queue[0]?.type === 'chocolate');
+        expect(column).toBeGreaterThanOrEqual(0);
+        state = select(state, practiceLevel, column).state;
+      }
+    }
+    fillTray();
+    expect(state.status).toBe('blocked');
+    expect(state.tray).toHaveLength(BASE_TRAY_CAPACITY);
+    state = expandTray(state, practiceLevel).state;
+    fillTray();
+    expect(state.status).toBe('gameover');
+    expect(state.tray).toHaveLength(BASE_TRAY_CAPACITY + TRAY_EXPANSION);
   });
 
   it('게임 시작 직후 첫 주문과 대기열 선두에 크루아상과 초코 아이스크림가 있다', () => {
