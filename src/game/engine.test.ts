@@ -26,6 +26,16 @@ function tray(type: DonutType, count: number) {
 }
 
 describe('자동 매칭과 상태 전이', () => {
+  it('연속 두 입력은 새 맨 앞 ID로 각각 처리하고 이전 ID 중복만 무시한다', () => {
+    const level = fixture([{ strawberry: 20 }]);
+    const initial = createGame(level);
+    const first = select(initial, level, 2).state;
+    const second = select(first, level, 2).state;
+    expect(second.tray.map(token => token.id)).toEqual(['2-0', '2-1']);
+    expect(second.queues[2]?.[0]?.id).toBe('2-2');
+    expect(selectDonut(second, level, 2, '2-1').state).toBe(second);
+  });
+
   it('선택한 토큰은 대기열에서 제거되고 한 번만 소비된다', () => {
     const level = fixture([{ strawberry: 2 }, { strawberry: 2 }]);
     const original = createGame(level);

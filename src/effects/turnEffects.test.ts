@@ -48,7 +48,7 @@ describe('빠른 이동과 깜빡임 방지', () => {
     await effects.play(s.root, s.state, [{ type: 'moved', donutId: s.source.dataset.tokenId ?? '', queueIndex: 0 }]);
     expect(s.calls).toHaveLength(1);
     expect(s.calls[0]).toMatchObject({ duration: MOVE_DURATION, fill: 'both' });
-    expect(s.source.style.visibility).toBe('hidden');
+    expect(s.source.style.visibility).toBe('');
     expect(s.lifecycle).toEqual([]);
     effects.cleanup();
     expect(s.lifecycle).toEqual(['remove', 'cancel']);

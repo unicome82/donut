@@ -7,7 +7,6 @@ export const MATCH_DURATION = 160;
 export function createEffects() {
   const animations = new Set<Animation>();
   const elements = new Set<HTMLElement>();
-  const hidden = new Set<HTMLElement>();
   let disposed = false;
   const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.visibilityState !== 'visible';
   async function animate(element: Element, frames: Keyframe[], duration: number) {
@@ -34,7 +33,6 @@ export function createEffects() {
   function tokenElement(root: HTMLElement, id: string) {
     return Array.from(root.querySelectorAll<HTMLElement>('[data-token-id]')).find(el => el.dataset.tokenId === id);
   }
-  function hide(element: HTMLElement) { element.style.visibility = 'hidden'; hidden.add(element); }
   async function fly(origin: HTMLElement, target: Element, via?: Element) {
     const svg = origin.querySelector('svg');
     if (!svg || disposed || reduceMotion()) return;
@@ -46,7 +44,6 @@ export function createEffects() {
     ghost.style.left = `${from.x}px`; ghost.style.top = `${from.y}px`;
     ghost.style.width = `${from.width}px`; ghost.style.height = `${from.height}px`;
     document.body.append(ghost); elements.add(ghost);
-    hide(origin);
     const x = to.x + to.width / 2 - (from.x + from.width / 2);
     const y = to.y + to.height / 2 - (from.y + from.height / 2);
     const frames: Keyframe[] = [{ transform: 'translate(0,0)', opacity: 1 }];
@@ -102,7 +99,6 @@ export function createEffects() {
       // Remove ghosts before canceling their transforms to prevent a return-to-origin flash.
       for (const element of elements) element.remove();
       for (const animation of animations) animation.cancel();
-      for (const element of hidden) element.style.visibility = '';
       document.removeEventListener('visibilitychange', visibility);
     },
   };

@@ -169,3 +169,21 @@ button { border: 0; background: none; touch-action: manipulation; }
 .queue-column { padding-bottom: 12px; }
 .queue-front .donut { width: 18px; height: 19px; max-height: 100%; }
 .queue-back .donut { width: 18px; height: 19px; max-height: none; filter: drop-shadow(0 1px 1px #59412b33); }
+
+/* Visits animate independently of input and game-state commits. */
+.order-card { position: relative; overflow: hidden; }
+.customer-visit { display: flex; align-items: center; gap: 4px; width: 100%; height: 100%; min-width: 0; }
+.customer-leaving { position: absolute; inset: 3px 0; height: auto; pointer-events: none; z-index: 2; }
+.customer { width: 36px; height: 45px; flex-basis: 36px; }
+.speech-bubble { flex: 0 1 auto; width: max-content; max-width: calc(100% - 40px); height: 34px; padding: 3px 5px; border-radius: 10px 10px 10px 3px; }
+.speech-bubble .order-items { gap: 5px; }
+.speech-bubble .order-items li { flex-shrink: 0; }
+.speech-bubble .order-items .donut { width: 17px; height: 18px; }
+.speech-bubble .order-items strong { font-size: 12px; }
+.tray-donut { display: grid; place-items: center; width: 18px; height: 19px; }
+@media (max-width: 360px) {
+  .customer { width: 28px; height: 37px; flex-basis: 28px; }
+  .speech-bubble { max-width: calc(100% - 32px); padding: 3px; }
+  .speech-bubble .order-items { gap: 3px; }
+  .speech-bubble .order-items .donut { width: 16px; height: 17px; }
+}
