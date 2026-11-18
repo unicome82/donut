@@ -1,50 +1,35 @@
-import { useState } from 'react';
-import { Customer } from '../components/Customer';
-import { Donut } from '../components/Donut/Donut';
+import { useState, type CSSProperties } from 'react';
 import { Icon } from '../components/Icon';
-import { ShopAwning } from '../components/ShopAwning';
-import type { DonutType } from '../game/types';
 
-const themes: ReadonlyArray<{
-  name: string;
-  guest: number;
-  companion?: number;
-  menu: readonly [DonutType, DonutType];
-}> = [
-  { name: 'berry', guest: 3, companion: 2, menu: ['chocolate', 'strawberry'] },
-  { name: 'bakery', guest: 18, menu: ['cake', 'blueberryCupcake'] },
-  { name: 'honey', guest: 10, menu: ['chocolate', 'lemonMacaron'] },
-  { name: 'rose', guest: 17, menu: ['raspberryMacaron', 'cake'] },
-  { name: 'matcha', guest: 15, menu: ['chocolate', 'matchaLatte'] },
-  { name: 'sky', guest: 24, menu: ['strawberry', 'blueberryAde'] },
-  { name: 'peach', guest: 6, menu: ['peachAde', 'chocolate'] },
-  { name: 'night', guest: 20, menu: ['raspberryMacaron', 'cake'] },
-  { name: 'shop', guest: 14, menu: ['strawberry', 'americano'] },
-  { name: 'lavender', guest: 8, menu: ['chocolate', 'blueberryCupcake'] },
-];
+const posters = import.meta.glob<string>('../assets/home/*.webp', {
+  eager: true,
+  import: 'default',
+  query: '?url&no-inline',
+});
+
+const themes = [
+  { name: 'berry', button: '#a63126' },
+  { name: 'bakery', button: '#594587' },
+  { name: 'honey', button: '#975008' },
+  { name: 'rose', button: '#a52c55' },
+  { name: 'matcha', button: '#51601c' },
+  { name: 'sky', button: '#255981' },
+  { name: 'peach', button: '#a44429' },
+  { name: 'night', button: '#463e72' },
+  { name: 'shop', button: '#9e4818' },
+  { name: 'lavender', button: '#56418b' },
+] as const;
 
 export function StartPage({ level, onGame, onLevels }: { level: number; onGame: () => void; onLevels: () => void }) {
   const [theme] = useState(() => themes[Math.floor(Math.random() * themes.length)]!);
+  const poster = posters[`../assets/home/${theme.name}.webp`];
 
-  return <main className={`start-page start-theme--${theme.name}`}>
-    {theme.name === 'shop' && <ShopAwning />}
-    <div className="start-content">
-      <div className="start-brand">
-        <h1 aria-label="달콤한 주문, Sweet Order"><span>Sweet</span><span>Order</span></h1>
-        <p>달콤한 주문</p>
-      </div>
-      <div className="start-scene" aria-hidden="true">
-        <span className="start-sparkle">✦</span>
-        <span className="start-sparkle start-sparkle--small">✧</span>
-        {theme.companion && <Customer sequence={theme.companion} className="start-companion" />}
-        <Customer sequence={theme.guest} className="start-guest" />
-        <Donut type={theme.menu[0]} className="start-menu start-menu--left" />
-        <Donut type={theme.menu[1]} className="start-menu start-menu--right" />
-      </div>
-      <div className="start-actions">
-        <button className="primary-button" onClick={onGame}>Level {String(level).padStart(2, '0')} <Icon name="play" /></button>
-        <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>
-      </div>
+  return <main className="start-page" style={{ '--start-button': theme.button, '--start-poster': `url("${poster}")` } as CSSProperties}>
+    <h1 className="sr-only">달콤한 주문, Sweet Order</h1>
+    <img className="start-poster" src={poster} alt="" draggable={false} fetchPriority="high" />
+    <div className="start-actions">
+      <button className="primary-button" onClick={onGame}>Level {String(level).padStart(2, '0')} <Icon name="play" /></button>
+      <button className="secondary-button" onClick={onLevels}><Icon name="grid" />레벨 선택</button>
     </div>
   </main>;
 }
