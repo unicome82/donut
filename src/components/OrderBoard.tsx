@@ -1,5 +1,5 @@
 import displayShelf from '../assets/game/display-shelf.webp';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
@@ -7,10 +7,28 @@ import { itemNames } from './Donut/donutThemes';
 import { levels } from '../game/levels';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
+const ARRIVAL_DURATION = 160;
+const GREETING_DURATION = 450;
+
 function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | null; slot: number; portraitOffset: number }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
+  const greetedOrder = useRef<string | undefined>(undefined);
+  const [revealedOrder, setRevealedOrder] = useState<string>();
+  const orderId = order?.definitionId;
+
+  useEffect(() => {
+    const replacingCustomer = Boolean(greetedOrder.current && greetedOrder.current !== orderId);
+    greetedOrder.current = orderId;
+    if (!orderId) return;
+    const animateArrival = typeof root.current?.animate === 'function'
+      && document.visibilityState === 'visible'
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const leadIn = animateArrival ? ARRIVAL_DURATION + (replacingCustomer ? CUSTOMER_GOODBYE_MS : 0) : 0;
+    const timer = setTimeout(() => setRevealedOrder(orderId), leadIn + GREETING_DURATION);
+    return () => clearTimeout(timer);
+  }, [orderId]);
   useEffect(() => () => cancel.current?.(), []);
   useLayoutEffect(() => {
     const container = root.current;
@@ -50,27 +68,26 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
         { transform: 'translateX(-22px)', opacity: 0 },
       ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-in', fill: 'both' }));
     }
-    const arrivalDuration = 160;
     const departureDuration = leaving ? CUSTOMER_GOODBYE_MS : 0;
     const arriving = current.querySelector('.customer-scene') ?? current;
     animations.push(arriving.animate([
       { transform: 'translateX(22px)', opacity: 0 },
       { transform: 'translateX(0)', opacity: 1 },
-    ], { duration: arrivalDuration, delay: departureDuration, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
+    ], { duration: ARRIVAL_DURATION, delay: departureDuration, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'both' }));
     const nextBubble = current.querySelector('.speech-bubble');
-    if (leaving && nextBubble) {
+    if (order && nextBubble) {
       animations.push(nextBubble.animate(
         [{ visibility: 'hidden' }, { visibility: 'hidden' }],
-        { duration: departureDuration + arrivalDuration, fill: 'backwards' },
+        { duration: departureDuration + ARRIVAL_DURATION, fill: 'backwards' },
       ));
     }
     const cleanup = () => { leaving?.remove(); for (const animation of animations) animation.cancel(); };
-    const timeout = setTimeout(cleanup, departureDuration + arrivalDuration + 100);
+    const timeout = setTimeout(cleanup, departureDuration + ARRIVAL_DURATION + 100);
     cancel.current = () => { clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [order]);
   return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
-    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : null}</div>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble">{revealedOrder === orderId ? <ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul> : <span className="customer-greeting" lang="en">Hi!</span>}</div></> : null}</div>
   </article>;
 }
 export function OrderBoard({ orders, levelId }: { orders: Array<ActiveOrder | null>; levelId: number }) {

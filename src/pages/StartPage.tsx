@@ -11,7 +11,7 @@ export function StartPage({ level, onGame, onLevels }: { level: number; onGame: 
     <h1 className="sr-only">Sweet Order</h1>
     <img className="start-poster" src={poster} alt="" draggable={false} fetchPriority="high" />
     <div className="start-actions">
-      <button className="primary-button" onClick={onGame}>Level {String(level).padStart(2, '0')}</button>
+      <button className="primary-button" onClick={onGame}><span>Level {String(level).padStart(2, '0')}</span></button>
       <button className="secondary-button" onClick={onLevels}>레벨 선택</button>
     </div>
   </main>;
