@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
@@ -29,12 +30,12 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
     try { await effects.play(root.current, state, result.events); }
     catch { /* A presentation failure must not discard the valid game action. */ }
     finally {
-      effects.cleanup();
       if (running.current === effects) {
+        // Commit the destination first; only then remove the overlay and reveal real tokens.
+        flushSync(() => { dispatch(action); setBusy(false); });
         running.current = null;
-        dispatch(action);
-        setBusy(false);
       }
+      effects.cleanup();
     }
   }
 
