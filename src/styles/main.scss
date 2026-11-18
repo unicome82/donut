@@ -199,7 +199,6 @@ button { border: 0; background: none; touch-action: manipulation; }
 .box-donut .donut { width: 8px; height: 8px; }
 .box-front { position: absolute; inset: auto -1px 0; height: 8px; border: 1px solid #d4a5b4; border-radius: 0 0 3px 3px; background: #f3bccb; color: #a45370; text-align: center; font-size: 7px; line-height: 7px; }
 .customer-hearts { display: block; color: #e35d89; font-size: 18px; letter-spacing: 2px; text-align: center; animation: customer-thanks .36s ease-out both; }
-.customer-satisfied .speech-bubble { display: grid; place-items: center; background: #fff0f5; }
 .customer-satisfied .box-lid { transform: translateY(8px) skewX(0); transition: transform .15s; }
 .speech-bubble { max-width: calc(100% - 47px); }
 .game-board, .result-panel { grid-column: 1; grid-row: 2; }
@@ -245,3 +244,10 @@ button { border: 0; background: none; touch-action: manipulation; }
 @media (max-height: 520px) {
   :root { --section-gap: 8px; }
 }
+
+/* Satisfaction belongs to the character, without an order bubble. */
+.customer-satisfied .customer-hearts { position: absolute; top: 2px; left: 2px; width: 39px; z-index: 4; font-size: 15px; line-height: 17px; letter-spacing: 1px; pointer-events: none; animation: felt-heart .36s ease-out both; }
+.customer-satisfied .customer-scene .customer { transform: translateY(7px); }
+@keyframes felt-heart { 0% { opacity: 0; transform: translateY(5px) scale(.5); } 60% { opacity: 1; transform: translateY(0) scale(1.15); } 100% { opacity: 1; transform: translateY(-2px) scale(1); } }
+@media (max-width: 360px) { .customer-satisfied .customer-hearts { left: 0; width: 35px; font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { .customer-satisfied .customer-hearts { animation: none; } }

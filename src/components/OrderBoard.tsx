@@ -26,11 +26,12 @@ function CustomerOrder({ order, slot, definition }: { order: ActiveOrder | null;
       leaving = old.node;
       leaving.classList.add('customer-leaving');
       leaving.setAttribute('aria-hidden', 'true');
-      const bubble = leaving.querySelector('.speech-bubble');
-      if (bubble) {
+      leaving.querySelector('.speech-bubble')?.remove();
+      const scene = leaving.querySelector('.customer-scene');
+      if (scene) {
         const hearts = document.createElement('span');
         hearts.className = 'customer-hearts'; hearts.textContent = '♥ ♥';
-        bubble.replaceChildren(hearts);
+        scene.append(hearts);
       }
       leaving.querySelectorAll<HTMLElement>('.box-donut').forEach(donut => { donut.style.opacity = '1'; });
       leaving.classList.add('customer-satisfied');
