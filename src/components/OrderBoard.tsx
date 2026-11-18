@@ -1,3 +1,4 @@
+import displayShelf from '../assets/game/display-shelf.webp';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
@@ -74,5 +75,10 @@ function CustomerOrder({ order, slot, portraitOffset }: { order: ActiveOrder | n
 }
 export function OrderBoard({ orders, levelId }: { orders: Array<ActiveOrder | null>; levelId: number }) {
   const portraitOffset = levels.filter(level => level.id < levelId).reduce((total, level) => total + level.targetOrders, 0);
-  return <section className="order-section" aria-label="손님 주문"><div className="order-grid">{orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} />)}</div></section>;
+  return <section className="order-section" aria-label="손님 주문">
+    <div className="order-grid">
+      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} />)}
+    </div>
+    <img className="display-shelf" src={displayShelf} alt="" aria-hidden="true" draggable={false} />
+  </section>;
 }
