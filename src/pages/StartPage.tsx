@@ -1,8 +1,14 @@
-import poster from '../assets/home/lavender.webp';
+import { useState } from 'react';
+
+const posters = Object.values(import.meta.glob<string>('../assets/home/*.webp', {
+  eager: true, import: 'default', query: '?url&no-inline',
+}));
 
 export function StartPage({ level, onGame, onLevels }: { level: number; onGame: () => void; onLevels: () => void }) {
+  const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
+
   return <main className="start-page">
-    <h1 className="sr-only">달콤한 주문, Sweet Order</h1>
+    <h1 className="sr-only">Sweet Order</h1>
     <img className="start-poster" src={poster} alt="" draggable={false} fetchPriority="high" />
     <div className="start-actions">
       <button className="primary-button" onClick={onGame}>Level {String(level).padStart(2, '0')}</button>

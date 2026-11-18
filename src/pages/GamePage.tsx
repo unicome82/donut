@@ -13,7 +13,9 @@ import { getLevel, levels } from '../game/levels';
 import { getStars, selectDonut, expandTray, matchTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
-import { MOVE_DURATION, createEffects } from '../effects/turnEffects';
+import { createEffects } from '../effects/turnEffects';
+
+const TRAY_PICKUP_DELAY = 200;
 
 interface Props { state: GameState; score: number; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
 export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
@@ -32,7 +34,13 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     return () => { mounted.current = false; for (const effect of active) effect.cleanup(); active.clear(); for (const timer of timers) clearTimeout(timer); timers.clear(); };
   }, []);
   function act(action: GameAction) {
-    if (action.type === 'RESTART') { for (const timer of matchTimers.current) clearTimeout(timer); matchTimers.current.clear(); }
+    if (action.type === 'RESTART') {
+      for (const timer of matchTimers.current) clearTimeout(timer);
+      matchTimers.current.clear();
+      for (const effect of activeEffects.current) effect.cleanup();
+      activeEffects.current.clear();
+      setInFlight(new Set());
+    }
     const current = latest.current;
     const currentLevel = getLevel(current.levelId);
     const committedAction: GameAction = action.type === 'SELECT_DONUT' ? { ...action, type: 'QUEUE_DONUT' } : action;
@@ -53,17 +61,21 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       }
       dispatch(committedAction);
     });
-    if (moved) {
-      const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : MOVE_DURATION + 35;
-      const timer = setTimeout(() => { matchTimers.current.delete(timer); if (mounted.current) act({ type: 'MATCH_TRAY', donutId: moved.donutId }); }, delay);
-      matchTimers.current.add(timer);
-    }
     void feedback.catch(() => undefined).finally(() => {
-      if (mounted.current && moved) flushSync(() => setInFlight(previous => {
-        const next = new Set(previous); next.delete(moved.donutId); return next;
-      }));
+      if (!activeEffects.current.delete(effects)) return;
       effects.cleanup();
-      activeEffects.current.delete(effects);
+      if (!mounted.current || !moved || latest.current.levelId !== current.levelId) return;
+      flushSync(() => setInFlight(previous => {
+        const next = new Set(previous);
+        next.delete(moved.donutId);
+        return next;
+      }));
+      // Start the pickup delay when the real token becomes visible in the tray.
+      const timer = setTimeout(() => {
+        matchTimers.current.delete(timer);
+        if (mounted.current && latest.current.levelId === current.levelId) act({ type: 'MATCH_TRAY', donutId: moved.donutId });
+      }, TRAY_PICKUP_DELAY);
+      matchTimers.current.add(timer);
     });
   }
 
@@ -119,7 +131,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
     <OrderBoard orders={state.orders} levelId={state.levelId} />
-    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} expandUsed={state.expandUsed} disabled={!playing} onExpand={() => { void act({ type: 'EXPAND_TRAY' }); }} />
+    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
