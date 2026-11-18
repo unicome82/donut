@@ -3,16 +3,16 @@ import type { LevelDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const level01: LevelDefinition = {
   "id": 1,
-  "revision": 7,
+  "revision": 8,
   "donutTypes": [
     "croissant",
     "americano",
-    "vanilla",
-    "matcha",
-    "blueberry",
-    "orange",
-    "lemon",
-    "mint"
+    "vanillaIceCream",
+    "matchaCroffle",
+    "blueberryCupcake",
+    "cinnamonCroffle",
+    "lemonMacaron",
+    "matchaLatte"
   ],
   "targetOrders": 8,
   "trayCapacity": 40,
@@ -20,55 +20,55 @@ export const level01: LevelDefinition = {
     [
       {
         "id": "l1-r4-q0-p0",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q0-p1",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p0",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p1",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p2",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p3",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p4",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p5",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p6",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q8-p7",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q8-p8",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q8-p9",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q8-p10",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q0-p2",
@@ -96,27 +96,27 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q8-p11",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p12",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p13",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p14",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p15",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q8-p16",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       }
     ],
     [
@@ -130,7 +130,7 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q1-p0",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q9-p2",
@@ -154,47 +154,47 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q1-p1",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q1-p2",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q1-p3",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q1-p4",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q1-p5",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q1-p6",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q1-p7",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q1-p8",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q1-p9",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q1-p10",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q1-p11",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q9-p7",
@@ -240,31 +240,31 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q2-p4",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q2-p5",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q2-p6",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q2-p7",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q2-p8",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q2-p9",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q2-p10",
-        "type": "matcha"
+        "type": "matchaCroffle"
       }
     ],
     [
@@ -278,85 +278,85 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q3-p2",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q3-p3",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q3-p4",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q3-p5",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q3-p6",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q3-p7",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q3-p8",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       }
     ],
     [
       {
         "id": "l1-r4-q4-p0",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q4-p1",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q4-p2",
-        "type": "matcha"
+        "type": "matchaCroffle"
       },
       {
         "id": "l1-r4-q4-p3",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q4-p4",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q4-p5",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q4-p6",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q4-p7",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q4-p8",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q4-p9",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q4-p10",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q4-p11",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q4-p12",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       }
     ],
     [
@@ -374,155 +374,155 @@ export const level01: LevelDefinition = {
       },
       {
         "id": "l1-r4-q5-p3",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q5-p4",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q5-p5",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q5-p6",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q5-p7",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q5-p8",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q5-p9",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q5-p10",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q5-p11",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q5-p12",
-        "type": "lemon"
+        "type": "lemonMacaron"
       },
       {
         "id": "l1-r4-q5-p13",
-        "type": "lemon"
+        "type": "lemonMacaron"
       }
     ],
     [
       {
         "id": "l1-r4-q6-p0",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q6-p1",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q6-p2",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q6-p3",
-        "type": "orange"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "l1-r4-q6-p4",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p5",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p6",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p7",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p8",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p9",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p10",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p11",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p12",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p13",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       },
       {
         "id": "l1-r4-q6-p14",
-        "type": "vanilla"
+        "type": "vanillaIceCream"
       }
     ],
     [
       {
         "id": "l1-r4-q7-p0",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q7-p1",
-        "type": "blueberry"
+        "type": "blueberryCupcake"
       },
       {
         "id": "l1-r4-q7-p2",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p3",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p4",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p5",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p6",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p7",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p8",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p9",
-        "type": "mint"
+        "type": "matchaLatte"
       },
       {
         "id": "l1-r4-q7-p10",
-        "type": "mint"
+        "type": "matchaLatte"
       }
     ]
   ],
@@ -539,7 +539,7 @@ export const level01: LevelDefinition = {
       "id": "l1-o2",
       "sequence": 2,
       "items": {
-        "vanilla": 4
+        "vanillaIceCream": 4
       }
     },
     {
@@ -547,7 +547,7 @@ export const level01: LevelDefinition = {
       "sequence": 3,
       "items": {
         "croissant": 5,
-        "vanilla": 2
+        "vanillaIceCream": 2
       }
     },
     {
@@ -561,32 +561,32 @@ export const level01: LevelDefinition = {
       "id": "l1-o5",
       "sequence": 5,
       "items": {
-        "matcha": 3,
-        "blueberry": 2
+        "matchaCroffle": 3,
+        "blueberryCupcake": 2
       }
     },
     {
       "id": "l1-o6",
       "sequence": 6,
       "items": {
-        "orange": 6,
-        "lemon": 2
+        "cinnamonCroffle": 6,
+        "lemonMacaron": 2
       }
     },
     {
       "id": "l1-o7",
       "sequence": 7,
       "items": {
-        "vanilla": 9,
-        "mint": 3
+        "vanillaIceCream": 9,
+        "matchaLatte": 3
       }
     },
     {
       "id": "l1-o8",
       "sequence": 8,
       "items": {
-        "orange": 12,
-        "matcha": 4
+        "cinnamonCroffle": 12,
+        "matchaCroffle": 4
       }
     }
   ]

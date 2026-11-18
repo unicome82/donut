@@ -18,7 +18,7 @@ function scene(reduced = false) {
     setAttribute() { /* Presentation-only attributes do not affect this scene. */ }
     cloneNode() { return new FakeElement(); }
     getBoundingClientRect() { return { x: 10, y: 20, width: 18, height: 19 }; }
-    querySelector(selector: string): FakeElement | null { return selector === 'svg' ? new FakeElement() : null; }
+    querySelector(selector: string): FakeElement | null { return selector === 'img, svg' ? new FakeElement() : null; }
     animate(_frames: Keyframe[], options: KeyframeAnimationOptions) {
       calls.push(options);
       return { finished: Promise.resolve(), cancel() { lifecycle.push('cancel'); }, finish() { /* already finished */ } };

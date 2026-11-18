@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import type { DonutType } from '../../game/types';
-import { MenuArtwork } from './MenuArtwork';
-import { donutThemes, menuNames } from './donutThemes';
+import { donutThemes } from './donutThemes';
 const decorations = [[27, 27, -20], [48, 18, 20], [73, 28, 50], [81, 49, -15], [71, 73, 40], [47, 81, -20], [25, 68, 30], [18, 47, 65]] as const;
 const toppingShapes = {
   sprinkles: 'M-5 0H5',
@@ -15,11 +14,12 @@ const toppingShapes = {
   dots: 'M3 0A3 3 0 1 1-3 0A3 3 0 1 1 3 0Z',
 };
 const solidPatterns = new Set(['chunks', 'leaves', 'stars', 'dots']);
-export function Donut({ type, className = '' }: { type: DonutType; className?: string }) {
+const menuImages = import.meta.glob<string>('../../assets/menu/*.webp', { eager: true, import: 'default', query: '?url&no-inline' });
+
+export function Donut({ type, className = '', useMenuArt = true }: { type: DonutType; className?: string; useMenuArt?: boolean }) {
   const glaze = useId();
-  if (type in menuNames) return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
-    <MenuArtwork type={type as keyof typeof menuNames} />
-  </svg>;
+  const image = menuImages[`../../assets/menu/${type}.webp`];
+  if (useMenuArt && image) return <img className={`donut ${className}`} src={image} alt="" draggable={false} />;
   const theme = donutThemes[type as keyof typeof donutThemes];
   return <svg className={`donut ${className}`} viewBox="0 0 100 104" aria-hidden="true" focusable="false">
     <defs>

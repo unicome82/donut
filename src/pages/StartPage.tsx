@@ -8,7 +8,7 @@ export function StartPage({ onGame, onLevels }: { onGame: () => void; onLevels: 
     <ShopAwning />
     <div className="start-content">
       <div className="start-brand">
-        <Donut type="strawberry" />
+        <Donut type="strawberry" useMenuArt={false} />
         <h1 aria-label="도넛 퍼즐">Donut <span>Puzzle</span></h1>
       </div>
       <ShopArt art="storefront" className="storefront-art" />

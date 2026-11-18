@@ -34,13 +34,13 @@ export function createEffects() {
     return Array.from(root.querySelectorAll<HTMLElement>('[data-token-id]')).find(el => el.dataset.tokenId === id);
   }
   async function fly(origin: HTMLElement, target: Element, via?: Element) {
-    const svg = origin.querySelector('svg');
-    if (!svg || disposed || reduceMotion()) return;
-    const from = svg.getBoundingClientRect();
+    const artwork = origin.querySelector('img, svg');
+    if (!artwork || disposed || reduceMotion()) return;
+    const from = artwork.getBoundingClientRect();
     const to = target.getBoundingClientRect();
     const ghost = document.createElement('span');
     ghost.className = 'flying-donut'; ghost.setAttribute('aria-hidden', 'true');
-    ghost.append(svg.cloneNode(true));
+    ghost.append(artwork.cloneNode(true));
     ghost.style.left = `${from.x}px`; ghost.style.top = `${from.y}px`;
     ghost.style.width = `${from.width}px`; ghost.style.height = `${from.height}px`;
     document.body.append(ghost); elements.add(ghost);
