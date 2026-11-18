@@ -54,7 +54,8 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
       dispatch(committedAction);
     });
     if (moved) {
-      const timer = setTimeout(() => { matchTimers.current.delete(timer); if (mounted.current) act({ type: 'MATCH_TRAY', donutId: moved.donutId }); }, MOVE_DURATION + 200);
+      const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : MOVE_DURATION + 35;
+      const timer = setTimeout(() => { matchTimers.current.delete(timer); if (mounted.current) act({ type: 'MATCH_TRAY', donutId: moved.donutId }); }, delay);
       matchTimers.current.add(timer);
     }
     void feedback.catch(() => undefined).finally(() => {
@@ -80,7 +81,6 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
   const [presentedClear, setPresentedClear] = useState<GameState | null>(null);
   const waitingForGoodbye = status === 'clear' && presentedClear !== state;
   const showResult = !playing && !waitingForGoodbye;
-  const illustratedResult = showResult && (failed || status === 'clear');
   const stars = status === 'clear' ? getStars(state) : 0;
   const lastLevel = state.levelId === levels[levels.length - 1]?.id;
   useEffect(() => {
@@ -93,7 +93,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
-    {illustratedResult && <ShopAwning />}
+    {showResult && failed && <ShopAwning />}
     <GameHeader level={state.levelId} score={score} onBack={onLevels} />
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
@@ -110,7 +110,7 @@ export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
-      {status === 'blocked' && <button type="button" className="expand-button" aria-label="2칸 늘리기" onClick={() => act({ type: 'EXPAND_TRAY' })}><span aria-hidden="true">+2</span> 늘리기</button>}
+      {status === 'blocked' && <button type="button" className="expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
       <div className="result-actions">
         {status === 'clear' && !lastLevel && <button className="primary-button" onClick={onNext}>다음 레벨 <Icon name="arrow" /></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>

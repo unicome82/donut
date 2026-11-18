@@ -1,7 +1,7 @@
 import type { GameEvent } from '../game/engine';
 import type { GameState } from '../game/types';
 
-export const MOVE_DURATION = 110;
+export const MOVE_DURATION = 75;
 export const MATCH_DURATION = 160;
 
 export function createEffects() {

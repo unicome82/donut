@@ -43,7 +43,7 @@ function scene(reduced = false) {
 }
 afterEach(() => vi.unstubAllGlobals());
 describe('빠른 이동과 깜빡임 방지', () => {
-  it('미매칭 도넛은 110ms 이동 후 도착 위치를 유지하며 정리 전에는 취소하지 않는다', async () => {
+  it('미매칭 도넛은 이동 후 도착 위치를 유지하며 정리 전에는 취소하지 않는다', async () => {
     const s = scene(); const effects = createEffects();
     await effects.play(s.root, s.state, [{ type: 'moved', donutId: s.source.dataset.tokenId ?? '', queueIndex: 0 }]);
     expect(s.calls).toHaveLength(1);
