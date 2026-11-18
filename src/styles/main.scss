@@ -139,3 +139,33 @@ button { border: 0; background: none; touch-action: manipulation; }
   .confetti, .effect-particle, .flying-donut { display: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Customers order through compact speech bubbles. */
+.game-board { grid-template-rows: clamp(110px, 21dvh, 140px) 100px minmax(0, 1fr); }
+.order-card { display: flex; gap: 5px; padding: 3px 0; background: transparent; border: 0; border-radius: 0; }
+.customer { width: 31px; height: 40px; flex: 0 0 31px; align-self: end; }
+.speech-bubble { position: relative; flex: 1; height: 100%; min-width: 0; border: 1px solid #dfd1c2; border-radius: 12px 12px 12px 3px; background: #fffefa; padding: 4px; }
+.speech-bubble::before { content: ''; position: absolute; left: -5px; bottom: 8px; width: 8px; height: 8px; transform: rotate(45deg); background: #fffefa; border-left: 1px solid #dfd1c2; border-bottom: 1px solid #dfd1c2; }
+.order-items { gap: 4px; }
+.order-items li { flex: 0 1 auto; gap: 2px; }
+.order-items .donut { width: 19px; height: 20px; }
+.order-items strong { font-size: 13px; line-height: 1; }
+.tray-slots, .tray--expanded .tray-slots { grid-template-columns: repeat(10, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.tray--expanded .tray-slots { grid-template-columns: repeat(11, minmax(0, 1fr)); }
+@media (max-width: 360px) {
+  .customer { width: 25px; height: 34px; flex-basis: 25px; }
+  .order-card { gap: 3px; }
+  .speech-bubble { padding: 3px; }
+  .order-items { gap: 2px; }
+  .order-items li { gap: 1px; }
+  .order-items .donut { width: 16px; height: 17px; }
+  .order-items strong { font-size: 12px; }
+}
+@media (max-height: 520px) and (min-width: 600px) {
+  .game-board { grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
+}
+
+/* Keep the leading donut readable while repeated donuts stack behind it. */
+.queue-column { padding-bottom: 12px; }
+.queue-front .donut { width: 18px; height: 19px; max-height: 100%; }
+.queue-back .donut { width: 18px; height: 19px; max-height: none; filter: drop-shadow(0 1px 1px #59412b33); }

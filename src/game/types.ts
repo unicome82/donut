@@ -1,4 +1,4 @@
-export const DONUT_TYPES = ['strawberry', 'chocolate', 'vanilla', 'matcha', 'blueberry', 'caramel', 'lemon', 'sprinkle', 'mint', 'orange'] as const;
+export const DONUT_TYPES = ['strawberry', 'chocolate', 'vanilla', 'matcha', 'blueberry', 'caramel', 'lemon', 'sprinkle', 'mint', 'orange', 'raspberry', 'sesame', 'coconut', 'coffee'] as const;
 export type DonutType = typeof DONUT_TYPES[number];
 export interface DonutToken { id: string; type: DonutType }
 export interface OrderDefinition { id: string; sequence: number; items: Partial<Record<DonutType, number>> }

@@ -4,13 +4,14 @@ import { reduceGame } from './reducer';
 import { createSession, isUnlocked, reduceSession } from './session';
 import { levels } from './levels';
 import { solutions } from './levels/solutions';
+import { BASE_TRAY_CAPACITY, TRAY_EXPANSION } from './constants';
 import { validateLevel } from './validation';
 import type { DonutType, GameState, LevelDefinition, OrderDefinition } from './types';
 
 function fixture(items: OrderDefinition['items'][]): LevelDefinition {
   const types: DonutType[] = ['strawberry', 'chocolate', 'vanilla'];
   return {
-    id: 1, revision: 1, donutTypes: types, targetOrders: items.length, trayCapacity: 8,
+    id: 1, revision: 1, donutTypes: types, targetOrders: items.length, trayCapacity: BASE_TRAY_CAPACITY,
     orders: items.map((item, i) => ({ id: 'o' + i, sequence: i + 1, items: item })),
     queues: Array.from({ length: 6 }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanilla' }))),
   };
@@ -71,21 +72,21 @@ describe('자동 매칭과 상태 전이', () => {
   it('트레이가 차도 매칭 후 공간이 생기면 실패하지 않는다', () => {
     const level = fixture([{ strawberry: 2 }]);
     const state = createGame(level);
-    state.tray = tray('vanilla', 7);
+    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
     const next = select(state, level, 0).state;
     expect(next.status).toBe('playing');
-    expect(next.tray).toHaveLength(7);
+    expect(next.tray).toHaveLength(BASE_TRAY_CAPACITY - 1);
   });
   it('가득 찬 트레이는 확장 기회를 제공하고 선택을 차단한다', () => {
     const level = fixture([{ strawberry: 2 }]);
     const state = createGame(level);
-    state.tray = tray('vanilla', 7);
+    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
     const blocked = select(state, level, 2).state;
     expect(blocked.status).toBe('blocked');
     expect(select(blocked, level, 0).state).toBe(blocked);
     const expanded = expandTray(blocked, level).state;
     expect(expanded.status).toBe('playing');
-    expect(expanded.trayCapacity).toBe(10);
+    expect(expanded.trayCapacity).toBe(BASE_TRAY_CAPACITY + TRAY_EXPANSION);
     expect(expanded.expandUsed).toBe(true);
     expect(expandTray(expanded, level).state).toBe(expanded);
     const nine = select(expanded, level, 2).state;
@@ -95,7 +96,7 @@ describe('자동 매칭과 상태 전이', () => {
   it('확장 거절과 비정상 액션을 안전하게 처리한다', () => {
     const level = fixture([{ strawberry: 2 }]);
     const state = createGame(level);
-    state.tray = tray('vanilla', 7);
+    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
     const blocked = select(state, level, 2).state;
     expect(reduceGame(blocked, { type: 'DECLINE_EXPAND' }, level).status).toBe('gameover');
     for (const index of [-1, 0.5, 6, NaN]) expect(selectDonut(state, level, index, 'bad').state).toBe(state);
@@ -105,7 +106,7 @@ describe('자동 매칭과 상태 전이', () => {
   it('클리어를 트레이 용량과 대기열 소진보다 먼저 판정한다', () => {
     const level = fixture([{ strawberry: 1 }]);
     const state = createGame(level);
-    state.tray = tray('vanilla', 7);
+    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
     state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
     expect(select(state, level, 0).state.status).toBe('clear');
   });
@@ -152,36 +153,19 @@ describe('레벨 1~5 해법과 게임 불변식', () => {
       for (const queue of solution) {
         expect(state.status).toBe('playing');
         state = select(state, level, queue).state;
-        expect(state.tray.length).toBeLessThan(8);
+        expect(state.tray.length).toBeLessThan(BASE_TRAY_CAPACITY);
         expect(state.expandUsed).toBe(false);
       }
       expect(state.status).toBe('clear');
       expect(state.completedOrders).toBe(level.targetOrders);
       expect(level).toEqual(original);
     });
-    it('레벨 ' + level.id + '는 6~10종이며 여섯 대기열의 미주문 도넛이 쌓였다가 후속 주문에 소비된다', () => {
-      expect(level.donutTypes).toHaveLength(level.id + 5);
+    it('레벨 ' + level.id + '는 다양한 종류가 연속 묶음으로 쌓이고 20칸을 사용한다', () => {
+      expect(level.donutTypes).toHaveLength(level.id + 9);
+      expect(level.trayCapacity).toBe(20);
       expect(new Set(level.queues.flat().map(token => token.type)).size).toBe(level.donutTypes.length);
       expect(new Set(level.orders.flatMap(order => Object.keys(order.items))).size).toBe(level.donutTypes.length);
-      let state = createGame(level);
-      const waitingIds: string[] = [];
-      for (let queue = 0; queue < 6; queue += 1) {
-        const token = state.queues[queue]?.[0];
-        if (!token) throw new Error('대기열 앞 도넛 누락');
-        expect(state.orders.some(order => (order?.remaining[token.type] ?? 0) > 0)).toBe(false);
-        waitingIds.push(token.id);
-        state = select(state, level, queue).state;
-        expect(state.tray).toHaveLength(queue + 1);
-        expect(state.completedOrders).toBe(0);
-      }
-      const consumedIds: string[] = [];
-      for (const queue of (solutions[level.id] ?? []).slice(6)) {
-        const result = select(state, level, queue);
-        for (const event of result.events) if (event.type === 'consumed') consumedIds.push(event.donutId);
-        state = result.state;
-      }
-      expect(state.status).toBe('clear');
-      for (const id of waitingIds) expect(consumedIds).toContain(id);
+      expect(level.queues.every(queue => queue.some((token, index) => index >= 2 && token.type === queue[index - 1]?.type && token.type === queue[index - 2]?.type))).toBe(true);
     });
     it('레벨 ' + level.id + '의 여러 선택 경로에서 토큰과 주문 수량을 보존한다', () => {
       for (let seed = 1; seed <= 20; seed += 1) {
