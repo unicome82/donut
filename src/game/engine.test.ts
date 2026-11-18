@@ -290,6 +290,10 @@ describe('세션 진행', () => {
       session = reduceSession(session, { type: 'GAME', action: { type: 'SELECT_DONUT', queueIndex: q, expectedDonutId: front.id } });
     }
     expect(session.stars[1]).toBeGreaterThan(0);
+    expect(session.score).toBe(session.game.completedOrders * 100);
+    const restarted = reduceSession(session, { type: 'GAME', action: { type: 'RESTART' } });
+    expect(restarted.score).toBe(session.score);
+    expect(reduceSession(session, { type: 'START', levelId: 2 }).score).toBe(session.score);
     expect(isUnlocked(2, session.stars)).toBe(true);
     expect(reduceSession(session, { type: 'START', levelId: 2 }).game.levelId).toBe(2);
   });

@@ -15,8 +15,8 @@ import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { MOVE_DURATION, createEffects } from '../effects/turnEffects';
 
-interface Props { state: GameState; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
-export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
+interface Props { state: GameState; score: number; dispatch: (action: GameAction) => void; onLevels: () => void; onNext: () => void }
+export function GamePage({ state, score, dispatch, onLevels, onNext }: Props) {
   const level = getLevel(state.levelId);
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
@@ -94,8 +94,8 @@ export function GamePage({ state, dispatch, onLevels, onNext }: Props) {
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {illustratedResult && <ShopAwning />}
-    <GameHeader level={state.levelId} completed={state.completedOrders} target={level.targetOrders} onBack={onLevels} />
-    <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
+    <GameHeader level={state.levelId} score={score} onBack={onLevels} />
+    <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. 누적 점수 {score.toLocaleString('ko-KR')}점.</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : ''}><Icon name="star" /></span>)}

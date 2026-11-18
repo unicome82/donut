@@ -182,7 +182,7 @@
   font-size: 14px;
   font-weight: 900;
 }
-.progress-count {
+.score-count {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -194,9 +194,8 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.progress-count > span { font-size: 11px; font-weight: 700; }
-.progress-count strong { font-size: 16px; }
-.progress-count .donut { width: 21px; }
+.score-count > span { font-size: 11px; font-weight: 700; }
+.score-count strong { font-size: 16px; }
 .game-board {
   display: grid;
   flex: 1;
@@ -216,7 +215,7 @@
 .order-card {
   position: relative;
   min-width: 0;
-  height: min(100%, clamp(104px, 35vw, 167px));
+  height: min(100%, clamp(140px, 39vw, 184px));
 }
 .display-shelf {
   position: absolute;
@@ -241,7 +240,12 @@
   grid-row: 1;
   position: relative;
   z-index: 1;
-  padding: 3px clamp(2px, 1vw, 6px);
+  display: grid;
+  place-items: center;
+  min-width: min(100%, 48px);
+  max-width: 100%;
+  min-height: 44px;
+  padding: 5px 3px;
   border: 1px solid #e4c8b5;
   border-radius: 11px;
   background: #fffdf9;
@@ -264,13 +268,20 @@
   height: 7px;
   background: #fffdf9;
 }
-.order-items { display: flex; align-items: center; gap: clamp(1px, .7vw, 4px); }
-.order-items li { display: flex; align-items: center; gap: 2px; }
-.order-items .donut { width: clamp(12px, 3.6vw, 20px); }
-.order-items strong { font-size: clamp(11px, 3.3vw, 16px); font-variant-numeric: tabular-nums; }
-.speech-bubble:has(li:nth-child(3)) { padding-inline: 2px; }
-.order-items:has(li:nth-child(3)) li { gap: 1px; }
-.order-items:has(li:nth-child(3)) .donut { width: clamp(10px, 3vw, 17px); }
+.order-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2px 3px;
+}
+.order-items li { display: flex; flex: none; align-items: center; gap: 1px; }
+.order-items .donut { width: clamp(21px, 5.65vw, 28px); }
+.order-items strong {
+  font-size: clamp(19px, 4.9vw, 25px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
 .customer-scene { position: relative; grid-row: 2; width: min(100%, 145px); height: 100%; }
 .customer-scene .customer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
 .order-delivery { position: absolute; left: 50%; bottom: 55%; width: 1px; height: 1px; pointer-events: none; }
@@ -342,10 +353,9 @@
 }
 .tray-section { padding: 4px 6px 8px; }
 .tray-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
-.tray-count { font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.tray-count strong { margin-left: 2px; font-size: 15px; }
 .expand-button {
   flex: none;
+  margin-left: auto;
   min-height: 29px;
   border: 0;
   border-radius: 999px;
@@ -454,15 +464,20 @@
 }
 @keyframes confetti-fall { 85% { opacity: 1; } 100% { transform: translate(35px, 100dvh) rotate(540deg); opacity: 0; } }
 
+@media (max-width: 360px) {
+  .order-items { column-gap: 2px; }
+  .order-items .donut { width: 18px; }
+}
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
   .app-shell { width: min(100%, 820px); }
   .start-actions { width: min(86%, 230px); margin-bottom: max(16px, env(safe-area-inset-bottom)); }
   .start-poster { object-fit: contain; mask-image: none; }
   .level-list { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: none; }
-  .game-board { grid-template-rows: clamp(78px, 27dvh, 125px) auto minmax(0, 1fr); }
+  .game-board { grid-template-rows: clamp(112px, 32dvh, 146px) auto minmax(0, 1fr); }
   .order-grid { max-width: 360px; margin-inline: auto; padding-bottom: 30px; }
   .display-shelf { height: 55px; width: min(100%, 360px); }
-  .order-items .donut { width: 20px; }
+  .order-items .donut { width: 22px; }
+  .order-items strong { font-size: 20px; }
   .queue-column { --queue-head: 33px; --queue-step: 22px; }
   .queue-front .donut, .queue-back .donut { width: 31px; }
   .result-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; max-height: 100%; }
