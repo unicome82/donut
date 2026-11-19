@@ -151,38 +151,27 @@
 }
 
 .stage-page {
-  isolation: isolate;
   min-height: var(--page-height);
   padding-bottom: max(calc(50vh - 48px), env(safe-area-inset-bottom));
   overflow-anchor: none;
-}
-.stage-page::before, .stage-page::after, .stage-navigation {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100%, var(--shell-width));
-}
-.stage-page::before, .stage-page::after {
-  content: '';
-  top: 0;
-  z-index: -1;
-  pointer-events: none;
-}
-.stage-page::before {
-  bottom: 0;
   background: linear-gradient(#fbe0e7, #fce8ee 42%, #fff4f7);
 }
-.stage-page::after, .stage-hero {
+.stage-hero {
+  position: relative;
+  isolation: isolate;
   min-height: 170px;
   aspect-ratio: 1.94;
+  padding-top: calc(76px + var(--safe-top));
+  text-align: center;
 }
-.stage-page::after {
+.stage-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background: #9bdbfa url('../assets/game/stage-select.webp') center center / cover no-repeat;
   mask-image: linear-gradient(#000 73%, transparent 100%);
-}
-.stage-hero {
-  padding-top: calc(62px + var(--safe-top));
-  text-align: center;
 }
 .stage-hero h1 {
   position: relative;
@@ -208,12 +197,23 @@
   padding-inline: max(15px, 5%, env(safe-area-inset-left), env(safe-area-inset-right));
 }
 .stage-navigation {
+  position: fixed;
   z-index: 5;
   top: calc(12px + var(--safe-top));
+  inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+  max-width: calc(var(--shell-width) - 24px);
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  gap: 10px;
+  padding: 5px 8px;
+  border: 1px solid #ffffffdd;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #ffffffe0, #fff7eea8);
+  box-shadow: inset 0 1px 1px #fff, inset 0 -2px 2px #e9c8af60, 0 3px 9px #8d59402c;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   pointer-events: none;
 }
 .stage-navigation button { pointer-events: auto; }
@@ -636,8 +636,8 @@
   :root { --shell-width: 820px; }
   .start-actions { width: min(86%, 230px); }
   .stage-button:has(.stage-difficulty) { padding-right: 54px; }
-  .stage-page::after, .stage-hero { aspect-ratio: auto; min-height: 190px; }
-  .stage-page::after { background-position: center 38%; }
+  .stage-hero { aspect-ratio: auto; min-height: 190px; }
+  .stage-hero::before { background-position: center 38%; }
   .stage-list { max-width: 560px; }
   .game-board { grid-template-rows: clamp(131px, 39dvh, 166px) auto minmax(0, 1fr); }
   .order-grid { max-width: 360px; margin-inline: auto; padding-bottom: 30px; }
