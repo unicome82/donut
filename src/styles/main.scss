@@ -119,6 +119,14 @@
   height: auto;
   pointer-events: none;
 }
+.sound-button {
+  position: absolute;
+  top: calc(12px + var(--safe-top));
+  right: max(16px, env(safe-area-inset-right));
+  background: #fff9f3ed;
+  box-shadow: 0 2px 7px #71492b30;
+  z-index: 1;
+}
 .start-actions {
   position: relative;
   z-index: 1;

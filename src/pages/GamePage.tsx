@@ -15,13 +15,14 @@ import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../gam
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { useOrderPatience } from '../hooks/useOrderPatience';
+import { playSound } from '../effects/sound';
 import { createEffects } from '../effects/turnEffects';
 
 const TRAY_PICKUP_DELAY = 200;
 const PICKUP_INTERVAL = 200;
 
-interface Props { state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
-export function GamePage({ state, dispatch, onStages, onNext }: Props) {
+interface Props { soundEnabled: boolean; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
+export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Props) {
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -79,6 +80,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
     const effects = createEffects();
     activeEffects.current.add(effects);
     const moved = result.events.find(event => event.type === 'moved');
+    if (moved && soundEnabled) playSound('select');
     // Capture all geometry before the DOM changes, but commit the action immediately.
     const feedback = effects.play(root.current, current, result.events);
     flushSync(() => {
@@ -129,6 +131,20 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !playing && !waitingForGoodbye;
+  const previousFeedback = useRef({ completed: state.completedOrders, departures, result: false });
+  useEffect(() => {
+    const previous = previousFeedback.current;
+    previousFeedback.current = { completed: state.completedOrders, departures, result: showResult };
+    if (!soundEnabled) return;
+    if (showResult && !previous.result) {
+      if (status === 'clear') playSound('clear');
+      else if (status === 'gameover') playSound('failed');
+      else if (status === 'blocked') playSound('blocked');
+    } else if (status === 'playing') {
+      if (departures > previous.departures) playSound('departure');
+      else if (state.completedOrders > previous.completed) playSound('order');
+    }
+  }, [departures, showResult, soundEnabled, state.completedOrders, status]);
   const stars = status === 'clear' ? getStars(state) : 0;
   const lastStage = state.stageId === stages[stages.length - 1]?.id;
   useEffect(() => {
