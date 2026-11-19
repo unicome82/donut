@@ -12,6 +12,15 @@ const FIRST_ARRIVAL_STAGGER = 130;
 const BUBBLE_FADE_DURATION = 180;
 const ORDER_PREVIEW_DURATION = 250;
 
+const patienceColors = ['#85c1ef', '#8cd4ac', '#f6d77e', '#e87e87'];
+
+function patienceColor(fraction: number): string {
+  const elapsed = (1 - fraction) * (patienceColors.length - 1);
+  const segment = Math.min(Math.floor(elapsed), patienceColors.length - 2);
+  const mix = (elapsed - segment) * 100;
+  return `color-mix(in oklab, ${patienceColors[segment]}, ${patienceColors[segment + 1]} ${mix}%)`;
+}
+
 function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs, departedOrderIds }: { remainingMs?: number; departedOrderIds?: readonly string[]; order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
@@ -101,7 +110,7 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
         aria-valuenow={Math.round(fraction * 100)}>
         <span aria-hidden="true" style={{
           transform: `scaleX(${fraction})`,
-          backgroundColor: `color-mix(in oklab, #85c1ef ${fraction * 100}%, #e87e87)`,
+          backgroundColor: patienceColor(fraction),
         }} />
       </div>}
     </div></> : null}</div>

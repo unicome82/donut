@@ -422,7 +422,8 @@
   box-shadow: 0 1px #eed3bd80;
 }
 .order-patience {
-  width: 100%;
+  justify-self: stretch;
+  margin-inline: 6px;
   height: 5px;
   margin-top: 3px;
   overflow: hidden;
