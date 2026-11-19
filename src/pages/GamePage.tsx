@@ -144,9 +144,10 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>
-        {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={allCustomersLeft ? 'game-over-title' : status === 'clear' ? 'clear-title' : undefined} lang={allCustomersLeft ? 'en' : undefined}>
+        {allCustomersLeft ? <>Game<br />Over</> : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
+      {allCustomersLeft && <p>{resultTitles.gameover}</p>}
       {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
       {failed && !allCustomersLeft && state.tray.length > 0 && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
