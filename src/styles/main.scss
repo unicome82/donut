@@ -468,6 +468,8 @@
   height: 10.5%;
   border-radius: 50%;
   background: radial-gradient(ellipse, #ee5e55ab 16%, #ef685e60 54%, transparent 76%);
+  filter: blur(1px);
+  mix-blend-mode: multiply;
 }
 @keyframes practice-bubble-warning {
   30% { border-color: #e87e87; box-shadow: 0 0 0 3px #e87e8740; }
