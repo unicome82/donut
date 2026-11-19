@@ -1,3 +1,5 @@
+import { stagesById } from '../game/stages';
+import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { useState } from 'react';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
@@ -25,7 +27,7 @@ export function StartPage({ stage, onGame, onStages }: { stage: number; onGame: 
     <h1 className="sr-only">Sweet Order</h1>
     <img className="start-poster" src={poster?.src} width={800} height={1800} alt="" draggable={false} fetchPriority="high" />
     <div className="start-actions">
-      <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span></button>
+      <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>
       <button className="secondary-button" onClick={onStages}>스테이지 선택</button>
     </div>
   </main>;

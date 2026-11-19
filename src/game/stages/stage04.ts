@@ -4,6 +4,7 @@ import type { StageDefinition } from '../types';
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const stage04: StageDefinition = {
   "id": 4,
+  "difficulty": "normal",
   "revision": 9,
   "donutTypes": [
     "cake",

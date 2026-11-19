@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createGame, expandTray, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
-import { createSession, isUnlocked, reduceSession } from './session';
+import { createSession, getCurrentStage, isUnlocked, reduceSession } from './session';
 import { authoredStages, stages, practiceStage } from './stages';
 import { solutions } from './stages/solutions';
 import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
@@ -345,6 +345,18 @@ describe('세션 진행', () => {
     expect(reduceSession(session, { type: 'START', stageId: 5 })).toBe(session);
     expect(isUnlocked((stages.at(-1)?.id ?? 0) + 1, { 5: 3 })).toBe(false);
   });
+  it('테스트 모드에서 모든 등록된 스테이지에 진입할 수 있다', () => {
+    const session = createSession(true);
+    for (const stage of stages) {
+      expect(isUnlocked(stage.id, session.stars, session.unlockAllStages)).toBe(true);
+      expect(reduceSession(session, { type: 'START', stageId: stage.id }).game.stageId).toBe(stage.id);
+      expect(['easy', 'normal', 'hard']).toContain(stage.difficulty);
+    }
+    const missingStage = (stages.at(-1)?.id ?? 0) + 1;
+    expect(reduceSession(session, { type: 'START', stageId: missingStage })).toBe(session);
+    expect(getCurrentStage(session.stars)).toBe(1);
+  });
+
   it('클리어 시 별점을 기록하고 다음 스테이지을 연다', () => {
     let session = reduceSession(createSession(), { type: 'START', stageId: 1 });
     for (const q of solutions[1] ?? []) {

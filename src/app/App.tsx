@@ -12,7 +12,7 @@ export function App() {
     {screen === 'start'
       ? <StartPage stage={currentStage} onGame={() => dispatch({ type: 'START', stageId: currentStage })} onStages={() => dispatch({ type: 'STAGES' })} />
       : screen === 'stages'
-        ? <StageSelectPage stars={stars} onBack={() => dispatch({ type: 'HOME' })} onGame={stageId => dispatch({ type: 'START', stageId })} />
+        ? <StageSelectPage stars={stars} unlockAllStages={session.unlockAllStages} onBack={() => dispatch({ type: 'HOME' })} onGame={stageId => dispatch({ type: 'START', stageId })} />
         : <GamePage key={game.stageId} state={game} dispatch={action => dispatch({ type: 'GAME', action })} onStages={() => dispatch({ type: 'STAGES' })} onNext={() => dispatch({ type: 'START', stageId: game.stageId + 1 })} />
     }
   </div>;

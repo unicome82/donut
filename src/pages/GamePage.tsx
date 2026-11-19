@@ -1,3 +1,4 @@
+import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import clearDesserts from '../assets/game/clear-desserts.webp';
 import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
@@ -10,7 +11,7 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getStage, stages } from '../game/stages';
+import { getStage, stages, stagesById } from '../game/stages';
 import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -145,7 +146,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
         {status === 'blocked' && <button type="button" className="primary-button stage-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
-        {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span></button>}
+        {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(state.stageId + 1)?.difficulty} /></button>}
         <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onStages}>스테이지 선택</button>}
       </div>

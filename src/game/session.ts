@@ -10,6 +10,7 @@ export interface SessionState {
   game: GameState;
   stars: Record<number, number>;
   score: number;
+  unlockAllStages: boolean;
 }
 export type SessionAction =
   | { type: 'HOME' }
@@ -17,12 +18,12 @@ export type SessionAction =
   | { type: 'START'; stageId: number }
   | { type: 'GAME'; action: GameAction };
 
-export function createSession(): SessionState {
-  return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0 };
+export function createSession(unlockAllStages = false): SessionState {
+  return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0, unlockAllStages };
 }
-export function isUnlocked(id: number, stars: Record<number, number>): boolean {
+export function isUnlocked(id: number, stars: Record<number, number>, unlockAllStages = false): boolean {
   if (id === practiceStage.id) return true;
-  return stagesById.has(id) && (id === 1 || (stars[id - 1] ?? 0) > 0);
+  return stagesById.has(id) && (unlockAllStages || id === 1 || (stars[id - 1] ?? 0) > 0);
 }
 export function getCurrentStage(stars: Record<number, number>): number {
   return stages.find(stage => isUnlocked(stage.id, stars) && !stars[stage.id])?.id ?? stages.at(-1)?.id ?? 1;
@@ -32,7 +33,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
   switch (action.type) {
     case 'HOME': return { ...state, screen: 'start' };
     case 'STAGES': return { ...state, screen: 'stages' };
-    case 'START': return isUnlocked(action.stageId, state.stars)
+    case 'START': return isUnlocked(action.stageId, state.stars, state.unlockAllStages)
       ? { ...state, screen: 'game', game: createGame(getStage(action.stageId)) } : state;
     case 'GAME': {
       if (state.screen !== 'game') return state;
