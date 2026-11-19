@@ -31,7 +31,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const mounted = useRef(true);
   const [readyOrders, setReadyOrders] = useState<string[]>([]);
   const [round, setRound] = useState(0);
-  const { seconds, resetPatience } = useOrderPatience(state.status === 'playing', state.orders, readyOrders,
+  const { remainingMs, resetPatience } = useOrderPatience(state.status === 'playing', state.orders, readyOrders,
     orderIds => dispatch({ type: 'EXPIRE_ORDERS', orderIds }));
   const nextPickupAt = useRef(0);
   const onOrderReady = useCallback((id: string) => {
@@ -160,7 +160,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard key={round} orders={state.orders} seconds={seconds} departedOrderIds={state.departedOrderIds} stageId={state.stageId} onOrderReady={onOrderReady} />
+    <OrderBoard key={round} orders={state.orders} remainingMs={remainingMs} departedOrderIds={state.departedOrderIds} stageId={state.stageId} onOrderReady={onOrderReady} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

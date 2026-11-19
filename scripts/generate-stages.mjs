@@ -16,7 +16,7 @@ const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevisions = { easy: 7, normal: 7, hard: 6 };
+const layoutRevisions = { easy: 8, normal: 7, hard: 6 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -63,10 +63,11 @@ function makeCandidate(id, difficulty, random, previous) {
       items: Object.fromEntries(types.map(type => [type, 2 + random(4)])),
     };
   });
-  if (difficulty === 'easy' && (!previous || previous.revision < 7)) {
+  if (difficulty === 'easy') {
+    const increase = previous ? Math.min(2, layoutRevisions.easy - previous.revision) : 2;
     orders = orders.map(order => ({
       ...order,
-      items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + 1])),
+      items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + increase])),
     }));
   }
   const queues = Array.from({ length: QUEUE_COUNT }, () => []);

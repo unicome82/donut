@@ -381,7 +381,7 @@ describe('세션 진행', () => {
 
   it('게임 시작 직후 첫 주문과 대기열 선두에 크루아상과 초코 아이스크림가 있다', () => {
     const { game } = reduceSession(createSession(), { type: 'START', stageId: 1 });
-    expect(game.orders[0]?.remaining).toMatchObject({ croissant: 3, chocolateIceCream: 2 });
+    expect(game.orders[0]?.remaining).toMatchObject({ croissant: 4, chocolateIceCream: 3 });
     expect(game.queues.map(queue => queue[0]?.type)).toEqual(expect.arrayContaining(['croissant', 'chocolateIceCream']));
   });
 

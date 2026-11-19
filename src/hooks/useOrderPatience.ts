@@ -8,7 +8,7 @@ export function useOrderPatience(
   onExpire: (ids: readonly string[]) => void,
 ) {
   const remaining = useRef(new Map<string, number>());
-  const [seconds, setSeconds] = useState<Record<string, number>>({});
+  const [remainingMs, setRemainingMs] = useState<Record<string, number>>({});
   const enabled = orders.some(order => order?.patienceMs);
   const tick = useEffectEvent((elapsed: number) => {
     const active = new Map<string, number>();
@@ -22,8 +22,8 @@ export function useOrderPatience(
       if (milliseconds === 0) expired.push(id);
     }
     remaining.current = active;
-    const display = Object.fromEntries([...active].map(([id, ms]) => [id, Math.ceil(ms / 1000)]));
-    setSeconds(previous => Object.keys(previous).length === active.size
+    const display = Object.fromEntries(active);
+    setRemainingMs(previous => Object.keys(previous).length === active.size
       && Object.entries(display).every(([id, value]) => previous[id] === value) ? previous : display);
     if (expired.length) onExpire(expired);
   });
@@ -46,7 +46,7 @@ export function useOrderPatience(
 
   function resetPatience() {
     remaining.current.clear();
-    setSeconds({});
+    setRemainingMs({});
   }
-  return { seconds, resetPatience };
+  return { remainingMs, resetPatience };
 }

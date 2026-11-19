@@ -408,7 +408,7 @@
   inset-inline: 0;
   bottom: calc(var(--customer-height) + 4px);
   z-index: 1;
-  width: max-content;
+  width: 100%;
   margin-inline: auto;
   display: grid;
   place-items: center;
@@ -422,35 +422,20 @@
   box-shadow: 0 1px #eed3bd80;
 }
 .order-patience {
-  display: flex;
-  align-items: center;
-  gap: 3px;
   width: 100%;
-  margin-top: 3px;
-  color: #614638;
-  font-size: 10px;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-.order-patience progress {
-  appearance: none;
-  flex: 1;
-  width: 0;
-  min-width: 12px;
   height: 5px;
-  border: 0;
+  margin-top: 3px;
+  overflow: hidden;
   border-radius: 999px;
-  background: #eaded3;
-  accent-color: #4d956b;
+  background: #eee3e0;
 }
-.order-patience progress::-webkit-progress-bar { border-radius: 999px; background: #eaded3; }
-.order-patience progress::-webkit-progress-value { border-radius: 999px; background: #4d956b; }
-.order-patience progress::-moz-progress-bar { border-radius: 999px; background: #4d956b; }
-.order-card--urgent .order-patience { color: #a4294c; }
-.order-card--urgent progress { accent-color: #c94d70; }
-.order-card--urgent progress::-webkit-progress-value { background: #c94d70; }
-.order-card--urgent progress::-moz-progress-bar { background: #c94d70; }
+.order-patience > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transform-origin: left center;
+  transition: transform 200ms linear, background-color 200ms linear;
+}
 .order-card--urgent .customer { animation: customer-impatient 420ms ease-out; }
 @keyframes customer-impatient {
   25% { translate: -2px 0; }
