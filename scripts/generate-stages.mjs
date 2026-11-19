@@ -16,7 +16,7 @@ const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevision = 5;
+const layoutRevision = 6;
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -25,8 +25,8 @@ if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaig
 
 const profiles = {
   easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, peakMin: 0, peakMax: 5 },
-  normal: { variety: 14, orders: 12, kinds: 3, batch: 5, runSize: 2, peakMin: 4, peakMax: 12 },
-  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 1, peakMin: 6, peakMax: 8 },
+  normal: { variety: 14, orders: 12, kinds: 3, batch: 5, runSize: 3, peakMin: 4, peakMax: 12 },
+  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 2, peakMin: 6, peakMax: 8 },
 };
 const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
 const file = new URL('../src/game/stages/generated.json', import.meta.url);
@@ -48,11 +48,11 @@ function shuffle(values, random) {
   return shuffled;
 }
 
-function makeCandidate(id, difficulty, random) {
+function makeCandidate(id, difficulty, random, previous) {
   const profile = profiles[difficulty];
   const menuPool = difficulty === 'hard' ? DONUT_TYPES : DONUT_TYPES.slice(DONUT_TYPES.indexOf('croissant'));
-  const menu = shuffle(menuPool, random).slice(0, profile.variety);
-  const orders = Array.from({ length: profile.orders }, (_, index) => {
+  const menu = previous?.donutTypes ?? shuffle(menuPool, random).slice(0, profile.variety);
+  const orders = previous?.orders ?? Array.from({ length: profile.orders }, (_, index) => {
     const featured = menu[index % menu.length];
     const required = [featured, ...menu.slice(profile.orders + index, profile.orders + index + 1)];
     const alternatives = shuffle(menu.filter(type => !required.includes(type)), random);
@@ -133,7 +133,7 @@ try {
     const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
     let accepted = false;
     for (let attempt = 0; attempt < 1000; attempt += 1) {
-      const candidate = makeCandidate(id, difficulty, random);
+      const candidate = makeCandidate(id, difficulty, random, old);
       const solution = findSolution(candidate, random);
       if (!solution) continue;
       const queues = candidate.queues.map(queue => queue.map(token => candidate.donutTypes.indexOf(token.type)));
