@@ -43,8 +43,8 @@ describe('손님 대기 시간과 주문 취소', () => {
 
   it('취소한 주문의 여분만 뒤로 보내고 트레이는 다른 주문에 계속 사용할 수 있다', () => {
     const initial = createGame(stage);
-    expect(initial.orders[0]?.patienceMs).toBe(6_000);
-    expect(createGame({ ...stage, difficulty: 'hard', trayCapacity: 8 }).orders[0]?.patienceMs).toBe(6_000);
+    expect(initial.orders[0]?.patienceMs).toBe(9_000);
+    expect(createGame({ ...stage, difficulty: 'hard', trayCapacity: 8 }).orders[0]?.patienceMs).toBe(9_000);
     const queued = selectDonut(initial, stage, 0, 's0', true).state;
     let state = expireOrders(queued, stage, ['o0']);
     expect(state.tray).toEqual(queued.tray);
