@@ -620,15 +620,6 @@
 .result-panel h2 { font-size: clamp(17px, 5.3vw, 25px); font-weight: 900; }
 .result-panel--compact h2 { color: var(--secondary-text); }
 .result-panel--compact h2:focus { outline: none; }
-.result-panel .game-over-title {
-  padding: 0 4px 3px;
-  font: 400 clamp(42px, 12vw, 58px) / .94 var(--stage-script);
-  text-align: center;
-  background: linear-gradient(120deg, #d28b46, #cd775b 49%, #b9497f);
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 2px 2px #8453414a);
-}
 .result-panel > p { font-size: 13px; line-height: 1.35; }
 .game-status--clear {
   padding-top: calc(clamp(54px, 14dvh, 127px) + var(--safe-top));
@@ -658,14 +649,14 @@
   65% { opacity: 1; scale: var(--clear-pop-scale, 1.12); }
   100% { opacity: 1; scale: 1; }
 }
-.result-panel .clear-title {
+.result-panel .result-display-title {
   color: var(--secondary-text);
   font-family: var(--stage-script);
   font-size: clamp(34px, 10vw, 48px);
   line-height: 1.05;
   font-weight: 400;
 }
-.result-panel .clear-title:focus { outline: none; }
+.result-panel .result-display-title:focus { outline: none; }
 .result-desserts {
   display: block;
   width: min(100%, 310px);

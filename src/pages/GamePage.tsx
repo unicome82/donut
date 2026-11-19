@@ -144,7 +144,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={allCustomersLeft ? 'game-over-title' : status === 'clear' ? 'clear-title' : undefined} lang={allCustomersLeft ? 'en' : undefined}>
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={allCustomersLeft || status === 'clear' ? 'result-display-title' : undefined} lang={allCustomersLeft ? 'en' : undefined}>
         {allCustomersLeft ? <>Game<br />Over</> : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {allCustomersLeft && <p>{resultTitles.gameover}</p>}
