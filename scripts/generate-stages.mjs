@@ -10,12 +10,13 @@ registerHooks({
   },
 });
 
-const { BASE_TRAY_CAPACITY, QUEUE_COUNT } = await import('../src/game/constants.ts');
+const { QUEUE_COUNT } = await import('../src/game/constants.ts');
+const { TRAY_CAPACITY_BY_DIFFICULTY } = await import('../src/game/trayCapacity.ts');
 const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/game/engine.ts');
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevision = 2;
+const layoutRevision = 5;
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -23,13 +24,12 @@ if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaig
 }
 
 const profiles = {
-  easy: { variety: 6, orders: 9, kinds: 2, batch: 3, peakMin: 0, peakMax: 5 },
-  normal: { variety: 12, orders: 12, kinds: 3, batch: 5, peakMin: 3, peakMax: 11, revision: 3 },
-  hard: { variety: 28, orders: 15, kinds: 3, batch: 7, peakMin: 8, peakMax: 17, revision: 4 },
+  easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, peakMin: 0, peakMax: 5 },
+  normal: { variety: 14, orders: 12, kinds: 3, batch: 5, runSize: 2, peakMin: 4, peakMax: 12 },
+  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 1, peakMin: 6, peakMax: 8 },
 };
 const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
 const file = new URL('../src/game/stages/generated.json', import.meta.url);
-const revisionFor = difficulty => profiles[difficulty].revision ?? layoutRevision;
 
 function randomFor(seed) {
   let state = seed >>> 0;
@@ -67,7 +67,10 @@ function makeCandidate(id, difficulty, random) {
   const columns = shuffle(queues.map((_, index) => index), random);
   let run = 0;
   for (let start = 0; start < orders.length; start += profile.batch) {
-    const runs = orders.slice(start, start + profile.batch).flatMap(order => Object.entries(order.items));
+    const runs = orders.slice(start, start + profile.batch).flatMap(order =>
+      Object.entries(order.items).flatMap(([type, quantity]) =>
+        Array.from({ length: Math.ceil(quantity / profile.runSize) }, (_, index) =>
+          [type, Math.min(quantity - index * profile.runSize, profile.runSize)])));
     for (const [type, quantity] of shuffle(runs, random)) {
       const column = columns[run % QUEUE_COUNT];
       const queue = queues[column];
@@ -77,37 +80,13 @@ function makeCandidate(id, difficulty, random) {
       run += 1;
     }
   }
-  return { id, difficulty, donutTypes: menu, targetOrders: orders.length, trayCapacity: BASE_TRAY_CAPACITY, queues, orders };
-}
-
-function addSurplus(stage, random, interleavedLimit) {
-  const orderQuantity = stage.orders.flatMap(order => Object.values(order.items))
-    .reduce((total, quantity) => total + quantity, 0);
-  // Extra stock equal to half the demand leaves a third of the starting stock.
-  const surplus = Math.round(orderQuantity / 2);
-  const interleaved = Math.min(interleavedLimit, Math.round(surplus / 5));
-  const decoys = shuffle(DONUT_TYPES.filter(type => !stage.donutTypes.includes(type)), random).slice(0, 2);
-  const queues = stage.queues.map(queue => queue.map(token => token.type));
-  const positions = queues.flatMap((queue, column) =>
-    queue.slice(0, -1).map((_, index) => `${column}:${index}`));
-  const inserts = new Set(shuffle(positions, random).slice(0, interleaved));
-  const mixed = queues.map((queue, column) => queue.flatMap((type, index) =>
-    inserts.has(`${column}:${index}`) ? [type, type] : [type]));
-  const columns = shuffle(mixed.map((_, column) => column), random);
-  for (let i = interleaved; i < surplus; i += 1) {
-    mixed[columns[i % columns.length]].push(decoys[random(decoys.length)]);
-  }
   return {
-    ...stage,
-    revision: revisionFor(stage.difficulty),
-    donutTypes: [...stage.donutTypes, ...decoys],
-    queues: mixed.map((queue, column) => queue.map((type, index) => ({
-      id: `s${stage.id}-q${column}-${index}`, type,
-    }))),
+    id, difficulty, revision: layoutRevision, donutTypes: menu, targetOrders: orders.length,
+    trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY[difficulty], queues, orders,
   };
 }
 
-function findSolution(stage, random, knownPath) {
+function findSolution(stage, random) {
   let state = createGame(stage);
   const readyOrders = stage.orders.map(order => order.id);
   const solution = [];
@@ -121,7 +100,7 @@ function findSolution(stage, random, knownPath) {
       choices.push({ column, priority: (depth < 0 ? Infinity : depth + random(100) / 100) });
     }
     choices.sort((left, right) => left.priority - right.priority);
-    const choice = knownPath ? choices.find(({ column }) => column === knownPath[solution.length]) : choices[0];
+    const choice = choices[0];
     if (!choice || !Number.isFinite(choice.priority)) break;
     const token = state.queues[choice.column][0];
     const selected = selectDonut(state, stage, choice.column, token.id, true).state;
@@ -144,7 +123,7 @@ mkdirSync(lock);
 try {
   const { stages: generated, solutions } = JSON.parse(readFileSync(file, 'utf8'));
   const lastId = generated.at(-1)?.id ?? firstId - 1;
-  const outdated = generated.filter(stage => stage.revision < revisionFor(stage.difficulty));
+  const outdated = generated.filter(stage => stage.revision < layoutRevision);
   const ids = [...outdated.map(stage => stage.id),
     ...Array.from({ length: Math.max(0, endId - lastId) }, (_, index) => lastId + index + 1)];
   const oldStages = new Map(outdated.map(stage => [stage.id, stage]));
@@ -152,18 +131,10 @@ try {
     const old = oldStages.get(id);
     const difficulty = old?.difficulty ?? cadence[(id - firstId) % cadence.length];
     const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
-    const base = old && old.donutTypes.length === profiles[difficulty].variety && {
-      ...old,
-      queues: old.queues.map(queue => queue.map(index => ({ type: old.donutTypes[index] }))),
-    };
     let accepted = false;
-    for (let attempt = 0; attempt < 500; attempt += 1) {
-      // Reduce interleaving on retries to preserve a three-star route.
-      const limit = Math.max(0, 8 - Math.floor(attempt / 8));
-      const candidate = addSurplus(base || makeCandidate(id, difficulty, random), random, limit);
-      const stockedTypes = new Set(candidate.queues.flat().map(token => token.type));
-      if (stockedTypes.size !== candidate.donutTypes.length) continue;
-      const solution = findSolution(candidate, random, base && limit === 0 ? solutions[id] : undefined);
+    for (let attempt = 0; attempt < 1000; attempt += 1) {
+      const candidate = makeCandidate(id, difficulty, random);
+      const solution = findSolution(candidate, random);
       if (!solution) continue;
       const queues = candidate.queues.map(queue => queue.map(token => candidate.donutTypes.indexOf(token.type)));
       if (old) generated[generated.indexOf(old)] = { ...candidate, queues };

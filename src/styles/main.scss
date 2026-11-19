@@ -509,7 +509,6 @@
 .tray-section--near-full { background: #fff0ec; border-color: #dc8a96; }
 .tray-slots {
   display: grid;
-  grid-template-columns: repeat(20, minmax(0, 1fr));
   row-gap: 2px;
   max-width: 550px;
   margin: 0 auto;

@@ -5,6 +5,7 @@ import { createSession, getCurrentStage, isUnlocked, reduceSession } from './ses
 import { authoredStages, stages, practiceStage } from './stages';
 import { solutions } from './stages/solutions';
 import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
+import { TRAY_CAPACITY_BY_DIFFICULTY } from './trayCapacity';
 import { validateStage } from './validation';
 import type { DonutType, GameState, StageDefinition, OrderDefinition } from './types';
 
@@ -232,16 +233,13 @@ describe('스테이지 해법과 게임 불변식', () => {
       for (const queue of solution) {
         expect(state.status).toBe('playing');
         state = select(state, stage, queue).state;
-        expect(state.tray.length).toBeLessThan(BASE_TRAY_CAPACITY);
+        expect(state.tray.length).toBeLessThan(stage.trayCapacity);
         expect(state.expandUsed).toBe(false);
       }
       expect(state.status).toBe('clear');
       expect(state.completedOrders).toBe(stage.targetOrders);
-      const supplied = stage.queues.flat().length;
-      const ordered = stage.orders.flatMap(order => Object.values(order.items))
-        .reduce((sum, quantity) => sum + quantity, 0);
-      expect(state.queues.flat().length + state.tray.length).toBe(Math.round(ordered / 2));
-      expect(supplied).toBe(ordered + Math.round(ordered / 2));
+      expect(state.queues.every(queue => queue.length === 0)).toBe(true);
+      expect(state.tray).toHaveLength(0);
       expect(stage).toEqual(original);
     });
     it('스테이지 ' + stage.id + '는 트레이 대기 후 매칭하는 실제 플레이 경로에서도 클리어한다', () => {
@@ -264,18 +262,17 @@ describe('스테이지 해법과 게임 불변식', () => {
     });
   }
   for (const stage of authoredStages) {
-    it('스테이지 ' + stage.id + '는 다양한 종류가 연속 묶음으로 쌓이고 기본 트레이를 사용한다', () => {
+    it('스테이지 ' + stage.id + '는 난이도에 맞는 종류 수와 트레이를 사용한다', () => {
       const variety = { easy: 8, normal: 14, hard: 30 };
       expect(stage.donutTypes).toHaveLength(variety[stage.difficulty ?? 'easy']);
-      expect(stage.trayCapacity).toBe(BASE_TRAY_CAPACITY);
+      expect(stage.trayCapacity).toBe(TRAY_CAPACITY_BY_DIFFICULTY[stage.difficulty ?? 'easy']);
       expect(stage.queues).toHaveLength(QUEUE_COUNT);
       const quantities = stage.orders.flatMap(order => Object.values(order.items));
       expect(Math.max(...quantities)).toBeLessThanOrEqual(16);
       expect(Math.max(...stage.orders.map(order => Object.values(order.items).reduce((sum, n) => sum + n, 0)))).toBeLessThanOrEqual(16);
       expect(new Set(quantities).size).toBeGreaterThanOrEqual(4);
       expect(new Set(stage.queues.flat().map(token => token.type)).size).toBe(stage.donutTypes.length);
-      expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(stage.difficulty === 'hard' ? 28 : 8);
-      expect(stage.queues.every(queue => queue.some((token, index) => index >= 2 && token.type === queue[index - 1]?.type && token.type === queue[index - 2]?.type))).toBe(true);
+      expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(stage.donutTypes.length);
     });
     it('스테이지 ' + stage.id + '의 여러 선택 경로에서 토큰과 주문 수량을 보존한다', () => {
       for (let seed = 1; seed <= 20; seed += 1) {

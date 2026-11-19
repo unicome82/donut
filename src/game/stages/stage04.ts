@@ -1,815 +1,666 @@
-import { BASE_TRAY_CAPACITY } from '../constants';
+import { TRAY_CAPACITY_BY_DIFFICULTY } from '../trayCapacity';
 import type { StageDefinition } from '../types';
 
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const stage04: StageDefinition = {
   "id": 4,
   "difficulty": "normal",
-  "revision": 11,
+  "revision": 12,
   "donutTypes": [
-    "cake",
-    "chocolate",
-    "raspberryMacaron",
+    "croissant",
     "chocolateCake",
+    "chocolateCroissant",
     "chocolateIceCream",
     "blueberryTart",
-    "strawberryTart",
+    "cinnamonCroffle",
+    "matchaCroffle",
+    "raspberryMacaron",
+    "chocolateCookie",
     "chocolateCupcake",
-    "strawberry",
-    "vanilla",
-    "matcha",
-    "blueberry",
-    "caramel",
-    "lemon"
+    "berryScone",
+    "whiteCookie",
+    "vanillaIceCream",
+    "strawberryTart"
   ],
-  "targetOrders": 14,
-  "trayCapacity": BASE_TRAY_CAPACITY,
+  "targetOrders": 12,
+  "trayCapacity": TRAY_CAPACITY_BY_DIFFICULTY.normal,
   "queues": [
     [
       {
-        "id": "l4-r4-q8-p0",
-        "type": "raspberryMacaron"
+        "id": "s4-q0-0",
+        "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q0-p0",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q0-p1",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q0-p2",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q0-p3",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q0-p4",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q0-p5",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q8-p1",
-        "type": "chocolate"
-      },
-      {
-        "id": "l4-r4-q0-p6",
+        "id": "s4-q0-1",
         "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q8-p2",
-        "type": "chocolate"
+        "id": "s4-q0-2",
+        "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q8-p3",
-        "type": "chocolate"
+        "id": "s4-q0-3",
+        "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q8-p4",
-        "type": "chocolate"
+        "id": "s4-q0-4",
+        "type": "vanillaIceCream"
       },
       {
-        "id": "l4-r4-q8-p5",
-        "type": "chocolateCake"
+        "id": "s4-q0-5",
+        "type": "vanillaIceCream"
       },
       {
-        "id": "l4-r4-q8-p6",
-        "type": "chocolateCake"
+        "id": "s4-q0-6",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q0-p7",
-        "type": "chocolateIceCream"
+        "id": "s4-q0-7",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q8-p7",
-        "type": "chocolateCake"
+        "id": "s4-q0-8",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q8-p8",
-        "type": "chocolateCake"
+        "id": "s4-q0-9",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q0-p8",
-        "type": "chocolateIceCream"
+        "id": "s4-q0-10",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q0-p9",
-        "type": "chocolateIceCream"
+        "id": "s4-q0-11",
+        "type": "chocolateCookie"
       },
       {
-        "id": "l4-r4-q0-p10",
-        "type": "chocolateIceCream"
+        "id": "s4-q0-12",
+        "type": "chocolateCookie"
       },
       {
-        "id": "l4-r4-q0-p11",
-        "type": "chocolateIceCream"
+        "id": "s4-q0-13",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q0-p12",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p13",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p14",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p15",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p16",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p17",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q0-p18",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q8-p9",
-        "type": "strawberry"
+        "id": "s4-q0-14",
+        "type": "raspberryMacaron"
       }
     ],
     [
       {
-        "id": "l4-r4-q9-p0",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q9-p1",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q9-p2",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q9-p3",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q9-p4",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q1-p0",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p1",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p2",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p3",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p4",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q1-p5",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q9-p5",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p6",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q1-p7",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q1-p8",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q1-p9",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q9-p6",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q9-p7",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q1-p10",
+        "id": "s4-q1-0",
         "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q1-p11",
+        "id": "s4-q1-1",
         "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q1-p12",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q1-p13",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q1-p14",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q1-p15",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q9-p8",
+        "id": "s4-q1-2",
         "type": "chocolateCupcake"
       },
       {
-        "id": "l4-r4-q9-p9",
+        "id": "s4-q1-3",
         "type": "chocolateCupcake"
       },
       {
-        "id": "l4-r4-q9-p10",
-        "type": "chocolateCupcake"
+        "id": "s4-q1-4",
+        "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q9-p11",
-        "type": "cake"
+        "id": "s4-q1-5",
+        "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q9-p12",
-        "type": "cake"
+        "id": "s4-q1-6",
+        "type": "matchaCroffle"
       },
       {
-        "id": "l4-r4-q9-p13",
-        "type": "cake"
+        "id": "s4-q1-7",
+        "type": "matchaCroffle"
       },
       {
-        "id": "l4-r4-q9-p14",
-        "type": "cake"
+        "id": "s4-q1-8",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q9-p15",
-        "type": "cake"
+        "id": "s4-q1-9",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q9-p16",
-        "type": "vanilla"
+        "id": "s4-q1-10",
+        "type": "whiteCookie"
+      },
+      {
+        "id": "s4-q1-11",
+        "type": "whiteCookie"
+      },
+      {
+        "id": "s4-q1-12",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q1-13",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q1-14",
+        "type": "whiteCookie"
+      },
+      {
+        "id": "s4-q1-15",
+        "type": "raspberryMacaron"
+      },
+      {
+        "id": "s4-q1-16",
+        "type": "raspberryMacaron"
       }
     ],
     [
       {
-        "id": "l4-r4-q2-p0",
+        "id": "s4-q2-0",
+        "type": "vanillaIceCream"
+      },
+      {
+        "id": "s4-q2-1",
+        "type": "vanillaIceCream"
+      },
+      {
+        "id": "s4-q2-2",
+        "type": "chocolateIceCream"
+      },
+      {
+        "id": "s4-q2-3",
+        "type": "chocolateIceCream"
+      },
+      {
+        "id": "s4-q2-4",
         "type": "chocolateCake"
       },
       {
-        "id": "l4-r4-q2-p1",
+        "id": "s4-q2-5",
         "type": "chocolateCake"
       },
       {
-        "id": "l4-r4-q2-p2",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p3",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p4",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p5",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p6",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p7",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p8",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q2-p9",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p10",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p11",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p12",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p13",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p14",
-        "type": "chocolateCake"
-      },
-      {
-        "id": "l4-r4-q2-p15",
+        "id": "s4-q2-6",
         "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q2-p16",
+        "id": "s4-q2-7",
         "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q2-p17",
-        "type": "strawberryTart"
+        "id": "s4-q2-8",
+        "type": "chocolateCookie"
       },
       {
-        "id": "l4-r4-q2-p18",
-        "type": "strawberryTart"
+        "id": "s4-q2-9",
+        "type": "chocolateCroissant"
       },
       {
-        "id": "l4-r4-q2-p19",
-        "type": "strawberryTart"
+        "id": "s4-q2-10",
+        "type": "chocolateCroissant"
       },
       {
-        "id": "l4-r4-q2-p20",
-        "type": "matcha"
+        "id": "s4-q2-11",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q2-12",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q2-13",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q2-14",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q2-15",
+        "type": "berryScone"
+      },
+      {
+        "id": "s4-q2-16",
+        "type": "berryScone"
       }
     ],
     [
       {
-        "id": "l4-r4-q3-p0",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q3-p1",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q3-p2",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q3-p3",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q3-p4",
+        "id": "s4-q3-0",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q3-p5",
-        "type": "chocolateIceCream"
+        "id": "s4-q3-1",
+        "type": "matchaCroffle"
       },
       {
-        "id": "l4-r4-q3-p6",
-        "type": "chocolateIceCream"
+        "id": "s4-q3-2",
+        "type": "matchaCroffle"
       },
       {
-        "id": "l4-r4-q3-p7",
-        "type": "chocolateCake"
+        "id": "s4-q3-3",
+        "type": "chocolateCroissant"
       },
       {
-        "id": "l4-r4-q3-p8",
-        "type": "chocolateCake"
+        "id": "s4-q3-4",
+        "type": "chocolateCroissant"
       },
       {
-        "id": "l4-r4-q3-p9",
-        "type": "chocolateCake"
+        "id": "s4-q3-5",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q3-p10",
-        "type": "raspberryMacaron"
+        "id": "s4-q3-6",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q3-p11",
-        "type": "raspberryMacaron"
+        "id": "s4-q3-7",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q3-p12",
-        "type": "raspberryMacaron"
+        "id": "s4-q3-8",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q3-p13",
-        "type": "raspberryMacaron"
+        "id": "s4-q3-9",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q3-p14",
-        "type": "raspberryMacaron"
+        "id": "s4-q3-10",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q3-p15",
-        "type": "blueberry"
-      }
-    ],
-    [
-      {
-        "id": "l4-r4-q4-p0",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p1",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p2",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p3",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p4",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q4-p5",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q4-p6",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q4-p7",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q4-p8",
-        "type": "chocolate"
-      },
-      {
-        "id": "l4-r4-q4-p9",
-        "type": "chocolate"
-      },
-      {
-        "id": "l4-r4-q4-p10",
-        "type": "chocolate"
-      },
-      {
-        "id": "l4-r4-q4-p11",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q4-p12",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q4-p13",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p14",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p15",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p16",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p17",
-        "type": "chocolateCupcake"
-      },
-      {
-        "id": "l4-r4-q4-p18",
-        "type": "caramel"
-      }
-    ],
-    [
-      {
-        "id": "l4-r4-q5-p0",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q5-p1",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q5-p2",
+        "id": "s4-q3-11",
         "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q5-p3",
+        "id": "s4-q3-12",
         "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q5-p4",
-        "type": "strawberryTart"
+        "id": "s4-q3-13",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q5-p5",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q5-p6",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q5-p7",
-        "type": "cake"
-      },
-      {
-        "id": "l4-r4-q5-p8",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q5-p9",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q5-p10",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q5-p11",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q5-p12",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q5-p13",
-        "type": "lemon"
+        "id": "s4-q3-14",
+        "type": "berryScone"
       }
     ],
     [
       {
-        "id": "l4-r4-q6-p0",
-        "type": "chocolate"
+        "id": "s4-q4-0",
+        "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q6-p1",
-        "type": "chocolate"
+        "id": "s4-q4-1",
+        "type": "strawberryTart"
       },
       {
-        "id": "l4-r4-q6-p2",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p3",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p4",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p5",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p6",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p7",
-        "type": "blueberryTart"
-      },
-      {
-        "id": "l4-r4-q6-p8",
+        "id": "s4-q4-2",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q6-p9",
-        "type": "chocolateIceCream"
+        "id": "s4-q4-3",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q6-p10",
-        "type": "cake"
+        "id": "s4-q4-4",
+        "type": "vanillaIceCream"
       },
       {
-        "id": "l4-r4-q6-p11",
-        "type": "cake"
+        "id": "s4-q4-5",
+        "type": "vanillaIceCream"
       },
       {
-        "id": "l4-r4-q6-p12",
-        "type": "cake"
+        "id": "s4-q4-6",
+        "type": "whiteCookie"
       },
       {
-        "id": "l4-r4-q6-p13",
-        "type": "cake"
+        "id": "s4-q4-7",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q6-p14",
-        "type": "cake"
+        "id": "s4-q4-8",
+        "type": "cinnamonCroffle"
       },
       {
-        "id": "l4-r4-q6-p15",
-        "type": "cake"
+        "id": "s4-q4-9",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q4-10",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q4-11",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q4-12",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q4-13",
+        "type": "whiteCookie"
       }
     ],
     [
       {
-        "id": "l4-r4-q7-p0",
+        "id": "s4-q5-0",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q5-1",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q5-2",
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q5-3",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p1",
+        "id": "s4-q5-4",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p2",
+        "id": "s4-q5-5",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p3",
+        "id": "s4-q5-6",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p4",
-        "type": "chocolateIceCream"
+        "id": "s4-q5-7",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q7-p5",
-        "type": "chocolateIceCream"
+        "id": "s4-q5-8",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q7-p6",
+        "id": "s4-q5-9",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q5-10",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q5-11",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q5-12",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q5-13",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q5-14",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q5-15",
+        "type": "chocolateCookie"
+      }
+    ],
+    [
+      {
+        "id": "s4-q6-0",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q6-1",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q6-2",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q6-3",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q6-4",
         "type": "chocolateCake"
       },
       {
-        "id": "l4-r4-q7-p7",
+        "id": "s4-q6-5",
         "type": "chocolateCake"
       },
       {
-        "id": "l4-r4-q7-p8",
-        "type": "chocolateCake"
+        "id": "s4-q6-6",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q7-p9",
-        "type": "chocolateCake"
+        "id": "s4-q6-7",
+        "type": "raspberryMacaron"
       },
       {
-        "id": "l4-r4-q7-p10",
-        "type": "chocolateCake"
+        "id": "s4-q6-8",
+        "type": "blueberryTart"
       },
       {
-        "id": "l4-r4-q7-p11",
+        "id": "s4-q6-9",
+        "type": "blueberryTart"
+      },
+      {
+        "id": "s4-q6-10",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q6-11",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q6-12",
+        "type": "whiteCookie"
+      },
+      {
+        "id": "s4-q6-13",
+        "type": "whiteCookie"
+      },
+      {
+        "id": "s4-q6-14",
+        "type": "chocolateCupcake"
+      },
+      {
+        "id": "s4-q6-15",
+        "type": "chocolateCupcake"
+      }
+    ],
+    [
+      {
+        "id": "s4-q7-0",
+        "type": "vanillaIceCream"
+      },
+      {
+        "id": "s4-q7-1",
+        "type": "vanillaIceCream"
+      },
+      {
+        "id": "s4-q7-2",
+        "type": "berryScone"
+      },
+      {
+        "id": "s4-q7-3",
+        "type": "berryScone"
+      },
+      {
+        "id": "s4-q7-4",
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q7-5",
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q7-6",
+        "type": "berryScone"
+      },
+      {
+        "id": "s4-q7-7",
+        "type": "berryScone"
+      },
+      {
+        "id": "s4-q7-8",
+        "type": "chocolateCroissant"
+      },
+      {
+        "id": "s4-q7-9",
+        "type": "chocolateCroissant"
+      },
+      {
+        "id": "s4-q7-10",
+        "type": "chocolateCroissant"
+      },
+      {
+        "id": "s4-q7-11",
+        "type": "chocolateCroissant"
+      },
+      {
+        "id": "s4-q7-12",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q7-13",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q7-14",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q7-15",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p12",
+        "id": "s4-q7-16",
         "type": "chocolateIceCream"
       },
       {
-        "id": "l4-r4-q7-p13",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q7-p14",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q7-p15",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l4-r4-q7-p16",
-        "type": "chocolateIceCream"
+        "id": "s4-q7-17",
+        "type": "chocolateCupcake"
       }
     ]
   ],
   "orders": [
     {
-      "id": "l4-o1",
+      "id": "s4-o1",
       "sequence": 1,
       "items": {
-        "cake": 2,
-        "chocolate": 1
+        "croissant": 3,
+        "vanillaIceCream": 4,
+        "chocolateCupcake": 5
       }
     },
     {
-      "id": "l4-o2",
+      "id": "s4-o2",
       "sequence": 2,
       "items": {
+        "chocolateCake": 4,
+        "strawberryTart": 3,
+        "whiteCookie": 3
+      }
+    },
+    {
+      "id": "s4-o3",
+      "sequence": 3,
+      "items": {
+        "chocolateCroissant": 4,
+        "blueberryTart": 2,
+        "vanillaIceCream": 4
+      }
+    },
+    {
+      "id": "s4-o4",
+      "sequence": 4,
+      "items": {
+        "chocolateIceCream": 5,
+        "berryScone": 4,
+        "matchaCroffle": 4
+      }
+    },
+    {
+      "id": "s4-o5",
+      "sequence": 5,
+      "items": {
+        "blueberryTart": 3,
+        "strawberryTart": 5,
+        "chocolateIceCream": 5
+      }
+    },
+    {
+      "id": "s4-o6",
+      "sequence": 6,
+      "items": {
+        "cinnamonCroffle": 5,
+        "chocolateCookie": 3,
+        "whiteCookie": 5
+      }
+    },
+    {
+      "id": "s4-o7",
+      "sequence": 7,
+      "items": {
+        "matchaCroffle": 4,
+        "chocolateCroissant": 4,
+        "cinnamonCroffle": 4
+      }
+    },
+    {
+      "id": "s4-o8",
+      "sequence": 8,
+      "items": {
+        "raspberryMacaron": 3,
+        "chocolateCookie": 4,
+        "blueberryTart": 2
+      }
+    },
+    {
+      "id": "s4-o9",
+      "sequence": 9,
+      "items": {
+        "chocolateCookie": 4,
+        "matchaCroffle": 2,
+        "whiteCookie": 3
+      }
+    },
+    {
+      "id": "s4-o10",
+      "sequence": 10,
+      "items": {
+        "chocolateCupcake": 3,
+        "strawberryTart": 2,
         "raspberryMacaron": 4
       }
     },
     {
-      "id": "l4-o3",
-      "sequence": 3,
+      "id": "s4-o11",
+      "sequence": 11,
       "items": {
-        "cake": 5,
-        "raspberryMacaron": 2
-      }
-    },
-    {
-      "id": "l4-o4",
-      "sequence": 4,
-      "items": {
-        "chocolate": 8
-      }
-    },
-    {
-      "id": "l4-o5",
-      "sequence": 5,
-      "items": {
-        "chocolateCake": 16
-      }
-    },
-    {
-      "id": "l4-o6",
-      "sequence": 6,
-      "items": {
-        "blueberryTart": 1,
-        "strawberryTart": 2
-      }
-    },
-    {
-      "id": "l4-o7",
-      "sequence": 7,
-      "items": {
-        "raspberryMacaron": 2,
+        "berryScone": 3,
+        "chocolateIceCream": 2,
         "chocolateCupcake": 3
       }
     },
     {
-      "id": "l4-o8",
-      "sequence": 8,
-      "items": {
-        "blueberryTart": 4,
-        "cake": 4
-      }
-    },
-    {
-      "id": "l4-o9",
-      "sequence": 9,
-      "items": {
-        "chocolateIceCream": 12
-      }
-    },
-    {
-      "id": "l4-o10",
-      "sequence": 10,
-      "items": {
-        "chocolateCake": 12,
-        "chocolateIceCream": 2,
-        "cake": 2
-      }
-    },
-    {
-      "id": "l4-o11",
-      "sequence": 11,
-      "items": {
-        "blueberryTart": 1,
-        "strawberryTart": 2
-      }
-    },
-    {
-      "id": "l4-o12",
+      "id": "s4-o12",
       "sequence": 12,
       "items": {
-        "raspberryMacaron": 1,
-        "chocolateCupcake": 4
-      }
-    },
-    {
-      "id": "l4-o13",
-      "sequence": 13,
-      "items": {
-        "blueberryTart": 6,
-        "chocolateCake": 2
-      }
-    },
-    {
-      "id": "l4-o14",
-      "sequence": 14,
-      "items": {
-        "chocolateIceCream": 10,
-        "raspberryMacaron": 2
+        "whiteCookie": 3,
+        "chocolateCookie": 2,
+        "raspberryMacaron": 5
       }
     }
   ]

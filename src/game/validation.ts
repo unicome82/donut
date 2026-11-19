@@ -1,12 +1,14 @@
 import { DONUT_TYPES, type DonutType, type StageDefinition } from './types';
-import { BASE_TRAY_CAPACITY, QUEUE_COUNT, MAX_ORDER_QUANTITY } from './constants';
+import { QUEUE_COUNT, MAX_ORDER_QUANTITY } from './constants';
+import { TRAY_CAPACITY_BY_DIFFICULTY } from './trayCapacity';
 export function validateStage(stage: StageDefinition): string[] {
   const errors: string[] = [];
   const validPositive = (n: number) => Number.isInteger(n) && n > 0;
   if (!Number.isInteger(stage.id) || stage.id < 0 || !validPositive(stage.revision)) errors.push('스테이지 ID는 0 이상의 정수이고 revision은 양의 정수여야 합니다.');
   if (!validPositive(stage.targetOrders) || stage.orders.length !== stage.targetOrders) errors.push('목표 주문 수가 일치하지 않습니다.');
   if (stage.queues.length !== QUEUE_COUNT) errors.push(`대기열은 ${QUEUE_COUNT}개여야 합니다.`);
-  if (stage.trayCapacity !== BASE_TRAY_CAPACITY) errors.push(`기본 트레이는 ${BASE_TRAY_CAPACITY}칸이어야 합니다.`);
+  const capacity = TRAY_CAPACITY_BY_DIFFICULTY[stage.difficulty ?? 'easy'];
+  if (stage.trayCapacity !== capacity) errors.push(`기본 트레이는 ${capacity}칸이어야 합니다.`);
   if (!stage.donutTypes.length || new Set(stage.donutTypes).size !== stage.donutTypes.length || stage.donutTypes.some(t => !DONUT_TYPES.includes(t))) errors.push('도넛 종류 설정이 올바르지 않습니다.');
   const ids = new Set<string>();
   const supply: Partial<Record<DonutType, number>> = {};
@@ -31,6 +33,11 @@ export function validateStage(stage: StageDefinition): string[] {
       demand[type] = (demand[type] ?? 0) + count;
     }
   });
-  for (const type of DONUT_TYPES) if ((supply[type] ?? 0) < (demand[type] ?? 0)) errors.push(`${type} 공급이 부족합니다.`);
+  for (const type of DONUT_TYPES) {
+    const available = supply[type] ?? 0;
+    const ordered = demand[type] ?? 0;
+    if (available < ordered) errors.push(`${type} 공급이 부족합니다.`);
+    if (stage.difficulty && available > ordered) errors.push(`${type} 공급이 주문량을 초과합니다.`);
+  }
   return errors;
 }

@@ -1,11 +1,11 @@
-import { BASE_TRAY_CAPACITY } from '../constants';
+import { TRAY_CAPACITY_BY_DIFFICULTY } from '../trayCapacity';
 import type { StageDefinition } from '../types';
 
 // Fixed clustered runs; witness solutions are replayed in engine tests.
 export const stage01: StageDefinition = {
   "id": 1,
   "difficulty": "easy",
-  "revision": 10,
+  "revision": 11,
   "donutTypes": [
     "croissant",
     "chocolateIceCream",
@@ -17,7 +17,7 @@ export const stage01: StageDefinition = {
     "strawberryTart"
   ],
   "targetOrders": 8,
-  "trayCapacity": BASE_TRAY_CAPACITY,
+  "trayCapacity": TRAY_CAPACITY_BY_DIFFICULTY.easy,
   "queues": [
     [
       {
@@ -147,14 +147,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q2-p4",
         "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p5",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p6",
-        "type": "matchaCroffle"
       }
     ],
     [
@@ -169,30 +161,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q3-p2",
         "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q3-p3",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l1-r4-q3-p4",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l1-r4-q3-p5",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l1-r4-q3-p6",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l1-r4-q3-p7",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l1-r4-q3-p8",
-        "type": "blueberryCupcake"
       }
     ],
     [
@@ -207,46 +175,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q4-p2",
         "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p3",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q4-p4",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q4-p5",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q4-p6",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q4-p7",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p8",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p9",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p10",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p11",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q4-p12",
-        "type": "cinnamonCroffle"
       }
     ],
     [
@@ -281,30 +209,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q5-p7",
         "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q5-p8",
-        "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q5-p9",
-        "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q5-p10",
-        "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q5-p11",
-        "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q5-p12",
-        "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q5-p13",
-        "type": "lemonMacaron"
       }
     ],
     [
@@ -359,14 +263,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q6-p12",
         "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q6-p13",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q6-p14",
-        "type": "vanillaIceCream"
       }
     ],
     [
@@ -388,30 +284,6 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "l1-r4-q7-p4",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p5",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p6",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p7",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p8",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p9",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "l1-r4-q7-p10",
         "type": "strawberryTart"
       }
     ]
