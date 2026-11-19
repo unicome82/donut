@@ -28,8 +28,8 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
   const orderId = order?.definitionId;
   const duration = order?.patienceMs ?? 0;
   const fraction = duration > 0 ? (remainingMs ?? duration) / duration : 0;
-  const frowning = practice && duration > 0 && fraction <= 0.2;
-  const urgent = frowning || (!practice && remainingMs !== undefined && remainingMs <= 10_000);
+  const worried = practice && duration > 0 && fraction <= 0.4;
+  const urgent = worried || (!practice && remainingMs !== undefined && remainingMs <= 10_000);
 
   useLayoutEffect(() => () => {
     cancel.current?.();
@@ -105,9 +105,9 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
     cancel.current = () => { clearTimeout(ready); clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [departedOrderIds, onOrderReady, order, orderId, slot]);
-  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}${frowning ? ' order-card--practice-frown' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
+  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}${worried ? ' order-card--practice-worried' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
     <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
-      {frowning && <span className="practice-customer-expression" aria-hidden="true"><span className="practice-face-flush" /></span>}
+      {worried && <span className="practice-customer-expression" aria-hidden="true"><span className="practice-face-flush" /></span>}
       <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
       {duration > 0 && <div className="order-patience" role="progressbar" aria-label="손님 대기 시간"
         aria-valuenow={Math.round(fraction * 100)}>

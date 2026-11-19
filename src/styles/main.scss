@@ -438,8 +438,15 @@
   transition: transform 200ms linear, background-color 200ms linear;
 }
 .order-card--urgent .customer-scene { animation: customer-impatient 420ms ease-out; }
-.order-card--practice-frown .speech-bubble { animation: practice-bubble-warning 650ms ease-out; }
-.order-card--practice-frown .customer-scene { container-type: size; }
+.order-card--practice-worried .speech-bubble { animation: practice-bubble-warning 650ms ease-out; }
+.order-card--practice-worried .customer-scene {
+  container-type: size;
+  animation: practice-customer-hop 620ms infinite;
+}
+@keyframes practice-customer-hop {
+  0%, 100% { translate: 0 0; }
+  45% { translate: 0 -8px; }
+}
 .practice-customer-expression {
   position: absolute;
   inset: auto 0 0;
@@ -458,14 +465,14 @@
   z-index: 1;
   background: #553625;
 }
-.practice-customer-expression::before { left: 50.4%; transform: rotate(21deg); }
-.practice-customer-expression::after { left: 57%; transform: rotate(-21deg); }
+.practice-customer-expression::before { left: 50.4%; transform: rotate(-21deg); }
+.practice-customer-expression::after { left: 57%; transform: rotate(21deg); }
 .practice-face-flush {
   position: absolute;
-  top: 15.4%;
-  left: 46.4%;
-  width: 20.2%;
-  height: 10.5%;
+  top: 13.5%;
+  left: 42.5%;
+  width: 28%;
+  height: 14%;
   border-radius: 50%;
   background: radial-gradient(ellipse, #ee5e55ab 16%, #ef685e60 54%, transparent 76%);
   filter: blur(1px);
