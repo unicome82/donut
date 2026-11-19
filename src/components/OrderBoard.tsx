@@ -107,7 +107,7 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
   }, [departedOrderIds, onOrderReady, order, orderId, slot]);
   return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}${frowning ? ' order-card--practice-frown' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
     <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
-      {frowning && <span className="practice-customer-expression" aria-hidden="true"><i /></span>}
+      {frowning && <span className="practice-customer-expression" aria-hidden="true"><span className="practice-face-flush" /></span>}
       <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
       {duration > 0 && <div className="order-patience" role="progressbar" aria-label="손님 대기 시간"
         aria-valuenow={Math.round(fraction * 100)}>

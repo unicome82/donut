@@ -437,8 +437,7 @@
   transform-origin: left center;
   transition: transform 200ms linear, background-color 200ms linear;
 }
-.order-card--urgent .customer { animation: customer-impatient 420ms ease-out; }
-.order-card--practice-frown .customer { animation: none; }
+.order-card--urgent .customer-scene { animation: customer-impatient 420ms ease-out; }
 .order-card--practice-frown .speech-bubble { animation: practice-bubble-warning 650ms ease-out; }
 .order-card--practice-frown .customer-scene { container-type: size; }
 .practice-customer-expression {
@@ -456,25 +455,26 @@
   width: 4.8%;
   height: 1.5%;
   border-radius: 999px;
+  z-index: 1;
   background: #553625;
 }
 .practice-customer-expression::before { left: 50.4%; transform: rotate(21deg); }
 .practice-customer-expression::after { left: 57%; transform: rotate(-21deg); }
-.practice-customer-expression i {
+.practice-face-flush {
   position: absolute;
-  top: 21.1%;
-  left: 53.7%;
-  width: 5.4%;
-  height: 3%;
-  border-top: max(1px, 0.9cqh) solid #6d4131;
+  top: 15.4%;
+  left: 46.4%;
+  width: 20.2%;
+  height: 10.5%;
   border-radius: 50%;
+  background: radial-gradient(ellipse, #ee5e55ab 16%, #ef685e60 54%, transparent 76%);
 }
 @keyframes practice-bubble-warning {
   30% { border-color: #e87e87; box-shadow: 0 0 0 3px #e87e8740; }
 }
 @keyframes customer-impatient {
-  25% { translate: -2px 0; }
-  60% { translate: 2px 0; }
+  28% { translate: 0 -5px; }
+  66% { translate: 0 1px; }
 }
 .speech-bubble::before, .speech-bubble::after {
   content: '';
