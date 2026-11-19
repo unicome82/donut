@@ -122,6 +122,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       ? (state.stageId === 0 ? '손님이 떠났어요' : '모든 손님이 떠났어요') : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
+  const compactResult = status === 'blocked' || allCustomersLeft;
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !playing && !waitingForGoodbye;
@@ -139,11 +140,11 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
-    {showResult && <section className="result-panel" aria-labelledby="result-heading">
+    {showResult && <section className={`result-panel${compactResult ? ' result-panel--compact' : ''}`} aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : status === 'blocked' ? 'tray-full-title' : undefined}>
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : undefined}>
         {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
@@ -155,7 +156,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       <div className="result-actions">
         {status === 'blocked' && <button type="button" className="primary-button stage-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(state.stageId + 1)?.difficulty} /></button>}
-        <button className="primary-button stage-button" onClick={() => act({ type: 'RESTART' })}><span>다시 하기</span></button>
+        <button className="primary-button stage-button" onClick={() => act({ type: 'RESTART' })}><span lang="en">Retry</span></button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onStages}>스테이지 선택</button>}
       </div>
     </section>}

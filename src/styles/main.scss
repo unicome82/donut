@@ -609,7 +609,7 @@
   text-align: center;
   animation: result-arrive .25s ease-out both;
 }
-.game-status--blocked .result-panel {
+.result-panel--compact {
   flex: 0 1 auto;
   align-self: center;
   width: min(100%, 340px);
@@ -618,8 +618,8 @@
   padding: 22px 16px;
 }
 .result-panel h2 { font-size: clamp(17px, 5.3vw, 25px); font-weight: 900; }
-.result-panel .tray-full-title { color: var(--secondary-text); }
-.result-panel .tray-full-title:focus { outline: none; }
+.result-panel--compact h2 { color: var(--secondary-text); }
+.result-panel--compact h2:focus { outline: none; }
 .result-panel > p { font-size: 13px; line-height: 1.35; }
 .game-status--clear {
   padding-top: calc(clamp(54px, 14dvh, 127px) + var(--safe-top));
