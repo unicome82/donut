@@ -110,15 +110,26 @@
   padding: var(--safe-top) env(safe-area-inset-right) max(clamp(20px, 5dvh, 48px), env(safe-area-inset-bottom)) env(safe-area-inset-left);
   background-color: #c5e9ff;
 }
-.start-poster {
+.start-artwork {
+  --artwork-top: calc(var(--safe-top) + var(--poster-top-gap, 20px));
   position: absolute;
-  top: calc(var(--safe-top) + var(--poster-top-gap, 20px));
-  left: 0;
-  width: 100%;
-  height: calc(100% - var(--safe-top) - var(--poster-top-gap, 20px));
-  object-fit: fill;
-  object-position: top center;
+  inset: var(--artwork-top) 0 0;
+  width: min(100%, calc((var(--page-height) - var(--artwork-top)) * 2 / 3));
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
   pointer-events: none;
+}
+.start-artwork::after {
+  content: '';
+  flex: 1;
+  // Continue the poster's last pixel row through the space below it.
+  border-image: var(--poster-source) 1199 0 0 fill stretch;
+}
+.start-poster {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .start-actions {
   position: relative;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
   eager: true, import: 'default', query: '?url&no-inline',
@@ -21,9 +21,16 @@ const posters = Object.entries(posterSources).map(([path, src]) => ({
 export function StartPage({ stage, onGame, onStages }: { stage: number; onGame: () => void; onStages: () => void }) {
   const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
 
-  return <main className="start-page" style={{ backgroundColor: poster?.topColor }}>
+  const posterStyle = {
+    backgroundColor: poster?.topColor,
+    '--poster-source': poster ? `url("${poster.src}")` : 'none',
+  } as CSSProperties;
+
+  return <main className="start-page" style={posterStyle}>
     <h1 className="sr-only">Sweet Order</h1>
-    <img className="start-poster" src={poster?.src} alt="" draggable={false} fetchPriority="high" />
+    <div className="start-artwork" aria-hidden="true">
+      <img className="start-poster" src={poster?.src} width={800} height={1200} alt="" draggable={false} fetchPriority="high" />
+    </div>
     <div className="start-actions">
       <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span></button>
       <button className="secondary-button" onClick={onStages}>스테이지 선택</button>
