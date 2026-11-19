@@ -16,7 +16,7 @@ const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevisions = { easy: 9, normal: 8, hard: 7 };
+const layoutRevisions = { easy: 10, normal: 9, hard: 8 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -24,9 +24,9 @@ if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaig
 }
 
 const profiles = {
-  easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, dessertTotal: 126, peakMin: 0, peakMax: 5 },
-  normal: { variety: 14, orders: 12, kinds: 3, batch: 6, runSize: 3, dessertTotal: 160, peakMin: 6, peakMax: 12 },
-  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 2, dessertTotal: 200, peakMin: 6, peakMax: 8 },
+  easy: { variety: 10, orders: 9, kinds: 2, batch: 3, runSize: 6, dessertTotal: 126, peakMin: 0, peakMax: 5 },
+  normal: { variety: 15, orders: 12, kinds: 3, batch: 6, runSize: 4, dessertTotal: 160, peakMin: 6, peakMax: 12 },
+  hard: { variety: 20, orders: 15, kinds: 3, batch: 7, runSize: 3, dessertTotal: 200, peakMin: 6, peakMax: 8 },
 };
 const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
 const file = new URL('../src/game/stages/generated.json', import.meta.url);
@@ -51,8 +51,9 @@ function shuffle(values, random) {
 function makeCandidate(id, difficulty, random, previous) {
   const profile = profiles[difficulty];
   const menuPool = difficulty === 'hard' ? DONUT_TYPES : DONUT_TYPES.slice(DONUT_TYPES.indexOf('croissant'));
-  const menu = previous?.donutTypes ?? shuffle(menuPool, random).slice(0, profile.variety);
-  let orders = previous?.orders ?? Array.from({ length: profile.orders }, (_, index) => {
+  const compatible = previous?.donutTypes.length === profile.variety ? previous : undefined;
+  const menu = compatible?.donutTypes ?? shuffle(menuPool, random).slice(0, profile.variety);
+  let orders = compatible?.orders ?? Array.from({ length: profile.orders }, (_, index) => {
     const featured = menu[index % menu.length];
     const required = [featured, ...menu.slice(profile.orders + index, profile.orders + index + 1)];
     const alternatives = shuffle(menu.filter(type => !required.includes(type)), random);
@@ -63,7 +64,7 @@ function makeCandidate(id, difficulty, random, previous) {
       items: Object.fromEntries(types.map(type => [type, 2 + random(4)])),
     };
   });
-  if (difficulty === 'easy' && !previous) {
+  if (difficulty === 'easy' && !compatible) {
     orders = orders.map(order => ({
       ...order,
       items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + 2])),
@@ -85,6 +86,11 @@ function makeCandidate(id, difficulty, random, previous) {
       orders.push({ id: `s${id}-extra-o${sequence}`, sequence, items });
     }
   }
+  return arrangeStage(id, difficulty, random, menu, orders);
+}
+
+function arrangeStage(id, difficulty, random, menu, orders) {
+  const profile = profiles[difficulty];
   const queues = Array.from({ length: QUEUE_COUNT }, () => []);
   const columns = shuffle(queues.map((_, index) => index), random);
   let run = 0;
@@ -106,6 +112,18 @@ function makeCandidate(id, difficulty, random, previous) {
     id, difficulty, revision: layoutRevisions[difficulty], donutTypes: menu, targetOrders: orders.length,
     trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY[difficulty], queues, orders,
   };
+}
+
+function sameTypeNeighborFraction(queues) {
+  let pairs = 0;
+  let matching = 0;
+  for (const queue of queues) {
+    for (let index = 1; index < queue.length; index += 1) {
+      pairs += 1;
+      if (queue[index] === queue[index - 1]) matching += 1;
+    }
+  }
+  return pairs ? matching / pairs : 0;
 }
 
 function findSolution(stage, random) {
@@ -153,12 +171,14 @@ try {
     const old = oldStages.get(id);
     const difficulty = old?.difficulty ?? cadence[(id - firstId) % cadence.length];
     const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
+    const previousGrouping = old ? sameTypeNeighborFraction(old.queues) : 0;
     let accepted = false;
     for (let attempt = 0; attempt < 1000; attempt += 1) {
       const candidate = makeCandidate(id, difficulty, random, old);
+      const queues = candidate.queues.map(queue => queue.map(token => candidate.donutTypes.indexOf(token.type)));
+      if (old && sameTypeNeighborFraction(queues) <= previousGrouping) continue;
       const solution = findSolution(candidate, random);
       if (!solution) continue;
-      const queues = candidate.queues.map(queue => queue.map(token => candidate.donutTypes.indexOf(token.type)));
       if (old) generated[generated.indexOf(old)] = { ...candidate, queues };
       else generated.push({ ...candidate, queues });
       solutions[id] = solution;

@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage04: StageDefinition = {
   "id": 4,
   "difficulty": "normal",
-  "revision": 13,
+  "revision": 14,
   "donutTypes": [
     "croissant",
     "chocolateCake",
@@ -20,7 +20,8 @@ export const stage04: StageDefinition = {
     "berryScone",
     "whiteCookie",
     "vanillaIceCream",
-    "strawberryTart"
+    "strawberryTart",
+    "lemonMacaron"
   ],
   "targetOrders": 15,
   "trayCapacity": TRAY_CAPACITY_BY_DIFFICULTY.normal,
@@ -28,71 +29,71 @@ export const stage04: StageDefinition = {
     [
       {
         "id": "s4-q0-0",
-        "type": "chocolateCake"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-1",
-        "type": "chocolateCake"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-2",
-        "type": "chocolateCake"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-3",
-        "type": "chocolateCupcake"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "s4-q0-4",
-        "type": "chocolateCupcake"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "s4-q0-5",
-        "type": "chocolateCupcake"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "s4-q0-6",
-        "type": "chocolateIceCream"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "s4-q0-7",
-        "type": "chocolateIceCream"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-8",
-        "type": "chocolateIceCream"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-9",
-        "type": "vanillaIceCream"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-10",
-        "type": "cinnamonCroffle"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q0-11",
-        "type": "cinnamonCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q0-12",
-        "type": "cinnamonCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q0-13",
-        "type": "whiteCookie"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q0-14",
-        "type": "whiteCookie"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q0-15",
-        "type": "whiteCookie"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q0-16",
-        "type": "whiteCookie"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q0-17",
@@ -104,249 +105,229 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q0-19",
-        "type": "matchaCroffle"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q0-20",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "s4-q0-21",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "s4-q0-22",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "s4-q0-23",
-        "type": "strawberryTart"
-      },
-      {
-        "id": "s4-q0-24",
-        "type": "strawberryTart"
+        "type": "whiteCookie"
       }
     ],
     [
       {
         "id": "s4-q1-0",
-        "type": "chocolateCroissant"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q1-1",
-        "type": "chocolateCroissant"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q1-2",
-        "type": "chocolateCroissant"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q1-3",
-        "type": "whiteCookie"
+        "type": "strawberryTart"
       },
       {
         "id": "s4-q1-4",
-        "type": "whiteCookie"
+        "type": "chocolateCake"
       },
       {
         "id": "s4-q1-5",
-        "type": "chocolateIceCream"
+        "type": "chocolateCake"
       },
       {
         "id": "s4-q1-6",
-        "type": "chocolateIceCream"
+        "type": "chocolateCake"
       },
       {
         "id": "s4-q1-7",
-        "type": "chocolateIceCream"
+        "type": "chocolateCake"
       },
       {
         "id": "s4-q1-8",
-        "type": "whiteCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-9",
-        "type": "whiteCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-10",
-        "type": "whiteCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-11",
-        "type": "raspberryMacaron"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-12",
-        "type": "raspberryMacaron"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-13",
-        "type": "raspberryMacaron"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q1-14",
-        "type": "raspberryMacaron"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q1-15",
-        "type": "raspberryMacaron"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q1-16",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "s4-q1-17",
-        "type": "croissant"
-      },
-      {
-        "id": "s4-q1-18",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q1-19",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q1-20",
         "type": "chocolateCookie"
       }
     ],
     [
       {
         "id": "s4-q2-0",
-        "type": "chocolateIceCream"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q2-1",
-        "type": "chocolateIceCream"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q2-2",
-        "type": "blueberryTart"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q2-3",
-        "type": "blueberryTart"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q2-4",
-        "type": "blueberryTart"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q2-5",
-        "type": "matchaCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q2-6",
-        "type": "matchaCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q2-7",
-        "type": "matchaCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q2-8",
-        "type": "vanillaIceCream"
+        "type": "berryScone"
       },
       {
         "id": "s4-q2-9",
-        "type": "vanillaIceCream"
+        "type": "berryScone"
       },
       {
         "id": "s4-q2-10",
-        "type": "vanillaIceCream"
+        "type": "berryScone"
       },
       {
         "id": "s4-q2-11",
-        "type": "strawberryTart"
+        "type": "berryScone"
       },
       {
         "id": "s4-q2-12",
-        "type": "strawberryTart"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q2-13",
-        "type": "matchaCroffle"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q2-14",
-        "type": "matchaCroffle"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q2-15",
-        "type": "chocolateCupcake"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q2-16",
-        "type": "chocolateCupcake"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q2-17",
-        "type": "chocolateCupcake"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q2-18",
-        "type": "chocolateCake"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q2-19",
-        "type": "chocolateCake"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q2-20",
-        "type": "chocolateCake"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q2-21",
-        "type": "whiteCookie"
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q2-22",
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q2-23",
+        "type": "croissant"
+      },
+      {
+        "id": "s4-q2-24",
+        "type": "croissant"
       }
     ],
     [
       {
         "id": "s4-q3-0",
-        "type": "chocolateCake"
+        "type": "matchaCroffle"
       },
       {
         "id": "s4-q3-1",
-        "type": "chocolateCupcake"
+        "type": "matchaCroffle"
       },
       {
         "id": "s4-q3-2",
-        "type": "chocolateCupcake"
+        "type": "matchaCroffle"
       },
       {
         "id": "s4-q3-3",
-        "type": "strawberryTart"
+        "type": "matchaCroffle"
       },
       {
         "id": "s4-q3-4",
-        "type": "strawberryTart"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q3-5",
-        "type": "strawberryTart"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q3-6",
-        "type": "matchaCroffle"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q3-7",
-        "type": "chocolateCookie"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q3-8",
-        "type": "chocolateCookie"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q3-9",
-        "type": "chocolateCookie"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q3-10",
-        "type": "matchaCroffle"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q3-11",
@@ -358,53 +339,81 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q3-13",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q3-14",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q3-15",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q3-16",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q3-17",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q3-18",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q3-19",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "s4-q3-20",
         "type": "cinnamonCroffle"
       }
     ],
     [
       {
         "id": "s4-q4-0",
-        "type": "berryScone"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q4-1",
-        "type": "croissant"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q4-2",
-        "type": "croissant"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q4-3",
-        "type": "croissant"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q4-4",
-        "type": "strawberryTart"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q4-5",
-        "type": "strawberryTart"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q4-6",
-        "type": "strawberryTart"
+        "type": "chocolateCroissant"
       },
       {
         "id": "s4-q4-7",
-        "type": "cinnamonCroffle"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q4-8",
-        "type": "cinnamonCroffle"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q4-9",
-        "type": "chocolateCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q4-10",
-        "type": "chocolateCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q4-11",
@@ -412,53 +421,77 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q4-12",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "s4-q4-13",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "s4-q4-14",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "s4-q4-15",
         "type": "chocolateCookie"
       },
       {
+        "id": "s4-q4-13",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q4-14",
+        "type": "chocolateCookie"
+      },
+      {
+        "id": "s4-q4-15",
+        "type": "raspberryMacaron"
+      },
+      {
         "id": "s4-q4-16",
-        "type": "chocolateCake"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q4-17",
-        "type": "vanillaIceCream"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q4-18",
-        "type": "vanillaIceCream"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q4-19",
-        "type": "vanillaIceCream"
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q4-20",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q4-21",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q4-22",
+        "type": "strawberryTart"
+      },
+      {
+        "id": "s4-q4-23",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q4-24",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q4-25",
+        "type": "matchaCroffle"
       }
     ],
     [
       {
         "id": "s4-q5-0",
-        "type": "vanillaIceCream"
+        "type": "chocolateIceCream"
       },
       {
         "id": "s4-q5-1",
-        "type": "vanillaIceCream"
+        "type": "croissant"
       },
       {
         "id": "s4-q5-2",
-        "type": "vanillaIceCream"
+        "type": "croissant"
       },
       {
         "id": "s4-q5-3",
-        "type": "chocolateIceCream"
+        "type": "croissant"
       },
       {
         "id": "s4-q5-4",
@@ -466,113 +499,89 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q5-5",
-        "type": "strawberryTart"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q5-6",
-        "type": "strawberryTart"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q5-7",
-        "type": "berryScone"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q5-8",
-        "type": "berryScone"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q5-9",
-        "type": "berryScone"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q5-10",
-        "type": "chocolateIceCream"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q5-11",
-        "type": "chocolateIceCream"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q5-12",
-        "type": "chocolateCookie"
+        "type": "lemonMacaron"
       },
       {
         "id": "s4-q5-13",
-        "type": "chocolateCroissant"
+        "type": "lemonMacaron"
       },
       {
         "id": "s4-q5-14",
-        "type": "chocolateCroissant"
+        "type": "lemonMacaron"
       },
       {
         "id": "s4-q5-15",
-        "type": "chocolateCroissant"
-      },
-      {
-        "id": "s4-q5-16",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q5-17",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q5-18",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q5-19",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "s4-q5-20",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "s4-q5-21",
-        "type": "cinnamonCroffle"
+        "type": "lemonMacaron"
       }
     ],
     [
       {
         "id": "s4-q6-0",
-        "type": "blueberryTart"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q6-1",
-        "type": "blueberryTart"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q6-2",
-        "type": "vanillaIceCream"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q6-3",
-        "type": "chocolateCroissant"
+        "type": "whiteCookie"
       },
       {
         "id": "s4-q6-4",
-        "type": "chocolateCupcake"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q6-5",
-        "type": "chocolateCupcake"
+        "type": "blueberryTart"
       },
       {
         "id": "s4-q6-6",
-        "type": "chocolateCupcake"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q6-7",
-        "type": "raspberryMacaron"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q6-8",
-        "type": "raspberryMacaron"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q6-9",
-        "type": "raspberryMacaron"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q6-10",
@@ -588,19 +597,19 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q6-13",
-        "type": "strawberryTart"
+        "type": "raspberryMacaron"
       },
       {
         "id": "s4-q6-14",
-        "type": "croissant"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q6-15",
-        "type": "croissant"
+        "type": "chocolateCookie"
       },
       {
         "id": "s4-q6-16",
-        "type": "croissant"
+        "type": "chocolateCookie"
       }
     ],
     [
@@ -610,11 +619,11 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q7-1",
-        "type": "whiteCookie"
+        "type": "chocolateCupcake"
       },
       {
         "id": "s4-q7-2",
-        "type": "whiteCookie"
+        "type": "cinnamonCroffle"
       },
       {
         "id": "s4-q7-3",
@@ -630,23 +639,23 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q7-6",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q7-7",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q7-8",
-        "type": "chocolateCookie"
-      },
-      {
-        "id": "s4-q7-9",
         "type": "cinnamonCroffle"
       },
       {
+        "id": "s4-q7-7",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q7-8",
+        "type": "matchaCroffle"
+      },
+      {
+        "id": "s4-q7-9",
+        "type": "matchaCroffle"
+      },
+      {
         "id": "s4-q7-10",
-        "type": "berryScone"
+        "type": "matchaCroffle"
       },
       {
         "id": "s4-q7-11",
@@ -658,27 +667,19 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "s4-q7-13",
-        "type": "blueberryTart"
+        "type": "berryScone"
       },
       {
         "id": "s4-q7-14",
-        "type": "blueberryTart"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q7-15",
-        "type": "chocolateCroissant"
+        "type": "vanillaIceCream"
       },
       {
         "id": "s4-q7-16",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "s4-q7-17",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "s4-q7-18",
-        "type": "whiteCookie"
+        "type": "vanillaIceCream"
       }
     ]
   ],
@@ -813,9 +814,9 @@ export const stage04: StageDefinition = {
       "id": "s4-extra-o15",
       "sequence": 15,
       "items": {
-        "chocolateCake": 4,
         "chocolateCookie": 3,
-        "matchaCroffle": 3
+        "matchaCroffle": 3,
+        "lemonMacaron": 4
       }
     }
   ]
