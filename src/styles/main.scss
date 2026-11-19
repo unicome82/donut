@@ -22,7 +22,6 @@
 @media (display-mode: standalone) {
   :root { --page-height: max(100dvh, 100lvh, 100vh, var(--ios-full-height, 0px)); }
   :root:has(.start-page) { background-color: #c5e9ff; }
-  .start-page { --poster-top-gap: 28px; }
   :root:has(.stage-page) { background-color: #fff4f7; }
   :root:has(.game-page) { background-color: #fae2d2; }
 }
@@ -110,26 +109,15 @@
   padding: var(--safe-top) env(safe-area-inset-right) max(clamp(20px, 5dvh, 48px), env(safe-area-inset-bottom)) env(safe-area-inset-left);
   background-color: #c5e9ff;
 }
-.start-artwork {
-  --artwork-top: calc(var(--safe-top) + var(--poster-top-gap, 20px));
-  position: absolute;
-  inset: var(--artwork-top) 0 0;
-  width: min(100%, calc((var(--page-height) - var(--artwork-top)) * 2 / 3));
-  margin-inline: auto;
-  display: flex;
-  flex-direction: column;
-  pointer-events: none;
-}
-.start-artwork::after {
-  content: '';
-  flex: 1;
-  // Continue the poster's last pixel row through the space below it.
-  border-image: var(--poster-source) 1199 0 0 fill stretch;
-}
 .start-poster {
-  display: block;
-  width: 100%;
+  position: absolute;
+  top: 0;
+  inset-inline: 0;
+  margin-inline: auto;
+  // Short screens can cut into the added foreground, below the original artwork.
+  width: min(100%, calc(var(--page-height) * 800 / 1360));
   height: auto;
+  pointer-events: none;
 }
 .start-actions {
   position: relative;
