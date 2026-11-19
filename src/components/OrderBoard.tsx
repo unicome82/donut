@@ -15,7 +15,7 @@ const ORDER_PREVIEW_DURATION = 250;
 const patienceColors = ['#85c1ef', '#8cd4ac', '#f6d77e', '#e87e87'];
 
 function patienceColor(fraction: number): string {
-  const elapsed = (1 - fraction) * (patienceColors.length - 1);
+  const elapsed = Math.min(1, (1 - fraction) / 0.8) * (patienceColors.length - 1);
   const segment = Math.min(Math.floor(elapsed), patienceColors.length - 2);
   const mix = (elapsed - segment) * 100;
   return `color-mix(in oklab, ${patienceColors[segment]}, ${patienceColors[segment + 1]} ${mix}%)`;
