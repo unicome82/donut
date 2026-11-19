@@ -175,22 +175,6 @@
   background: #9bdbfa url('../assets/game/stage-select.webp') center center / cover no-repeat;
   mask-image: linear-gradient(#000 73%, transparent 100%);
 }
-.stage-hero h1 {
-  position: relative;
-  display: inline-block;
-  color: #fff;
-  font: 400 clamp(35px, 10.7vw, 52px) / 1 var(--stage-script);
-  text-shadow: 0 2px 5px #206c9e60;
-}
-.stage-hero h1::after {
-  content: '';
-  position: absolute;
-  inset: auto 8% -1px 8%;
-  height: 7px;
-  border-top: 1.5px solid #fff;
-  border-radius: 50%;
-  transform: rotate(-3deg);
-}
 .stage-list-frame {
   position: relative;
   min-height: 0;

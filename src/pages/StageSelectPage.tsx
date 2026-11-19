@@ -49,9 +49,7 @@ export function StageSelectPage({ onBack, onGame, stars, unlockAllStages }: { on
       <button type="button" className="icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
       <button type="button" className="secondary-button" onClick={goToProgress}>내 진행 위치</button>
     </nav>
-    <header className="stage-hero">
-      <h1 lang="en">Stage Select</h1>
-    </header>
+    <div className="stage-hero" aria-hidden="true" />
     <div className="stage-list-frame" data-scrolled={viewport.top > 0}>
       <div ref={scrollArea} className="stage-scroll" tabIndex={0} aria-label="스테이지 목록" role="region"
         onScroll={event => setViewport({ top: event.currentTarget.scrollTop, height: event.currentTarget.clientHeight })}>
