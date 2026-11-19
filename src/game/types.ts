@@ -6,6 +6,7 @@ export interface ActiveOrder { patienceMs?: number; definitionId: string; sequen
 export type StageDifficulty = 'easy' | 'normal' | 'hard';
 export interface StageDefinition {
   difficulty?: StageDifficulty;
+  previewPatienceMs?: number;
   id: number; revision: number; donutTypes: DonutType[]; targetOrders: number;
   trayCapacity: number; queues: DonutToken[][]; orders: OrderDefinition[];
 }

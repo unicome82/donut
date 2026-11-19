@@ -19,7 +19,7 @@ export function useOrderPatience(
       const previous = remaining.current.get(id);
       const milliseconds = Math.max(0, previous === undefined ? order.patienceMs : previous - elapsed);
       active.set(id, milliseconds);
-      if (milliseconds === 0) expired.push(id);
+      if (milliseconds === 0 && previous !== 0) expired.push(id);
     }
     remaining.current = active;
     const display = Object.fromEntries(active);

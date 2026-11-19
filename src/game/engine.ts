@@ -18,6 +18,8 @@ function orderFrom(stage: StageDefinition, index: number): ActiveOrder | null {
   if (stage.difficulty) {
     const quantity = Object.values(order.items).reduce((sum, count) => sum + count, 0);
     active.patienceMs = 2000 * quantity;
+  } else if (stage.previewPatienceMs) {
+    active.patienceMs = stage.previewPatienceMs;
   }
   return active;
 }
@@ -167,7 +169,7 @@ export function pickupTray(state: GameState, stage: StageDefinition, readyOrders
 }
 
 export function expireOrders(state: GameState, stage: StageDefinition, orderIds: readonly string[]): GameState {
-  if (state.status !== 'playing' || state.stageId !== stage.id) return state;
+  if (!stage.difficulty || state.status !== 'playing' || state.stageId !== stage.id) return state;
   const expiredSlots = state.orders.flatMap((order, slot) =>
     order?.patienceMs && orderIds.includes(order.definitionId) ? [slot] : [],
   );
