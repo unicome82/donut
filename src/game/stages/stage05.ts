@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage05: StageDefinition = {
   "id": 5,
   "difficulty": "hard",
-  "revision": 9,
+  "revision": 11,
   "donutTypes": [
     "strawberryTart",
     "chocolate",
@@ -14,7 +14,19 @@ export const stage05: StageDefinition = {
     "blueberryCupcake",
     "chocolateCookie",
     "pudding",
-    "croissant"
+    "croissant",
+    "strawberry",
+    "vanilla",
+    "matcha",
+    "blueberry",
+    "caramel",
+    "lemon",
+    "sprinkle",
+    "mint",
+    "orange",
+    "raspberry",
+    "sesame",
+    "coconut"
   ],
   "targetOrders": 16,
   "trayCapacity": BASE_TRAY_CAPACITY,
@@ -126,15 +138,11 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q8-p14",
-        "type": "chocolate"
+        "type": "orange"
       },
       {
         "id": "l5-r4-q8-p15",
-        "type": "chocolate"
-      },
-      {
-        "id": "l5-r4-q8-p16",
-        "type": "chocolate"
+        "type": "strawberry"
       }
     ],
     [
@@ -276,11 +284,11 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q9-p13",
-        "type": "strawberryTart"
+        "type": "raspberry"
       },
       {
         "id": "l5-r4-q9-p14",
-        "type": "strawberryTart"
+        "type": "vanilla"
       }
     ],
     [
@@ -346,11 +354,11 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q2-p15",
-        "type": "chocolateIceCream"
+        "type": "sesame"
       },
       {
         "id": "l5-r4-q2-p16",
-        "type": "chocolateIceCream"
+        "type": "matcha"
       }
     ],
     [
@@ -408,11 +416,11 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q3-p13",
-        "type": "croissant"
+        "type": "coconut"
       },
       {
         "id": "l5-r4-q3-p14",
-        "type": "croissant"
+        "type": "blueberry"
       }
     ],
     [
@@ -478,7 +486,7 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q4-p15",
-        "type": "chocolateCookie"
+        "type": "caramel"
       }
     ],
     [
@@ -548,7 +556,7 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q5-p16",
-        "type": "strawberryTart"
+        "type": "lemon"
       }
     ],
     [
@@ -650,7 +658,7 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q6-p24",
-        "type": "blueberryCupcake"
+        "type": "sprinkle"
       }
     ],
     [
@@ -744,7 +752,7 @@ export const stage05: StageDefinition = {
       },
       {
         "id": "l5-r4-q7-p22",
-        "type": "chocolateIceCream"
+        "type": "mint"
       }
     ]
   ],

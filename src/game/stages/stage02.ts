@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage02: StageDefinition = {
   "id": 2,
   "difficulty": "normal",
-  "revision": 8,
+  "revision": 10,
   "donutTypes": [
     "strawberry",
     "chocolate",
@@ -14,7 +14,13 @@ export const stage02: StageDefinition = {
     "blueberryTart",
     "chocolateCupcake",
     "lemonMacaron",
-    "berryScone"
+    "berryScone",
+    "vanilla",
+    "matcha",
+    "blueberry",
+    "caramel",
+    "lemon",
+    "sprinkle"
   ],
   "targetOrders": 10,
   "trayCapacity": BASE_TRAY_CAPACITY,
@@ -71,54 +77,6 @@ export const stage02: StageDefinition = {
       {
         "id": "l2-r4-q8-p3",
         "type": "chocolateCupcake"
-      },
-      {
-        "id": "l2-r4-q0-p9",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q0-p10",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q0-p11",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q0-p12",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q0-p13",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q0-p14",
-        "type": "whiteCookie"
-      },
-      {
-        "id": "l2-r4-q8-p4",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q8-p5",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q8-p6",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q8-p7",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q8-p8",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q8-p9",
-        "type": "strawberry"
       }
     ],
     [
@@ -184,51 +142,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q1-p9",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q1-p10",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q1-p11",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q1-p12",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q1-p13",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q1-p14",
-        "type": "matchaScone"
-      },
-      {
-        "id": "l2-r4-q9-p6",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q9-p7",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q9-p8",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q9-p9",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q9-p10",
-        "type": "strawberry"
-      },
-      {
-        "id": "l2-r4-q9-p11",
-        "type": "strawberry"
+        "type": "vanilla"
       }
     ],
     [
@@ -302,7 +216,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q2-p17",
-        "type": "blueberryTart"
+        "type": "matcha"
       }
     ],
     [
@@ -344,7 +258,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q3-p9",
-        "type": "chocolateCupcake"
+        "type": "blueberry"
       }
     ],
     [
@@ -402,7 +316,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q4-p13",
-        "type": "lemonMacaron"
+        "type": "caramel"
       }
     ],
     [
@@ -452,7 +366,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q5-p11",
-        "type": "whiteCookie"
+        "type": "lemon"
       }
     ],
     [
@@ -510,7 +424,7 @@ export const stage02: StageDefinition = {
       },
       {
         "id": "l2-r4-q6-p13",
-        "type": "berryScone"
+        "type": "sprinkle"
       }
     ],
     [

@@ -237,6 +237,11 @@ describe('스테이지 해법과 게임 불변식', () => {
       }
       expect(state.status).toBe('clear');
       expect(state.completedOrders).toBe(stage.targetOrders);
+      const supplied = stage.queues.flat().length;
+      const ordered = stage.orders.flatMap(order => Object.values(order.items))
+        .reduce((sum, quantity) => sum + quantity, 0);
+      expect(state.queues.flat().length + state.tray.length).toBe(Math.round(ordered / 2));
+      expect(supplied).toBe(ordered + Math.round(ordered / 2));
       expect(stage).toEqual(original);
     });
     it('스테이지 ' + stage.id + '는 트레이 대기 후 매칭하는 실제 플레이 경로에서도 클리어한다', () => {
@@ -260,7 +265,8 @@ describe('스테이지 해법과 게임 불변식', () => {
   }
   for (const stage of authoredStages) {
     it('스테이지 ' + stage.id + '는 다양한 종류가 연속 묶음으로 쌓이고 기본 트레이를 사용한다', () => {
-      expect(stage.donutTypes).toHaveLength(8);
+      const variety = { easy: 8, normal: 14, hard: 20 };
+      expect(stage.donutTypes).toHaveLength(variety[stage.difficulty ?? 'easy']);
       expect(stage.trayCapacity).toBe(BASE_TRAY_CAPACITY);
       expect(stage.queues).toHaveLength(QUEUE_COUNT);
       const quantities = stage.orders.flatMap(order => Object.values(order.items));
@@ -268,7 +274,7 @@ describe('스테이지 해법과 게임 불변식', () => {
       expect(Math.max(...stage.orders.map(order => Object.values(order.items).reduce((sum, n) => sum + n, 0)))).toBeLessThanOrEqual(16);
       expect(new Set(quantities).size).toBeGreaterThanOrEqual(4);
       expect(new Set(stage.queues.flat().map(token => token.type)).size).toBe(stage.donutTypes.length);
-      expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(stage.donutTypes.length);
+      expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(8);
       expect(stage.queues.every(queue => queue.some((token, index) => index >= 2 && token.type === queue[index - 1]?.type && token.type === queue[index - 2]?.type))).toBe(true);
     });
     it('스테이지 ' + stage.id + '의 여러 선택 경로에서 토큰과 주문 수량을 보존한다', () => {

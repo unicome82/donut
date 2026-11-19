@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage01: StageDefinition = {
   "id": 1,
   "difficulty": "easy",
-  "revision": 9,
+  "revision": 10,
   "donutTypes": [
     "croissant",
     "chocolateIceCream",
@@ -71,54 +71,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q8-p10",
         "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p2",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p3",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p4",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p5",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p6",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q0-p7",
-        "type": "chocolateIceCream"
-      },
-      {
-        "id": "l1-r4-q8-p11",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q8-p12",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q8-p13",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q8-p14",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q8-p15",
-        "type": "cinnamonCroffle"
-      },
-      {
-        "id": "l1-r4-q8-p16",
-        "type": "cinnamonCroffle"
       }
     ],
     [
@@ -173,54 +125,6 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q1-p5",
         "type": "lemonMacaron"
-      },
-      {
-        "id": "l1-r4-q1-p6",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q1-p7",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q1-p8",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q1-p9",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q1-p10",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q1-p11",
-        "type": "vanillaIceCream"
-      },
-      {
-        "id": "l1-r4-q9-p7",
-        "type": "croissant"
-      },
-      {
-        "id": "l1-r4-q9-p8",
-        "type": "croissant"
-      },
-      {
-        "id": "l1-r4-q9-p9",
-        "type": "croissant"
-      },
-      {
-        "id": "l1-r4-q9-p10",
-        "type": "croissant"
-      },
-      {
-        "id": "l1-r4-q9-p11",
-        "type": "croissant"
-      },
-      {
-        "id": "l1-r4-q9-p12",
-        "type": "croissant"
       }
     ],
     [
@@ -250,22 +154,6 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "l1-r4-q2-p6",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p7",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p8",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p9",
-        "type": "matchaCroffle"
-      },
-      {
-        "id": "l1-r4-q2-p10",
         "type": "matchaCroffle"
       }
     ],

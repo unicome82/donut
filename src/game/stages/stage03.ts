@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage03: StageDefinition = {
   "id": 3,
   "difficulty": "normal",
-  "revision": 9,
+  "revision": 11,
   "donutTypes": [
     "strawberry",
     "vanillaIceCream",
@@ -14,7 +14,13 @@ export const stage03: StageDefinition = {
     "blueberryCupcake",
     "chocolateCroissant",
     "raspberryMacaron",
-    "chocolateCookie"
+    "chocolateCookie",
+    "chocolate",
+    "vanilla",
+    "matcha",
+    "blueberry",
+    "caramel",
+    "lemon"
   ],
   "targetOrders": 12,
   "trayCapacity": BASE_TRAY_CAPACITY,
@@ -86,51 +92,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q0-p9",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q0-p10",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q0-p11",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q0-p12",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q0-p13",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q0-p14",
-        "type": "matchaPudding"
-      },
-      {
-        "id": "l3-r4-q8-p7",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l3-r4-q8-p8",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l3-r4-q8-p9",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l3-r4-q8-p10",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l3-r4-q8-p11",
-        "type": "blueberryCupcake"
-      },
-      {
-        "id": "l3-r4-q8-p12",
-        "type": "blueberryCupcake"
+        "type": "chocolate"
       }
     ],
     [
@@ -268,7 +230,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q9-p17",
-        "type": "strawberry"
+        "type": "vanilla"
       }
     ],
     [
@@ -334,7 +296,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q2-p15",
-        "type": "chocolateCroissant"
+        "type": "matcha"
       }
     ],
     [
@@ -384,7 +346,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q3-p11",
-        "type": "raspberryMacaron"
+        "type": "blueberry"
       }
     ],
     [
@@ -458,7 +420,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q4-p17",
-        "type": "croissant"
+        "type": "caramel"
       }
     ],
     [
@@ -520,7 +482,7 @@ export const stage03: StageDefinition = {
       },
       {
         "id": "l3-r4-q5-p14",
-        "type": "chocolateCookie"
+        "type": "lemon"
       }
     ],
     [

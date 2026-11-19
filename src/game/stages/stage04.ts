@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage04: StageDefinition = {
   "id": 4,
   "difficulty": "normal",
-  "revision": 9,
+  "revision": 11,
   "donutTypes": [
     "cake",
     "chocolate",
@@ -14,7 +14,13 @@ export const stage04: StageDefinition = {
     "chocolateIceCream",
     "blueberryTart",
     "strawberryTart",
-    "chocolateCupcake"
+    "chocolateCupcake",
+    "strawberry",
+    "vanilla",
+    "matcha",
+    "blueberry",
+    "caramel",
+    "lemon"
   ],
   "targetOrders": 14,
   "trayCapacity": BASE_TRAY_CAPACITY,
@@ -134,27 +140,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q8-p9",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q8-p10",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q8-p11",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q8-p12",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q8-p13",
-        "type": "raspberryMacaron"
-      },
-      {
-        "id": "l4-r4-q8-p14",
-        "type": "raspberryMacaron"
+        "type": "strawberry"
       }
     ],
     [
@@ -288,7 +274,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q9-p16",
-        "type": "cake"
+        "type": "vanilla"
       }
     ],
     [
@@ -374,7 +360,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q2-p20",
-        "type": "strawberryTart"
+        "type": "matcha"
       }
     ],
     [
@@ -440,7 +426,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q3-p15",
-        "type": "raspberryMacaron"
+        "type": "blueberry"
       }
     ],
     [
@@ -518,7 +504,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q4-p18",
-        "type": "chocolateCupcake"
+        "type": "caramel"
       }
     ],
     [
@@ -576,7 +562,7 @@ export const stage04: StageDefinition = {
       },
       {
         "id": "l4-r4-q5-p13",
-        "type": "blueberryTart"
+        "type": "lemon"
       }
     ],
     [
