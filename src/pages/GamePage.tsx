@@ -145,7 +145,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={allCustomersLeft || status === 'clear' ? 'result-display-title' : undefined} lang={allCustomersLeft ? 'en' : undefined}>
-        {allCustomersLeft ? <>Game<br />Over</> : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
+        {allCustomersLeft ? 'Game Over' : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {allCustomersLeft && <p>{resultTitles.gameover}</p>}
       {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
