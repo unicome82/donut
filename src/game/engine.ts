@@ -1,4 +1,4 @@
-import { ORDER_SLOTS, TRAY_EXPANSION } from './constants';
+import { CUSTOMER_DEPARTURE_LIMIT, ORDER_SLOTS, TRAY_EXPANSION } from './constants';
 import { DONUT_TYPES, type ActiveOrder, type DonutType, type GameState, type StageDefinition } from './types';
 import { validateStage } from './validation';
 
@@ -88,7 +88,10 @@ function firstPickup(state: GameState) {
 }
 
 function updateStatus(state: GameState, stage: StageDefinition, events: GameEvent[]) {
-  if (state.completedOrders + (state.departedOrderIds?.length ?? 0) === stage.targetOrders) {
+  const departures = state.departedOrderIds?.length ?? 0;
+  if (departures >= CUSTOMER_DEPARTURE_LIMIT) {
+    state.status = 'gameover';
+  } else if (state.completedOrders + departures === stage.targetOrders) {
     state.status = state.completedOrders > 0 ? 'clear' : 'gameover';
     if (state.status === 'clear') events.push({ type: 'stageCleared' });
   } else if (state.pendingMatchIds?.length || firstPickup(state)) {

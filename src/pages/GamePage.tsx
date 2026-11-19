@@ -1,3 +1,4 @@
+import { CUSTOMER_DEPARTURE_LIMIT } from '../game/constants';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import clearDesserts from '../assets/game/clear-desserts.webp';
 import rewardStar from '../assets/game/reward-star.webp';
@@ -110,19 +111,21 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const { status } = state;
   const playing = status === 'playing';
-  const allCustomersLeft = status === 'gameover'
-    && !!state.departedOrderIds?.length && state.completedOrders === 0 && state.orders.every(order => !order);
-  const showGoodbye = status === 'clear' || allCustomersLeft;
+  const departures = state.departedOrderIds?.length ?? 0;
+  const reachedDepartureLimit = departures >= CUSTOMER_DEPARTURE_LIMIT;
+  const departureFailure = status === 'gameover' && (reachedDepartureLimit
+    || (departures > 0 && state.completedOrders === 0 && state.orders.every(order => !order)));
+  const showGoodbye = status === 'clear' || departureFailure;
   const resultTitles = {
     ready: '다시 도전해요',
     paused: '다시 도전해요',
     clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
-    gameover: allCustomersLeft
-      ? (state.stageId === 0 ? '손님이 떠났어요' : '모든 손님이 떠났어요') : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
+    gameover: departureFailure
+      ? (reachedDepartureLimit ? `기다리다 떠난 손님 ${departures}명` : state.stageId === 0 ? '손님이 떠났어요' : '모든 손님이 떠났어요') : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
-  const compactResult = status === 'blocked' || allCustomersLeft;
+  const compactResult = status === 'blocked' || departureFailure;
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !playing && !waitingForGoodbye;
@@ -144,13 +147,13 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={allCustomersLeft || status === 'clear' ? 'result-display-title' : undefined} lang={allCustomersLeft ? 'en' : undefined}>
-        {allCustomersLeft ? 'Game Over' : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
+      <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={departureFailure || status === 'clear' ? 'result-display-title' : undefined} lang={departureFailure ? 'en' : undefined}>
+        {departureFailure ? 'Failed' : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
-      {allCustomersLeft && <p>{resultTitles.gameover}</p>}
+      {departureFailure && <p>{resultTitles.gameover}</p>}
       {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
-      {failed && !allCustomersLeft && state.tray.length > 0 && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
+      {failed && !departureFailure && state.tray.length > 0 && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}

@@ -476,8 +476,7 @@
 }
 .order-items li { display: flex; flex: none; align-items: center; gap: 1px; }
 .order-items:has(> li:nth-child(2):last-child) { flex-direction: column; flex-wrap: nowrap; }
-.order-items .donut { width: clamp(25px, 7vw, 33px); }
-.order-items:has(> li:nth-child(3)) .donut { width: clamp(20px, 5.6vw, 26px); }
+.order-items .donut { width: clamp(20px, 5.6vw, 26px); }
 .order-items strong {
   font-size: clamp(14px, 4vw, 18px);
   line-height: 1;
