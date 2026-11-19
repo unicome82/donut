@@ -3,13 +3,14 @@ import { stage01 } from './stages/stage01';
 import { stages } from './stages';
 import { validateStage } from './validation';
 describe('고정 스테이지 데이터 계약', () => {
-  it.each([['easy', 8, 20], ['normal', 14, 13], ['hard', 30, 8]] as const)(
-    '%s는 종류별 준비량과 주문량이 같고 지정된 트레이를 사용한다', (difficulty, variety, capacity) => {
+  it.each([['easy', 8, 20, 126], ['normal', 14, 13, 160], ['hard', 30, 8, 200]] as const)(
+    '%s는 종류별 준비량과 주문량이 같고 지정된 트레이를 사용한다', (difficulty, variety, capacity, dessertTotal) => {
       for (const stage of stages.filter(stage => stage.difficulty === difficulty)) {
         expect(validateStage(stage)).toEqual([]);
         expect(new Set(stage.queues.flat().map(token => token.type)).size).toBe(variety);
         expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(variety);
         expect(stage.trayCapacity).toBe(capacity);
+        expect(stage.queues.flat()).toHaveLength(dessertTotal);
       }
     },
   );

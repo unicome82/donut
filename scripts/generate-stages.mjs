@@ -16,7 +16,7 @@ const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevisions = { easy: 9, normal: 7, hard: 7 };
+const layoutRevisions = { easy: 9, normal: 8, hard: 7 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -25,7 +25,7 @@ if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaig
 
 const profiles = {
   easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, dessertTotal: 126, peakMin: 0, peakMax: 5 },
-  normal: { variety: 14, orders: 12, kinds: 3, batch: 6, runSize: 3, peakMin: 6, peakMax: 12 },
+  normal: { variety: 14, orders: 12, kinds: 3, batch: 6, runSize: 3, dessertTotal: 160, peakMin: 6, peakMax: 12 },
   hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 2, dessertTotal: 200, peakMin: 6, peakMax: 8 },
 };
 const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
