@@ -31,7 +31,13 @@ export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[
       }}
       onClick={event => { if (event.detail === 0) selectColumn(i); }}
       aria-label={`${i + 1}번 대기열, ${queue[0] ? `${itemNames[queue[0].type]} 선택, ${queue.length}개 남음` : '비어 있음'}`}>
-      {queue.map((donut, position) => <span className={position === 0 ? 'queue-front' : 'queue-back'} key={donut.id} data-token-id={donut.id}><Donut type={donut.type} /></span>)}
+      {queue.map((donut, position) => <span
+        className={position === 0 ? 'queue-front' : 'queue-back'}
+        key={donut.id}
+        data-token-id={donut.id}
+        style={{ zIndex: position }}>
+        <Donut type={donut.type} />
+      </span>)}
     </button>)}</div>
   </section>;
 }

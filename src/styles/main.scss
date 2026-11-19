@@ -528,6 +528,7 @@
 .queue-section { overflow: clip; min-width: 0; min-height: 0; }
 .queue-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; min-height: 100%; }
 .queue-column {
+  isolation: isolate;
   --queue-head: clamp(30px, 9vw, 42px);
   --queue-step: clamp(20px, 5vw, 28px);
   display: grid;
