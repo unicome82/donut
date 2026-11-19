@@ -16,7 +16,7 @@ const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/
 const { DONUT_TYPES } = await import('../src/game/types.ts');
 
 const firstId = 6;
-const layoutRevisions = { easy: 8, normal: 7, hard: 6 };
+const layoutRevisions = { easy: 9, normal: 7, hard: 7 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -24,9 +24,9 @@ if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaig
 }
 
 const profiles = {
-  easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, peakMin: 0, peakMax: 5 },
+  easy: { variety: 8, orders: 9, kinds: 2, batch: 3, runSize: 5, dessertTotal: 126, peakMin: 0, peakMax: 5 },
   normal: { variety: 14, orders: 12, kinds: 3, batch: 6, runSize: 3, peakMin: 6, peakMax: 12 },
-  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 2, peakMin: 6, peakMax: 8 },
+  hard: { variety: 30, orders: 15, kinds: 3, batch: 7, runSize: 2, dessertTotal: 200, peakMin: 6, peakMax: 8 },
 };
 const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
 const file = new URL('../src/game/stages/generated.json', import.meta.url);
@@ -63,12 +63,27 @@ function makeCandidate(id, difficulty, random, previous) {
       items: Object.fromEntries(types.map(type => [type, 2 + random(4)])),
     };
   });
-  if (difficulty === 'easy') {
-    const increase = previous ? Math.min(2, layoutRevisions.easy - previous.revision) : 2;
+  if (difficulty === 'easy' && !previous) {
     orders = orders.map(order => ({
       ...order,
-      items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + increase])),
+      items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + 2])),
     }));
+  }
+  if (profile.dessertTotal) {
+    const dessertCount = orders.reduce((sum, order) =>
+      sum + Object.values(order.items).reduce((total, quantity) => total + quantity, 0), 0);
+    const additional = Math.max(0, profile.dessertTotal - dessertCount);
+    const extraOrders = Math.ceil(additional / 13);
+    orders = [...orders];
+    for (let extra = 0; extra < extraOrders; extra += 1) {
+      const quantity = Math.floor(additional / extraOrders) + Number(extra < additional % extraOrders);
+      const types = shuffle(menu, random).slice(0, Math.min(profile.kinds, quantity));
+      const items = Object.fromEntries(types.map((type, index) => [
+        type, Math.floor(quantity / types.length) + Number(index < quantity % types.length),
+      ]));
+      const sequence = orders.length + 1;
+      orders.push({ id: `s${id}-extra-o${sequence}`, sequence, items });
+    }
   }
   const queues = Array.from({ length: QUEUE_COUNT }, () => []);
   const columns = shuffle(queues.map((_, index) => index), random);

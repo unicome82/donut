@@ -17,8 +17,7 @@ function orderFrom(stage: StageDefinition, index: number): ActiveOrder | null {
   const active: ActiveOrder = { definitionId: order.id, sequence: order.sequence, remaining: { ...order.items } };
   if (stage.difficulty) {
     const quantity = Object.values(order.items).reduce((sum, count) => sum + count, 0);
-    const seconds = { easy: 30 + 5 * quantity, normal: 20 + 4 * quantity, hard: 15 + 3 * quantity };
-    active.patienceMs = 1000 * seconds[stage.difficulty];
+    active.patienceMs = 2000 * quantity;
   }
   return active;
 }
