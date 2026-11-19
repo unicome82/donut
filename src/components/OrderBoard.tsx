@@ -58,7 +58,8 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
       leaving.setAttribute('aria-hidden', 'true');
       const bubble = leaving.querySelector<HTMLElement>('.speech-bubble');
       const scene = leaving.querySelector('.customer-scene');
-      if (scene && !departedOrderIds?.includes(old.id)) {
+      const abandoned = departedOrderIds?.includes(old.id);
+      if (scene && !abandoned) {
         const hearts = document.createElement('span');
         hearts.className = 'customer-hearts';
         hearts.setAttribute('aria-hidden', 'true');
@@ -78,7 +79,7 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
       }
       animations.push(leaving.animate([
         { transform: 'translateX(0)', opacity: 1 },
-        { transform: 'translateX(0)', opacity: 1, offset: .76 },
+        { transform: 'translateX(0)', opacity: 1, offset: abandoned ? .15 : .76 },
         { transform: 'translateX(-22px)', opacity: 0 },
       ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-in', fill: 'both' }));
     }

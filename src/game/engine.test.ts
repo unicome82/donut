@@ -61,6 +61,17 @@ describe('손님 대기 시간과 주문 취소', () => {
     expect(getStars(state)).toBe(2);
   });
 
+  it('연습 손님이 시간 초과로 떠나면 다시 시작할 수 있다', () => {
+    const initial = createGame(practiceStage);
+    const orderId = initial.orders[0]!.definitionId;
+    const expired = expireOrders(initial, practiceStage, [orderId]);
+    expect(expired.status).toBe('gameover');
+    expect(expired.departedOrderIds).toEqual([orderId]);
+    const restarted = reduceGame(expired, { type: 'RESTART' }, practiceStage);
+    expect(restarted.status).toBe('playing');
+    expect(restarted.orders[0]?.definitionId).toBe(orderId);
+  });
+
   it('모든 손님이 떠나면 완료한 주문 없이 클리어할 수 없다', () => {
     const state = expireOrders(createGame(stage), stage, ['o0', 'o1', 'o2']);
     expect(state.status).toBe('gameover');

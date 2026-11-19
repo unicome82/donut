@@ -112,26 +112,29 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const { status } = state;
   const playing = status === 'playing';
+  const allCustomersLeft = status === 'gameover'
+    && !!state.departedOrderIds?.length && state.completedOrders === 0 && state.orders.every(order => !order);
+  const showGoodbye = status === 'clear' || allCustomersLeft;
   const resultTitles = {
     ready: '다시 도전해요',
     paused: '다시 도전해요',
     clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
-    gameover: state.departedOrderIds?.length && state.completedOrders === 0 && state.orders.every(order => !order)
-      ? '모든 손님이 떠났어요' : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
+    gameover: allCustomersLeft
+      ? (state.stageId === 0 ? '손님이 떠났어요' : '모든 손님이 떠났어요') : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
-  const [presentedClear, setPresentedClear] = useState<GameState | null>(null);
-  const waitingForGoodbye = status === 'clear' && presentedClear !== state;
+  const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
+  const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !playing && !waitingForGoodbye;
   const stars = status === 'clear' ? getStars(state) : 0;
   const lastStage = state.stageId === stages[stages.length - 1]?.id;
   useEffect(() => {
-    if (state.status !== 'clear') return;
+    if (!showGoodbye) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const timer = setTimeout(() => setPresentedClear(state), reduceMotion ? 0 : CUSTOMER_GOODBYE_MS);
+    const timer = setTimeout(() => setPresentedResult(state), reduceMotion ? 0 : CUSTOMER_GOODBYE_MS);
     return () => clearTimeout(timer);
-  }, [state]);
+  }, [showGoodbye, state]);
   useEffect(() => {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
