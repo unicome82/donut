@@ -441,11 +441,12 @@
 .order-card--practice-worried .speech-bubble { animation: practice-bubble-warning 650ms ease-out; }
 .order-card--practice-worried .customer-scene {
   container-type: size;
-  animation: practice-customer-hop 620ms infinite;
+  transform-origin: center bottom;
+  animation: practice-customer-bounce 400ms ease-in-out infinite;
 }
-@keyframes practice-customer-hop {
-  0%, 100% { translate: 0 0; }
-  45% { translate: 0 -8px; }
+@keyframes practice-customer-bounce {
+  0%, 100% { scale: 1.045 .94; }
+  45% { scale: .98 1.035; }
 }
 .practice-customer-expression {
   position: absolute;
@@ -455,18 +456,6 @@
   margin-inline: auto;
   pointer-events: none;
 }
-.practice-customer-expression::before, .practice-customer-expression::after {
-  content: '';
-  position: absolute;
-  top: 16.1%;
-  width: 4.8%;
-  height: 1.5%;
-  border-radius: 999px;
-  z-index: 1;
-  background: #553625;
-}
-.practice-customer-expression::before { left: 50.4%; transform: rotate(-21deg); }
-.practice-customer-expression::after { left: 57%; transform: rotate(21deg); }
 .practice-face-flush {
   position: absolute;
   top: 13.5%;
