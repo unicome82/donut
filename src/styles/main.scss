@@ -437,29 +437,25 @@
   transform-origin: left center;
   transition: transform 200ms linear, background-color 200ms linear;
 }
-.order-card--urgent .customer-scene { animation: customer-impatient 420ms ease-out; }
-.order-card--practice-worried .speech-bubble { animation: practice-bubble-warning 650ms ease-out; }
-.order-card--practice-worried .customer-scene {
+.order-card--urgent .speech-bubble { animation: customer-bubble-warning 650ms ease-out; }
+.order-card--urgent .customer-scene {
   container-type: size;
   transform-origin: center bottom;
-  animation: practice-customer-bounce 400ms ease-in-out infinite;
+  animation: customer-impatient-bounce 400ms ease-in-out infinite;
 }
-@keyframes practice-customer-bounce {
+@keyframes customer-impatient-bounce {
   0%, 100% { scale: 1.045 .94; }
   45% { scale: .98 1.035; }
 }
-.practice-customer-expression {
+.customer-expression {
   position: absolute;
   inset: auto 0 0;
-  width: min(100%, 94.53cqh);
-  aspect-ratio: 242 / 256;
   margin-inline: auto;
   pointer-events: none;
 }
-.practice-face-flush {
+.customer-face-flush {
   position: absolute;
-  top: 13.5%;
-  left: 42.5%;
+  translate: -50% -50%;
   width: 28%;
   height: 14%;
   border-radius: 50%;
@@ -467,12 +463,8 @@
   filter: blur(1px);
   mix-blend-mode: multiply;
 }
-@keyframes practice-bubble-warning {
+@keyframes customer-bubble-warning {
   30% { border-color: #e87e87; box-shadow: 0 0 0 3px #e87e8740; }
-}
-@keyframes customer-impatient {
-  28% { translate: 0 -5px; }
-  66% { translate: 0 1px; }
 }
 .speech-bubble::before, .speech-bubble::after {
   content: '';
@@ -678,7 +670,6 @@
 }
 .game-status--clear .result-actions > :nth-child(2) { --action-delay: 550ms; }
 .game-status--clear .result-actions > :nth-child(3) { --action-delay: 670ms; }
-.result-character { object-fit: contain; width: min(65%, 192px); height: clamp(60px, 21dvh, 170px); }
 .result-tray { display: flex; align-items: center; justify-content: center; gap: 3px; width: min(100%, 205px); min-height: 38px; padding: 4px 6px 7px; }
 .result-tray .donut { width: min(15%, 25px); }
 .result-actions { display: grid; width: min(100%, 260px); gap: var(--button-stack-gap); }
@@ -721,8 +712,8 @@
   .game-status--clear .result-panel { padding: 18px 22px; gap: 13px 16px; }
   .game-status--clear .result-stars img { width: 44px; }
   .game-status--clear .result-stars > :nth-child(2) img { width: 52px; }
-  .result-panel:not(:has(.result-character, .result-stars)) { grid-template-columns: 1fr; }
-  .result-panel:not(:has(.result-character, .result-stars)) .result-actions { grid-area: auto; }
+  .result-panel:not(:has(.result-stars)) { grid-template-columns: 1fr; }
+  .result-panel:not(:has(.result-stars)) .result-actions { grid-area: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

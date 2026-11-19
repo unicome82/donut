@@ -4,8 +4,6 @@ import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
-import { Customer } from '../components/Customer';
-import { Icon } from '../components/Icon';
 import { Donut } from '../components/Donut/Donut';
 import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
@@ -145,20 +143,19 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
-      {status === 'gameover' && <Customer sequence={2} className="result-character" />}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : status === 'blocked' ? 'tray-full-title' : undefined}>
         {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
-      {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
+      {failed && !allCustomersLeft && state.tray.length > 0 && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       {status === 'blocked' && <p>트레이를 확장하면<br />메뉴를 2개 더 담을 수 있어요!</p>}
       <div className="result-actions">
         {status === 'blocked' && <button type="button" className="primary-button stage-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(state.stageId + 1)?.difficulty} /></button>}
-        <button className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시 하기</button>
+        <button className="primary-button stage-button" onClick={() => act({ type: 'RESTART' })}><span>다시 하기</span></button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onStages}>스테이지 선택</button>}
       </div>
     </section>}

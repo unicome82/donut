@@ -21,15 +21,14 @@ function patienceColor(fraction: number): string {
   return `color-mix(in oklab, ${patienceColors[segment]}, ${patienceColors[segment + 1]} ${mix}%)`;
 }
 
-function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs, departedOrderIds, practice }: { practice: boolean; remainingMs?: number; departedOrderIds?: readonly string[]; order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
+function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs, departedOrderIds }: { remainingMs?: number; departedOrderIds?: readonly string[]; order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
   const orderId = order?.definitionId;
   const duration = order?.patienceMs ?? 0;
   const fraction = duration > 0 ? (remainingMs ?? duration) / duration : 0;
-  const worried = practice && duration > 0 && fraction <= 0.4;
-  const urgent = worried || (!practice && remainingMs !== undefined && remainingMs <= 10_000);
+  const urgent = duration > 0 && fraction <= 0.4;
 
   useLayoutEffect(() => () => {
     cancel.current?.();
@@ -106,9 +105,8 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs,
     cancel.current = () => { clearTimeout(ready); clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
   }, [departedOrderIds, onOrderReady, order, orderId, slot]);
-  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}${worried ? ' order-card--practice-worried' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
-    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
-      {worried && <span className="practice-customer-expression" aria-hidden="true"><span className="practice-face-flush" /></span>}
+  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} impatient={urgent} />
       <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
       {duration > 0 && <div className="order-patience" role="progressbar" aria-label="손님 대기 시간"
         aria-valuenow={Math.round(fraction * 100)}>
@@ -124,7 +122,7 @@ export function OrderBoard({ orders, stageId, onOrderReady, remainingMs = {}, de
   const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
   return <section className="order-section" aria-label="손님 주문">
     <div className="order-grid">
-      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} practice={stageId === 0} portraitOffset={portraitOffset} onOrderReady={onOrderReady} remainingMs={order ? remainingMs[order.definitionId] : undefined} departedOrderIds={departedOrderIds} />)}
+      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} remainingMs={order ? remainingMs[order.definitionId] : undefined} departedOrderIds={departedOrderIds} />)}
     </div>
     <img className="display-shelf" src={displayShelf} alt="" aria-hidden="true" draggable={false} />
   </section>;
