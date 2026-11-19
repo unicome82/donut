@@ -160,7 +160,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       <div className="result-actions">
         {status === 'blocked' && <button type="button" className="primary-button stage-button expand-button" onClick={() => act({ type: 'EXPAND_TRAY' })}>2칸 늘리기</button>}
         {status === 'clear' && !lastStage && <button className="primary-button stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(state.stageId + 1)?.difficulty} /></button>}
-        <button className="primary-button stage-button" onClick={() => act({ type: 'RESTART' })}><span lang="en">Retry</span></button>
+        <button className={status === 'gameover' ? 'primary-button stage-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><span lang="en">Retry</span></button>
         {status !== 'blocked' && <button className="secondary-button" onClick={onStages}>스테이지 선택</button>}
       </div>
     </section>}
