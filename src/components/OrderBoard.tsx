@@ -12,11 +12,12 @@ const FIRST_ARRIVAL_STAGGER = 130;
 const BUBBLE_FADE_DURATION = 180;
 const ORDER_PREVIEW_DURATION = 250;
 
-function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
+function CustomerOrder({ order, slot, portraitOffset, onOrderReady, seconds, departedOrderIds }: { seconds?: number; departedOrderIds?: readonly string[]; order: ActiveOrder | null; slot: number; portraitOffset: number; onOrderReady: (id: string) => void }) {
   const root = useRef<HTMLElement>(null);
   const previous = useRef<{ id: string | undefined; node: HTMLElement } | null>(null);
   const cancel = useRef<(() => void) | null>(null);
   const orderId = order?.definitionId;
+  const urgent = seconds !== undefined && seconds <= 10;
 
   useLayoutEffect(() => () => {
     cancel.current?.();
@@ -45,7 +46,7 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: A
       leaving.setAttribute('aria-hidden', 'true');
       const bubble = leaving.querySelector<HTMLElement>('.speech-bubble');
       const scene = leaving.querySelector('.customer-scene');
-      if (scene) {
+      if (scene && !departedOrderIds?.includes(old.id)) {
         const hearts = document.createElement('span');
         hearts.className = 'customer-hearts';
         hearts.setAttribute('aria-hidden', 'true');
@@ -91,16 +92,21 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: { order: A
     const timeout = setTimeout(cleanup, animationDuration + 100);
     cancel.current = () => { clearTimeout(ready); clearTimeout(timeout); cleanup(); };
     void Promise.all(animations.map(animation => animation.finished.catch(() => undefined))).then(() => { clearTimeout(timeout); cleanup(); });
-  }, [onOrderReady, order, orderId, slot]);
-  return <article ref={root} className="order-card" data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
-    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul></div></> : null}</div>
+  }, [departedOrderIds, onOrderReady, order, orderId, slot]);
+  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}`} data-order-id={order?.definitionId} data-order-slot={slot} aria-label={order ? `${order.sequence}번 손님 주문` : undefined}>
+    <div className="customer-visit">{order ? <><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} /><span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
+      {order.patienceMs && seconds !== undefined && <div className="order-patience">
+        <progress aria-label="손님 남은 시간(초)" value={seconds} max={order.patienceMs / 1000} />
+        <span aria-hidden="true">{seconds}초</span>
+      </div>}
+    </div></> : null}</div>
   </article>;
 }
-export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
+export function OrderBoard({ orders, stageId, onOrderReady, seconds = {}, departedOrderIds }: { seconds?: Record<string, number>; departedOrderIds?: readonly string[]; orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
   const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
   return <section className="order-section" aria-label="손님 주문">
     <div className="order-grid">
-      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} />)}
+      {orders.map((order, slot) => <CustomerOrder key={slot} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} seconds={order ? seconds[order.definitionId] : undefined} departedOrderIds={departedOrderIds} />)}
     </div>
     <img className="display-shelf" src={displayShelf} alt="" aria-hidden="true" draggable={false} />
   </section>;

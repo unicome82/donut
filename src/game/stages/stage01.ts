@@ -5,7 +5,7 @@ import type { StageDefinition } from '../types';
 export const stage01: StageDefinition = {
   "id": 1,
   "difficulty": "easy",
-  "revision": 11,
+  "revision": 12,
   "donutTypes": [
     "croissant",
     "chocolateIceCream",
@@ -26,6 +26,10 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "l1-r4-q0-p1",
+        "type": "cinnamonCroffle"
+      },
+      {
+        "id": "l1-r4-q0-p1-extra",
         "type": "cinnamonCroffle"
       },
       {
@@ -71,6 +75,10 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q8-p10",
         "type": "vanillaIceCream"
+      },
+      {
+        "id": "l1-r4-q8-p10-extra",
+        "type": "vanillaIceCream"
       }
     ],
     [
@@ -80,6 +88,10 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "l1-r4-q9-p1",
+        "type": "croissant"
+      },
+      {
+        "id": "l1-r4-q9-p1-extra",
         "type": "croissant"
       },
       {
@@ -107,6 +119,10 @@ export const stage01: StageDefinition = {
         "type": "croissant"
       },
       {
+        "id": "l1-r4-q9-p6-extra",
+        "type": "croissant"
+      },
+      {
         "id": "l1-r4-q1-p1",
         "type": "matchaCroffle"
       },
@@ -124,6 +140,10 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "l1-r4-q1-p5",
+        "type": "lemonMacaron"
+      },
+      {
+        "id": "l1-r4-q1-p5-extra",
         "type": "lemonMacaron"
       }
     ],
@@ -159,6 +179,10 @@ export const stage01: StageDefinition = {
         "type": "chocolateIceCream"
       },
       {
+        "id": "l1-r4-q3-p1-extra",
+        "type": "chocolateIceCream"
+      },
+      {
         "id": "l1-r4-q3-p2",
         "type": "vanillaIceCream"
       }
@@ -173,6 +197,10 @@ export const stage01: StageDefinition = {
         "type": "matchaCroffle"
       },
       {
+        "id": "l1-r4-q4-p1-extra",
+        "type": "matchaCroffle"
+      },
+      {
         "id": "l1-r4-q4-p2",
         "type": "matchaCroffle"
       }
@@ -180,6 +208,10 @@ export const stage01: StageDefinition = {
     [
       {
         "id": "l1-r4-q5-p0",
+        "type": "chocolateIceCream"
+      },
+      {
+        "id": "l1-r4-q5-p0-extra",
         "type": "chocolateIceCream"
       },
       {
@@ -245,7 +277,15 @@ export const stage01: StageDefinition = {
         "type": "vanillaIceCream"
       },
       {
+        "id": "l1-r4-q6-p7-extra",
+        "type": "vanillaIceCream"
+      },
+      {
         "id": "l1-r4-q6-p8",
+        "type": "vanillaIceCream"
+      },
+      {
+        "id": "l1-r4-q6-p8-extra",
         "type": "vanillaIceCream"
       },
       {
@@ -275,6 +315,10 @@ export const stage01: StageDefinition = {
         "type": "blueberryCupcake"
       },
       {
+        "id": "l1-r4-q7-p1-extra",
+        "type": "blueberryCupcake"
+      },
+      {
         "id": "l1-r4-q7-p2",
         "type": "strawberryTart"
       },
@@ -285,6 +329,10 @@ export const stage01: StageDefinition = {
       {
         "id": "l1-r4-q7-p4",
         "type": "strawberryTart"
+      },
+      {
+        "id": "l1-r4-q7-p4-extra",
+        "type": "strawberryTart"
       }
     ]
   ],
@@ -293,54 +341,54 @@ export const stage01: StageDefinition = {
       "id": "l1-o1",
       "sequence": 1,
       "items": {
-        "croissant": 2,
-        "chocolateIceCream": 1
+        "croissant": 3,
+        "chocolateIceCream": 2
       }
     },
     {
       "id": "l1-o2",
       "sequence": 2,
       "items": {
-        "vanillaIceCream": 4
+        "vanillaIceCream": 5
       }
     },
     {
       "id": "l1-o3",
       "sequence": 3,
       "items": {
-        "croissant": 5,
-        "vanillaIceCream": 2
+        "croissant": 6,
+        "vanillaIceCream": 3
       }
     },
     {
       "id": "l1-o4",
       "sequence": 4,
       "items": {
-        "chocolateIceCream": 8
+        "chocolateIceCream": 9
       }
     },
     {
       "id": "l1-o5",
       "sequence": 5,
       "items": {
-        "matchaCroffle": 3,
-        "blueberryCupcake": 2
+        "matchaCroffle": 4,
+        "blueberryCupcake": 3
       }
     },
     {
       "id": "l1-o6",
       "sequence": 6,
       "items": {
-        "cinnamonCroffle": 6,
-        "lemonMacaron": 2
+        "cinnamonCroffle": 7,
+        "lemonMacaron": 3
       }
     },
     {
       "id": "l1-o7",
       "sequence": 7,
       "items": {
-        "vanillaIceCream": 9,
-        "strawberryTart": 3
+        "vanillaIceCream": 10,
+        "strawberryTart": 4
       }
     },
     {

@@ -15,6 +15,7 @@ import { getStage, stages, stagesById } from '../game/stages';
 import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
+import { useOrderPatience } from '../hooks/useOrderPatience';
 import { createEffects } from '../effects/turnEffects';
 
 const TRAY_PICKUP_DELAY = 200;
@@ -29,6 +30,9 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
   const activeEffects = useRef(new Set<ReturnType<typeof createEffects>>());
   const mounted = useRef(true);
   const [readyOrders, setReadyOrders] = useState<string[]>([]);
+  const [round, setRound] = useState(0);
+  const { seconds, resetPatience } = useOrderPatience(state.status === 'playing', state.orders, readyOrders,
+    orderIds => dispatch({ type: 'EXPIRE_ORDERS', orderIds }));
   const nextPickupAt = useRef(0);
   const onOrderReady = useCallback((id: string) => {
     setReadyOrders(previous => previous.includes(id) ? previous : [...previous, id]);
@@ -54,6 +58,8 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       activeEffects.current.clear();
       setInFlight(new Set());
       setReadyOrders([]);
+      setRound(previous => previous + 1);
+      resetPatience();
       nextPickupAt.current = 0;
     }
     const current = latest.current;
@@ -111,7 +117,8 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
     paused: '다시 도전해요',
     clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
-    gameover: state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
+    gameover: state.departedOrderIds?.length && state.completedOrders === 0 && state.orders.every(order => !order)
+      ? '모든 손님이 떠났어요' : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
   const [presentedClear, setPresentedClear] = useState<GameState | null>(null);
@@ -139,6 +146,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'clear-title' : status === 'blocked' ? 'tray-full-title' : undefined}>
         {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
+      {status === 'clear' && !!state.departedOrderIds?.length && <p>기다리다 떠난 손님 {state.departedOrderIds.length}명</p>}
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
       {failed && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
@@ -152,7 +160,7 @@ export function GamePage({ state, dispatch, onStages, onNext }: Props) {
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard orders={state.orders} stageId={state.stageId} onOrderReady={onOrderReady} />
+    <OrderBoard key={round} orders={state.orders} seconds={seconds} departedOrderIds={state.departedOrderIds} stageId={state.stageId} onOrderReady={onOrderReady} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}

@@ -2,7 +2,7 @@ export const DONUT_TYPES = ['strawberry', 'chocolate', 'vanilla', 'matcha', 'blu
 export type DonutType = typeof DONUT_TYPES[number];
 export interface DonutToken { id: string; type: DonutType }
 export interface OrderDefinition { id: string; sequence: number; items: Partial<Record<DonutType, number>> }
-export interface ActiveOrder { definitionId: string; sequence: number; remaining: Partial<Record<DonutType, number>> }
+export interface ActiveOrder { patienceMs?: number; definitionId: string; sequence: number; remaining: Partial<Record<DonutType, number>> }
 export type StageDifficulty = 'easy' | 'normal' | 'hard';
 export interface StageDefinition {
   difficulty?: StageDifficulty;
@@ -15,5 +15,6 @@ export interface GameState {
   orders: Array<ActiveOrder | null>; nextOrderIndex: number;
   queues: DonutToken[][]; tray: DonutToken[]; trayCapacity: number;
   pendingMatchIds?: string[];
+  departedOrderIds?: string[];
   completedOrders: number; expandUsed: boolean; transitionId: number;
 }
