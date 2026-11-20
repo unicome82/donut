@@ -6,7 +6,7 @@ import { stages, practiceStage } from '../game/stages';
 import { getCurrentStage, isUnlocked } from '../game/session';
 
 const columns = 3;
-const rowHeight = 96;
+const rowHeight = 146;
 const overscan = 2;
 const stageOptions = [practiceStage, ...stages];
 const rowCount = Math.ceil(stageOptions.length / columns);
@@ -64,7 +64,10 @@ export function StageSelectPage({ onBack, onGame, stars, unlockAllStages }: { on
             return <button type="button" key={stage.id} className={`stage-option${current ? ' stage-option--next' : ''}`}
               aria-current={current ? 'step' : undefined} aria-label={practice ? '스테이지 0, 연습' : `스테이지 ${stage.id}, ${stage.difficulty}, ${description}`}
               onClick={() => onGame(stage.id)} disabled={!unlocked}>
-              <span className="stage-index" lang="en">Stage {String(stage.id).padStart(2, '0')}</span>
+              <span className="stage-index" lang="en">
+                <span className="stage-index-label">Stage</span>
+                <span className="stage-index-number">{String(stage.id).padStart(2, '0')}</span>
+              </span>
               <StageDifficultyRibbon difficulty={stage.difficulty} />
               {practice ? <span className="stage-practice-label">연습</span> : unlocked ? <span className="stage-stars" aria-hidden="true">
                 {[0, 1, 2].map(index => <span key={index} className={index < score ? undefined : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
