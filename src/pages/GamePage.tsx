@@ -93,7 +93,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     const effects = createEffects();
     activeEffects.current.add(effects);
     const moved = result.events.find(event => event.type === 'moved');
-    if (moved && soundEnabled) playSound('select');
+    if (soundEnabled) {
+      const deliveries = result.events.filter(event => event.type === 'consumed').length;
+      if (moved) playSound('select');
+      if (deliveries) playSound('delivery', deliveries);
+    }
     // Capture all geometry before the DOM changes, but commit the action immediately.
     const feedback = effects.play(root.current, current, result.events);
     flushSync(() => {

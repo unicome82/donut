@@ -127,6 +127,39 @@
   box-shadow: 0 2px 7px #71492b30;
   z-index: 1;
 }
+.sound-dialog {
+  width: min(calc(100% - 32px), 340px);
+  max-height: calc(100dvh - 32px);
+  padding: 20px;
+  border: 1px solid #f1d3c0;
+  border-radius: 22px;
+  background: #fff8ef;
+  color: var(--text);
+  box-shadow: 0 16px 50px #49203c3b;
+}
+.sound-dialog::backdrop { background: #41244d5c; backdrop-filter: blur(4px); }
+.sound-dialog-header, .sound-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sound-dialog-header h2 { font-size: 22px; }
+.sound-dialog-header .secondary-button { min-height: 36px; }
+.sound-toggle { padding-block: 12px; font-weight: 700; }
+.sound-toggle input { width: 20px; height: 20px; accent-color: var(--pink); }
+.sound-samples { display: grid; gap: 10px; margin: 0 0 14px; }
+.sound-samples label { display: grid; gap: 4px; font-size: 14px; font-weight: 700; }
+.sound-samples select {
+  min-height: 42px;
+  padding: 5px 9px;
+  border: 1px solid #ecd3c2;
+  border-radius: 10px;
+  background: #fffdf9;
+  color: inherit;
+  font: inherit;
+}
+.sound-dialog > p { margin-top: 10px; font-size: 14px; }
 .start-actions {
   position: relative;
   z-index: 1;
