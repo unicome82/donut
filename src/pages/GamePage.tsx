@@ -19,8 +19,8 @@ import { StageClock } from '../components/StageClock';
 import { playSound } from '../effects/sound';
 import { createEffects } from '../effects/turnEffects';
 
-const TRAY_PICKUP_DELAY = 200;
-const PICKUP_INTERVAL = 200;
+const TRAY_PICKUP_DELAY = 100;
+const PICKUP_INTERVAL = 100;
 
 interface Props { soundEnabled: boolean; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
 export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Props) {
