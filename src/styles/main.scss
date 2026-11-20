@@ -357,6 +357,7 @@
   white-space: nowrap;
 }
 .stage-clock {
+  --stage-clock-size: 18px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
@@ -377,14 +378,14 @@
   align-items: center;
   gap: 2px;
 }
-.stage-clock-stars img { display: block; object-fit: contain; filter: drop-shadow(0 1px 1px #88552855); }
+.stage-clock-stars img { display: block; width: var(--stage-clock-size); height: var(--stage-clock-size); object-fit: contain; filter: drop-shadow(0 1px 1px #88552855); }
 .stage-clock-stars .star--unearned img { filter: grayscale(.85) brightness(.78); mix-blend-mode: multiply; }
 .stage-clock-track {
   position: relative;
-  height: 20px;
+  height: var(--stage-clock-size);
   overflow: hidden;
   border-radius: 999px;
-  background: linear-gradient(180deg, #a57d8e, #c4a0ad);
+  background: linear-gradient(180deg, #b28a9a, #cfadb8);
   box-shadow: inset 0 2px 5px #62455565, inset 0 -1px 2px #ffe8e666, 0 1px 3px #72485a28;
 }
 @property --stage-clock-start-color {
