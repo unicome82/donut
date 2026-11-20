@@ -178,16 +178,23 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     });
   }
 
+  const trayDialog = useRef<HTMLDialogElement>(null);
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const { status } = state;
   const playing = status === 'playing';
+  useLayoutEffect(() => {
+    const dialog = trayDialog.current;
+    if (!dialog) return;
+    if (status === 'blocked' && !dialog.open) dialog.showModal();
+    else if (status !== 'blocked' && dialog.open) dialog.close();
+  }, [status]);
   const showGoodbye = status === 'clear';
   const resultTitles = {
     ready: '다시 도전해요',
     paused: '다시 도전해요',
     clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
-    gameover: state.timeExpired ? '시간이 다 됐어요' : '트레이 비우기 횟수를 모두 사용했어요',
+    gameover: state.timeExpired ? '시간이 다 됐어요' : state.trayClearsLeft > 0 ? '다시 도전해요' : '트레이 비우기 횟수를 모두 사용했어요',
   };
   const failed = status === 'gameover';
   const boardVisible = playing || status === 'blocked';
@@ -243,14 +250,16 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       }
       return { ...order, remaining };
     }) : state.orders} stageId={state.stageId} onOrderReady={onOrderReady} />
-    <div className="tray-controls">
-      <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
-      <button type="button" className="tray-clear-button" disabled={status !== 'blocked'} onClick={() => act({ type: 'CLEAR_TRAY' })}>
-        트레이 비우기 · {state.trayClearsLeft}회
-      </button>
-    </div>
+    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
+    <dialog className="tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
+      <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
+      <div className="result-actions">
+        <button type="button" className="primary-button" onClick={() => act({ type: 'CLEAR_TRAY' })}>트레이 비우기</button>
+        <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>포기하기</button>
+      </div>
+    </dialog>
     {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
   </main>;
 }

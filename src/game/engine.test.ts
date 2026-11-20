@@ -227,6 +227,7 @@ describe('자동 매칭과 상태 전이', () => {
     expect(select(state, stage, 0).state).toBe(state);
 
     const full = state;
+    expect(reduceGame(full, { type: 'GIVE_UP' }, stage)).toMatchObject({ status: 'gameover', trayClearsLeft: 1 });
     const returned = clearTray(full, stage);
     expect(returned.events.map(event => event.type === 'returned' ? event.queueIndex : null)).toEqual(columns);
     state = returned.state;

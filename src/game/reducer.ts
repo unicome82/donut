@@ -9,6 +9,7 @@ export type GameAction = (
   | { type: 'TRAY_READY'; donutId: string }
   | { type: 'PICKUP_TRAY'; readyOrders: readonly string[]; parallel?: boolean }
   | { type: 'CLEAR_TRAY' }
+  | { type: 'GIVE_UP' }
   | { type: 'PAUSE' }
   | { type: 'RESUME' }
   | { type: 'RESTART' }
@@ -37,6 +38,7 @@ function applyGameAction(state: GameState, action: Exclude<GameAction, { type: '
     case 'TRAY_READY': return matchTray(state, stage, action.donutId, true).state;
     case 'PICKUP_TRAY': return pickupTray(state, stage, action.readyOrders, action.parallel).state;
     case 'CLEAR_TRAY': return clearTray(state, stage).state;
+    case 'GIVE_UP': return state.status === 'blocked' ? { ...state, status: 'gameover', transitionId: state.transitionId + 1 } : state;
     case 'PAUSE': return state.status === 'playing' ? { ...state, status: 'paused' } : state;
     case 'RESUME': return state.status === 'paused' ? { ...state, status: 'playing' } : state;
     case 'RESTART': return { ...createGame(stage), transitionId: state.transitionId + 1 };
