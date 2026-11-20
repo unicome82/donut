@@ -383,8 +383,8 @@
   height: var(--stage-clock-size);
   overflow: hidden;
   border-radius: 999px;
-  background: linear-gradient(180deg, #b28a9a, #cfadb8);
-  box-shadow: inset 0 2px 5px #62455565, inset 0 -1px 2px #ffe8e666, 0 1px 3px #72485a28;
+  background: #f0f0f0;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / .08);
 }
 @property --stage-clock-start-color {
   syntax: "<color>";
@@ -401,6 +401,7 @@
   --stage-clock-end-color: #3497ec;
   display: block;
   height: 100%;
+  border-radius: inherit;
   background:
     linear-gradient(to bottom, rgb(255 255 255 / .42), transparent 56%, rgb(50 20 66 / .14)),
     linear-gradient(to right, var(--stage-clock-start-color), var(--stage-clock-end-color));
