@@ -6,6 +6,7 @@ import { authoredStages, stages, practiceStage } from './stages';
 import { solutions } from './stages/solutions';
 import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
 import { TRAY_CAPACITY_BY_DIFFICULTY } from './trayCapacity';
+import { getStageTimeLimit, getTimeStars } from './stageTime';
 import { validateStage } from './validation';
 import type { DonutType, GameState, StageDefinition, OrderDefinition } from './types';
 
@@ -25,6 +26,43 @@ function select(state: GameState, stage: StageDefinition, queue: number) {
 function tray(type: DonutType, count: number) {
   return Array.from({ length: count }, (_, i) => ({ id: 'tray-' + i, type }));
 }
+
+describe('스테이지 공용 시간', () => {
+  it('연습은 시간 제한이 없고 난이도별 시간은 120초, 150초, 180초다', () => {
+    expect(getStageTimeLimit(practiceStage)).toBe(0);
+    expect(['easy', 'normal', 'hard'].map(difficulty =>
+      getStageTimeLimit(stages.find(stage => stage.difficulty === difficulty)!)))
+      .toEqual([120_000, 150_000, 180_000]);
+  });
+
+  it.each([[60_000, 3], [59_999, 2], [30_000, 2], [29_999, 1], [1, 1], [0, 0]])(
+    '120초 중 %i밀리초가 남으면 별 %i개 기준이다', (remaining, count) => {
+      expect(getTimeStars(remaining, 120_000)).toBe(count);
+    },
+  );
+
+  it('마지막 픽업의 남은 시간으로 별을 저장하고 0초에는 픽업 전에 실패한다', () => {
+    const stage = stages[0]!;
+    const session = reduceSession(createSession(), { type: 'START', stageId: stage.id });
+    const game = session.game;
+    const order = game.orders[0]!;
+    const type = stage.donutTypes[0]!;
+    game.orders = [{ ...order, remaining: { [type]: 1 } }, null, null, null];
+    game.completedOrders = stage.targetOrders - 1;
+    game.nextOrderIndex = stage.targetOrders;
+    game.tray = tray(type, 1);
+    const action = { type: 'PICKUP_TRAY', readyOrders: [order.definitionId], parallel: true } as const;
+    const cleared = reduceSession(session, { type: 'GAME', action: { ...action, remainingTimeMs: 30_000 } });
+    expect(cleared.game.status).toBe('clear');
+    expect(cleared.stars[stage.id]).toBe(2);
+    const failed = reduceSession(session, { type: 'GAME', action: { ...action, remainingTimeMs: 0 } });
+    expect(failed.game.status).toBe('gameover');
+    expect(failed.game.timeExpired).toBe(true);
+    expect(failed.game.tray).toEqual(game.tray);
+    expect(failed.stars[stage.id]).toBeUndefined();
+    expect(reduceGame(failed.game, { type: 'RESTART' }, stage).timeExpired).toBeUndefined();
+  });
+});
 
 describe('손님 대기 시간과 주문 취소', () => {
   const stage: StageDefinition = {

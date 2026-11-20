@@ -16,6 +16,8 @@ export interface GameState {
   orders: Array<ActiveOrder | null>; nextOrderIndex: number;
   queues: DonutToken[][]; tray: DonutToken[]; trayCapacity: number;
   pendingMatchIds?: string[];
+  timeExpired?: boolean;
+  clearStars?: number;
   departedOrderIds?: string[];
   completedOrders: number; expandUsed: boolean; transitionId: number;
 }

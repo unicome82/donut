@@ -12,17 +12,7 @@ const ARRIVAL_DURATION = 160;
 const FIRST_ARRIVAL_STAGGER = 130;
 const BUBBLE_FADE_DURATION = 180;
 const ORDER_PREVIEW_DURATION = 250;
-const SHIFT_DURATION = 240;
-const SHIFT_DELAY = 150;
-
-const patienceColors = ['#85c1ef', '#8cd4ac', '#f6d77e', '#e87e87'];
-
-function patienceColor(fraction: number): string {
-  const elapsed = Math.min(1, (1 - fraction) / 0.8) * (patienceColors.length - 1);
-  const segment = Math.min(Math.floor(elapsed), patienceColors.length - 2);
-  const mix = (elapsed - segment) * 100;
-  return `color-mix(in oklab, ${patienceColors[segment]}, ${patienceColors[segment + 1]} ${mix}%)`;
-}
+const REPLACEMENT_ARRIVAL_DELAY = 390;
 
 function canAnimate() {
   return typeof Element.prototype.animate === 'function'
@@ -30,21 +20,18 @@ function canAnimate() {
     && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs }: {
-  order: ActiveOrder; slot: number; portraitOffset: number; onOrderReady: (id: string) => void; remainingMs?: number;
+function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
+  order: ActiveOrder; slot: number; portraitOffset: number; onOrderReady: (id: string) => void;
 }) {
   const root = useRef<HTMLElement>(null);
   const { definitionId: orderId, sequence } = order;
-  const duration = order.patienceMs ?? 0;
-  const fraction = duration > 0 ? (remainingMs ?? duration) / duration : 0;
-  const urgent = duration > 0 && fraction <= 0.4;
 
   useLayoutEffect(() => {
     const container = root.current;
     const animations: Animation[] = [];
     let readyAfter = ORDER_PREVIEW_DURATION;
     if (container && canAnimate()) {
-      const arrivalDelay = sequence <= ORDER_SLOTS ? (sequence - 1) * FIRST_ARRIVAL_STAGGER : SHIFT_DELAY + SHIFT_DURATION;
+      const arrivalDelay = sequence <= ORDER_SLOTS ? (sequence - 1) * FIRST_ARRIVAL_STAGGER : REPLACEMENT_ARRIVAL_DELAY;
       const fadeDelay = arrivalDelay + ARRIVAL_DURATION;
       const scene = container.querySelector('.customer-scene');
       const bubble = container.querySelector('.speech-bubble');
@@ -68,16 +55,10 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady, remainingMs 
     };
   }, [onOrderReady, orderId, sequence]);
 
-  return <article ref={root} className={`order-card${urgent ? ' order-card--urgent' : ''}`} data-order-id={orderId} data-order-slot={slot} aria-label={`${sequence}번 손님 주문`}>
-    <div className="customer-visit"><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} impatient={urgent} />
+  return <article ref={root} className="order-card" style={{ gridColumn: slot + 1, gridRow: 1 }}
+    data-order-id={orderId} data-order-slot={slot} aria-label={`${sequence}번 손님 주문`}>
+    <div className="customer-visit"><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
       <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
-      {duration > 0 && <div className="order-patience" role="progressbar" aria-label="손님 대기 시간"
-        aria-valuenow={Math.round(fraction * 100)}>
-        <span aria-hidden="true" style={{
-          transform: `scaleX(${fraction})`,
-          backgroundColor: patienceColor(fraction),
-        }} />
-      </div>}
     </div></div>
   </article>;
 }
@@ -115,13 +96,11 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot, abandoned: 
   void animation.finished.then(() => node.remove(), () => node.remove());
 }
 
-export function OrderBoard({ orders, stageId, onOrderReady, remainingMs = {}, departedOrderIds }: { remainingMs?: Record<string, number>; departedOrderIds?: readonly string[]; orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
+export function OrderBoard({ orders, stageId, onOrderReady, departedOrderIds }: { departedOrderIds?: readonly string[]; orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
   const grid = useRef<HTMLDivElement>(null);
   const snapshots = useRef(new Map<string, CardSnapshot>());
-  const shifts = useRef(new WeakMap<HTMLElement, Animation>());
   const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
-  const arranged = orders.flatMap((order, slot) => order ? [{ order, slot }] : [])
-    .sort((left, right) => left.order.sequence - right.order.sequence);
+  const arranged = orders.flatMap((order, slot) => order ? [{ order, slot }] : []);
 
   useLayoutEffect(() => {
     const element = grid.current;
@@ -132,17 +111,6 @@ export function OrderBoard({ orders, stageId, onOrderReady, remainingMs = {}, de
     for (const card of element.querySelectorAll<HTMLElement>('[data-order-id]')) {
       const id = card.dataset.orderId!;
       const { offsetLeft: left, offsetTop: top, offsetWidth: width, offsetHeight: height } = card;
-      const old = previous.get(id);
-      if (animate && old && old.left !== left) {
-        const shift = shifts.current.get(card);
-        const transform = getComputedStyle(card).transform;
-        const inFlight = transform === 'none' ? 0 : new DOMMatrixReadOnly(transform).m41;
-        shift?.cancel();
-        shifts.current.set(card, card.animate([
-          { transform: `translateX(${old.left - left + inFlight}px)` },
-          { transform: 'translateX(0)' },
-        ], { delay: SHIFT_DELAY, duration: SHIFT_DURATION, easing: 'ease-out', fill: 'backwards' }));
-      }
       current.set(id, { node: card.cloneNode(true) as HTMLElement, left, top, width, height });
     }
     if (animate) {
@@ -155,7 +123,7 @@ export function OrderBoard({ orders, stageId, onOrderReady, remainingMs = {}, de
 
   return <section className="order-section" aria-label="손님 주문">
     <div ref={grid} className="order-grid">
-      {arranged.map(({ order, slot }) => <CustomerOrder key={order.definitionId} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} remainingMs={remainingMs[order.definitionId]} />)}
+      {arranged.map(({ order, slot }) => <CustomerOrder key={order.definitionId} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} />)}
     </div>
     <img className="display-shelf" src={displayShelf} alt="" aria-hidden="true" draggable={false} />
   </section>;

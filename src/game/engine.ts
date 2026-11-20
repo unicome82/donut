@@ -239,6 +239,7 @@ export function expandTray(state: GameState, stage: StageDefinition): Transition
 
 export function getStars(state: GameState): number {
   if (state.status !== 'clear') return 0;
+  if (state.clearStars !== undefined) return state.clearStars;
   if (state.departedOrderIds?.length) return Math.max(1, 3 - state.departedOrderIds.length);
   return state.tray.length === 0 ? 3 : state.tray.length <= 2 ? 2 : 1;
 }

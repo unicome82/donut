@@ -355,6 +355,49 @@
   text-shadow: 0 2px 2px #422137, 0 0 8px #422137a8;
   white-space: nowrap;
 }
+.stage-clock {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 44px;
+  align-items: center;
+  flex: none;
+  gap: 8px;
+  width: min(100%, 360px);
+  margin-inline: auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff8ee;
+  color: #75472c;
+  font-size: 14px;
+  font-weight: 800;
+}
+.stage-clock-stars { color: #985600; letter-spacing: 1px; }
+.stage-clock-time { text-align: end; font-variant-numeric: tabular-nums; }
+.stage-clock-track {
+  position: relative;
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8d6ca;
+}
+.stage-clock-track::before, .stage-clock-track::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset-block: 1px;
+  width: 2px;
+  background: #fffaf3;
+}
+.stage-clock-track::before { left: 25%; }
+.stage-clock-track::after { left: 50%; }
+.stage-clock-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #6da588;
+  transition: width 100ms linear;
+}
+.stage-clock-fill--2 { background: #d49a39; }
+.stage-clock-fill--1 { background: #d65e66; }
 .game-board {
   display: grid;
   flex: 1;
@@ -413,22 +456,6 @@
   border-radius: 11px;
   background: #fffdf9;
   box-shadow: 0 1px #eed3bd80;
-}
-.order-patience {
-  justify-self: stretch;
-  margin-inline: 6px;
-  height: 5px;
-  margin-top: 3px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: #eee3e0;
-}
-.order-patience > span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  transform-origin: left center;
-  transition: transform 200ms linear, background-color 200ms linear;
 }
 .order-card--urgent .speech-bubble { animation: customer-bubble-warning 650ms ease-out; }
 .order-card--urgent .customer-scene {

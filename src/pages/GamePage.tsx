@@ -14,7 +14,8 @@ import { getStage, stages, stagesById } from '../game/stages';
 import { getReadyTrayPickupOrders, getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
-import { useOrderPatience } from '../hooks/useOrderPatience';
+import { getStageTimeLimit } from '../game/stageTime';
+import { StageClock } from '../components/StageClock';
 import { playSound } from '../effects/sound';
 import { createEffects } from '../effects/turnEffects';
 
@@ -31,8 +32,22 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const mounted = useRef(true);
   const [readyOrders, setReadyOrders] = useState<string[]>([]);
   const [round, setRound] = useState(0);
-  const { remainingMs, resetPatience } = useOrderPatience(state.status === 'playing', state.orders, readyOrders,
-    orderIds => dispatch({ type: 'EXPIRE_ORDERS', orderIds }));
+  const timeLimit = getStageTimeLimit(getStage(state.stageId));
+  const [deadline, setDeadline] = useState(() => performance.now() + timeLimit);
+  const [remainingTimeMs, setRemainingTimeMs] = useState(timeLimit);
+  const timerRunning = timeLimit > 0 && (state.status === 'playing' || state.status === 'blocked');
+  const expireStage = useEffectEvent(() => dispatch({ type: 'TIME_EXPIRED' }));
+  useEffect(() => {
+    if (!timerRunning) return;
+    const updateClock = () => {
+      const remaining = Math.max(0, deadline - performance.now());
+      setRemainingTimeMs(remaining);
+      if (remaining === 0) expireStage();
+    };
+    const interval = setInterval(updateClock, 100);
+    const deadlineTimer = setTimeout(updateClock, Math.max(0, Math.ceil(deadline - performance.now())));
+    return () => { clearInterval(interval); clearTimeout(deadlineTimer); };
+  }, [deadline, timerRunning]);
   const nextPickupAt = useRef(new Map<string, number>());
   const onOrderReady = useCallback((id: string) => {
     setReadyOrders(previous => previous.includes(id) ? previous : [...previous, id]);
@@ -75,8 +90,14 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       setInFlight(new Set());
       setReadyOrders([]);
       setRound(previous => previous + 1);
-      resetPatience();
+      setDeadline(performance.now() + timeLimit);
+      setRemainingTimeMs(timeLimit);
       nextPickupAt.current.clear();
+    }
+    const remaining = timeLimit > 0 ? Math.max(0, deadline - performance.now()) : undefined;
+    if (action.type !== 'RESTART' && remaining === 0) {
+      dispatch({ type: 'TIME_EXPIRED' });
+      return;
     }
     const current = latest.current;
     const currentStage = getStage(current.stageId);
@@ -108,7 +129,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       if (moved && result.state.tray.some(token => token.id === moved.donutId)) {
         setInFlight(previous => new Set([...previous, moved.donutId]));
       }
-      dispatch(committedAction);
+      dispatch({ ...committedAction, remainingTimeMs: remaining });
     });
     if (soundEnabled) {
       if (moved) playSound('select');
@@ -149,7 +170,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     paused: '다시 도전해요',
     clear: 'Stage Clear!',
     blocked: '트레이가 가득 찼어요',
-    gameover: departureFailure
+    gameover: state.timeExpired ? '시간이 다 됐어요' : departureFailure
       ? (reachedDepartureLimit ? `기다리다 떠난 손님 ${departures}명` : state.stageId === 0 ? '손님이 떠났어요' : '모든 손님이 떠났어요') : state.tray.length >= state.trayCapacity ? '트레이에 빈칸이 없어요' : '대기열의 메뉴를 모두 사용했어요',
   };
   const failed = status === 'blocked' || status === 'gameover';
@@ -184,6 +205,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
+    {timerRunning && <StageClock limitMs={timeLimit} remainingMs={remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸.</p>
     {showResult && <section className={`result-panel${compactResult ? ' result-panel--compact' : ''}`} aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
@@ -207,7 +229,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       </div>
     </section>}
     {(playing || waitingForGoodbye) && <div className="game-board">
-    <OrderBoard key={round} orders={state.orders} remainingMs={remainingMs} departedOrderIds={state.departedOrderIds} stageId={state.stageId} onOrderReady={onOrderReady} />
+    <OrderBoard key={round} orders={state.orders} departedOrderIds={state.departedOrderIds} stageId={state.stageId} onOrderReady={onOrderReady} />
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} disabled={!playing || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
