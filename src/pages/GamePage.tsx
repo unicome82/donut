@@ -131,11 +131,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       }
       dispatch({ ...committedAction, remainingTimeMs: remaining });
     });
-    if (soundEnabled) {
-      if (moved) playSound('select');
-      // Check the previous transition for delivery events, including grouped pickups.
-      if (result.events.some(event => event.type === 'consumed')) playSound('delivery');
-    }
+    if (soundEnabled && moved) playSound('select');
     void feedback.catch(() => undefined).finally(() => {
       if (!activeEffects.current.delete(effects)) return;
       if (!mounted.current || !moved || latest.current.stageId !== current.stageId) {
@@ -178,20 +174,15 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !playing && !waitingForGoodbye;
-  const previousFeedback = useRef({ completed: state.completedOrders, departures, result: false });
+  const resultWasShown = useRef(false);
   useEffect(() => {
-    const previous = previousFeedback.current;
-    previousFeedback.current = { completed: state.completedOrders, departures, result: showResult };
-    if (!soundEnabled) return;
-    if (showResult && !previous.result) {
-      if (status === 'clear') playSound('clear');
-      else if (status === 'gameover') playSound('failed');
-      else if (status === 'blocked') playSound('blocked');
-    } else if (status === 'playing') {
-      if (departures > previous.departures) playSound('departure');
-      else if (state.completedOrders > previous.completed) playSound('order');
-    }
-  }, [departures, showResult, soundEnabled, state.completedOrders, status]);
+    const newlyShown = showResult && !resultWasShown.current;
+    resultWasShown.current = showResult;
+    if (!soundEnabled || !newlyShown) return;
+    if (status === 'clear') playSound('clear');
+    else if (status === 'gameover') playSound('failed');
+    else if (status === 'blocked') playSound('blocked');
+  }, [showResult, soundEnabled, status]);
   const stars = status === 'clear' ? getStars(state) : 0;
   const lastStage = state.stageId === stages[stages.length - 1]?.id;
   useEffect(() => {
