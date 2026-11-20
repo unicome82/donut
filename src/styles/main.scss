@@ -202,6 +202,7 @@
 .stage-scroll {
   height: 100%;
   overflow-y: auto;
+  touch-action: manipulation;
   overflow-anchor: none;
   overscroll-behavior-y: contain;
 }
@@ -377,15 +378,14 @@
   gap: 2px;
 }
 .stage-clock-stars img { display: block; object-fit: contain; filter: drop-shadow(0 1px 1px #88552855); }
-.stage-clock-stars .star--unearned img { filter: grayscale(.85) brightness(.86); mix-blend-mode: multiply; }
+.stage-clock-stars .star--unearned img { filter: grayscale(.85) brightness(.78); mix-blend-mode: multiply; }
 .stage-clock-track {
   position: relative;
   height: 20px;
   overflow: hidden;
-  border: 1px solid #fffaf4;
   border-radius: 999px;
-  background: linear-gradient(180deg, #5b414f, #80606d);
-  box-shadow: inset 0 2px 5px #392432a6, inset 0 -1px 2px #eed1d336, 0 1px 3px #72485a38;
+  background: linear-gradient(180deg, #a57d8e, #c4a0ad);
+  box-shadow: inset 0 2px 5px #62455565, inset 0 -1px 2px #ffe8e666, 0 1px 3px #72485a28;
 }
 @property --stage-clock-start-color {
   syntax: "<color>";
@@ -573,9 +573,16 @@
   box-shadow: inset 0 -4px #ecd2a9, 0 2px 3px #aa6b3b15;
 }
 .tray-section {
+  --tray-border: 1px;
+  --tray-padding: 6px;
+  --tray-slot-padding: 7px;
+  --tray-insets: calc(2 * (var(--tray-border) + var(--tray-padding) + var(--tray-slot-padding)));
+  width: calc(var(--tray-insets) + (100% - var(--tray-insets)) * var(--tray-width-ratio));
+  justify-self: center;
+  border-width: var(--tray-border);
   position: relative;
   z-index: 4;
-  padding: 4px 6px 8px;
+  padding: 4px var(--tray-padding) 8px;
 }
 .stage-button.expand-button {
   font-family: inherit;
@@ -586,9 +593,7 @@
 .tray-slots {
   display: grid;
   row-gap: 2px;
-  max-width: 550px;
-  margin: 0 auto;
-  padding-inline: 7px;
+  padding-inline: var(--tray-slot-padding);
 }
 .tray-slots li { display: grid; place-items: center; min-width: 0; height: clamp(24px, 4.2dvh, 38px); }
 .tray-slots li:empty::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #dfbd99; }
@@ -633,6 +638,7 @@
   gap: clamp(6px, 2dvh, 16px);
   min-height: 0;
   overflow-y: auto;
+  touch-action: manipulation;
   overscroll-behavior-y: none;
   border-radius: 18px;
   background: radial-gradient(ellipse at center, #fffdf6, #fff4e7);
