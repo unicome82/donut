@@ -1,4 +1,6 @@
-import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
+import { Icon } from '../components/Icon';
+import popupRibbon from '../assets/game/popup-ribbon.webp';
+import popupCat from '../assets/game/popup-cat.webp';
 import clearDesserts from '../assets/game/clear-desserts.webp';
 import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
@@ -9,7 +11,7 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getStage, stages, stagesById } from '../game/stages';
+import { getStage, stages } from '../game/stages';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -245,6 +247,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     {showClock && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
+      {status === 'clear' && <img className="popup-ribbon" src={popupRibbon} alt="" draggable={false} />}
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
@@ -256,9 +259,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       <div className="result-actions">
-        {status === 'clear' && !lastStage && <button className="primary-button stage-button next-stage-button" onClick={onNext}><span>Stage {String(state.stageId + 1).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(state.stageId + 1)?.difficulty} /></button>}
-        <button className={status === 'gameover' ? 'primary-button stage-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><span lang="en">Retry</span></button>
-        <button className="secondary-button" onClick={onStages}>스테이지 선택</button>
+        {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>다음 스테이지 <Icon name="arrow" /></button>}
+        <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시하기</button>
+        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />스테이지 선택</button>
       </div>
     </section>}
     {(boardVisible || waitingForGoodbye) && <div className="game-board">
@@ -274,10 +277,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     <dialog className="glass-popup tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
+      <img className="popup-cat" src={popupCat} alt="" draggable={false} />
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button stage-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
-          트레이 비우기 <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
+        <button type="button" className="primary-button popup-primary-button tray-clear-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
+          <Icon name="basket" />트레이 비우기 <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
         </button>
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>포기하기</button>
       </div>
