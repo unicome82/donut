@@ -161,7 +161,17 @@
   color: inherit;
   font: inherit;
 }
-.sound-sample-link { text-decoration: none; }
+.sound-dialog--preview { width: min(calc(100% - 24px), 760px); }
+.sound-preview { display: grid; gap: 10px; margin-top: 12px; }
+.sound-preview p { font-size: 14px; }
+.sound-preview iframe {
+  width: 100%;
+  height: clamp(240px, 55dvh, 540px);
+  border: 1px solid #ecd3c2;
+  border-radius: 12px;
+  background: #fffdf9;
+}
+.sound-sample-link { color: inherit; }
 .sound-sample-link:focus-visible { outline: 3px solid #40746a; outline-offset: 4px; }
 .start-actions {
   position: relative;
