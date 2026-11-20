@@ -357,27 +357,35 @@
 }
 .stage-clock {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) 44px;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   flex: none;
-  gap: 8px;
+  gap: 9px;
   width: min(100%, 360px);
   margin-inline: auto;
-  padding: 4px 10px;
+  padding: 5px 10px;
+  border: 1px solid rgb(255 255 255 / .58);
   border-radius: 999px;
-  background: #fff8ee;
-  color: #75472c;
-  font-size: 14px;
-  font-weight: 800;
+  background: rgb(255 246 237 / .64);
+  box-shadow: 0 3px 9px rgb(87 50 68 / .14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
-.stage-clock-stars { color: #985600; letter-spacing: 1px; }
-.stage-clock-time { text-align: end; font-variant-numeric: tabular-nums; }
+.stage-clock-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.stage-clock-stars img { display: block; object-fit: contain; filter: drop-shadow(0 1px 1px #88552855); }
+.stage-clock-stars .star--unearned img { filter: grayscale(.85); }
 .stage-clock-track {
   position: relative;
-  height: 9px;
+  height: 14px;
   overflow: hidden;
+  border: 1px solid #fffaf4;
   border-radius: 999px;
-  background: #e8d6ca;
+  background: #e9d6d2;
+  box-shadow: inset 0 1px 3px #8d627e45, 0 2px 4px #72485a40;
 }
 .stage-clock-track::before, .stage-clock-track::after {
   content: '';
@@ -390,14 +398,19 @@
 .stage-clock-track::before { left: 25%; }
 .stage-clock-track::after { left: 50%; }
 .stage-clock-fill {
+  --start-color: #47ce8a;
+  --end-color: #3497ec;
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #6da588;
+  background:
+    linear-gradient(to bottom, rgb(255 255 255 / .42), transparent 56%, rgb(50 20 66 / .14)),
+    linear-gradient(to right, var(--start-color), var(--end-color));
+  box-shadow: inset 0 1px #ffffff8c, inset 0 -1px #52344b30, 1px 0 2px #653c744a;
   transition: width 100ms linear;
 }
-.stage-clock-fill--2 { background: #d49a39; }
-.stage-clock-fill--1 { background: #d65e66; }
+.stage-clock-fill--2 { --start-color: #ed5aa2; --end-color: #f88b34; }
+.stage-clock-fill--1 { --start-color: #9560d8; --end-color: #e9475a; }
 .game-board {
   display: grid;
   flex: 1;
