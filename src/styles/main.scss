@@ -242,7 +242,7 @@
   align-content: center;
   gap: 8px;
   margin-block: 13px;
-  padding: 7px 3px;
+  padding: 13px 3px 7px;
   border: 1px solid #fff8ec;
   border-radius: clamp(18px, 5vw, 27px);
   background: #fff;
@@ -256,7 +256,7 @@
 }
 .stage-option:disabled { color: #98776a; }
 .stage-index { display: grid; justify-items: center; gap: 2px; line-height: 1; font-weight: 900; }
-.stage-index-label { color: #a96b4d; font-size: clamp(12px, 3.9vw, 17px); }
+.stage-index-label { color: #b78064; font-size: clamp(12px, 3.9vw, 17px); }
 .stage-index-number { font-size: clamp(28px, 9vw, 42px); }
 .stage-difficulty {
   position: absolute;
@@ -334,7 +334,7 @@
 .stage-option .stage-difficulty--easy {
   --badge-top: #a4cb89;
   --badge-bottom: #6ba975;
-  color: #233f29;
+  color: #fff;
 }
 .stage-option .stage-difficulty--normal {
   --badge-top: #ffe88c;
@@ -344,7 +344,7 @@
 .stage-option .stage-difficulty--hard, .stage-option--next .stage-difficulty--easy {
   --badge-top: #ff9aa4;
   --badge-bottom: #ed7182;
-  color: #592235;
+  color: #fff;
 }
 .stage-stars { display: flex; gap: 3px; }
 .stage-stars img { display: block; width: clamp(17px, 5.5vw, 26px); height: auto; }
