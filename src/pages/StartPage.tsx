@@ -28,7 +28,6 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
   const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
   const soundDialog = useRef<HTMLDialogElement>(null);
   const [{ group, sample }, setSelection] = useState({ group: 0, sample: 0 });
-  const [previewOpen, setPreviewOpen] = useState(false);
   const samples = soundSampleGroups[group]?.samples ?? soundSampleGroups[0].samples;
   const selected = samples[sample] ?? samples[0];
   const sampleUrl = `https://pixabay.com/sound-effects/${selected[1]}/`;
@@ -40,11 +39,10 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
       aria-label="게임 소리 설정" aria-haspopup="dialog">
       <Icon name={soundEnabled ? 'sound' : 'sound-off'} />
     </button>
-    <dialog ref={soundDialog} className={`sound-dialog${previewOpen ? ' sound-dialog--preview' : ''}`}
-      aria-labelledby="sound-dialog-title" onCancel={() => setPreviewOpen(false)} onClose={() => setPreviewOpen(false)}>
+    <dialog ref={soundDialog} className="sound-dialog" aria-labelledby="sound-dialog-title">
       <div className="sound-dialog-header">
         <h2 id="sound-dialog-title">효과음</h2>
-        <form method="dialog" onSubmit={() => setPreviewOpen(false)}>
+        <form method="dialog">
           <button type="submit" className="secondary-button">닫기</button>
         </form>
       </div>
@@ -64,15 +62,9 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
           </select>
         </label>
       </div>
-      <button type="button" className="primary-button" aria-expanded={previewOpen}
-        onClick={() => setPreviewOpen(open => !open)}>
-        {previewOpen ? '샘플 접기' : '팝업에서 듣기'}
-      </button>
-      {previewOpen && <div className="sound-preview">
-        <p>재생 버튼이 보이지 않으면 <a className="sound-sample-link" href={sampleUrl}>같은 탭에서 원본 열기</a></p>
-        <iframe key={sampleUrl} src={sampleUrl} title={`Pixabay 효과음 · ${selected[0]}`}
-          sandbox="allow-scripts allow-same-origin" />
-      </div>}
+      <a className="primary-button sound-sample-link" href={sampleUrl}>
+        Pixabay에서 듣기 (같은 탭)
+      </a>
     </dialog>
     <div className="start-actions">
       <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>
