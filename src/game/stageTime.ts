@@ -3,7 +3,7 @@ import type { StageDefinition } from './types';
 const limitByDifficulty = { easy: 120_000, normal: 150_000, hard: 180_000 } as const;
 
 export function getStageTimeLimit(stage: StageDefinition): number {
-  return stage.id === 0 ? 0 : limitByDifficulty[stage.difficulty ?? 'easy'];
+  return stage.id === 0 ? 10_000 : limitByDifficulty[stage.difficulty ?? 'easy'];
 }
 
 export function getTimeStars(remainingMs: number, limitMs: number): number {

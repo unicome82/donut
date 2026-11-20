@@ -28,8 +28,8 @@ function tray(type: DonutType, count: number) {
 }
 
 describe('스테이지 공용 시간', () => {
-  it('연습은 시간 제한이 없고 난이도별 시간은 120초, 150초, 180초다', () => {
-    expect(getStageTimeLimit(practiceStage)).toBe(0);
+  it('연습 제한 시간은 10초이고 난이도별 시간은 120초, 150초, 180초다', () => {
+    expect(getStageTimeLimit(practiceStage)).toBe(10_000);
     expect(['easy', 'normal', 'hard'].map(difficulty =>
       getStageTimeLimit(stages.find(stage => stage.difficulty === difficulty)!)))
       .toEqual([120_000, 150_000, 180_000]);
