@@ -313,7 +313,7 @@
 }
 .stage-stars { display: flex; gap: 2px; }
 .stage-stars img { display: block; width: clamp(16px, 4.8vw, 24px); height: auto; }
-.star--unearned img { filter: grayscale(.85); opacity: .28; }
+.star--unearned img { filter: grayscale(.85) brightness(.86); mix-blend-mode: multiply; opacity: .28; }
 .stage-stars .star--unearned img {
   filter: grayscale(1) sepia(.45) saturate(1.6) hue-rotate(300deg) brightness(.68);
 }
@@ -377,7 +377,7 @@
   gap: 2px;
 }
 .stage-clock-stars img { display: block; object-fit: contain; filter: drop-shadow(0 1px 1px #88552855); }
-.stage-clock-stars .star--unearned img { filter: grayscale(.85); }
+.stage-clock-stars .star--unearned img { filter: grayscale(.85) brightness(.86); mix-blend-mode: multiply; }
 .stage-clock-track {
   position: relative;
   height: 20px;
@@ -387,20 +387,29 @@
   background: linear-gradient(180deg, #5b414f, #80606d);
   box-shadow: inset 0 2px 5px #392432a6, inset 0 -1px 2px #eed1d336, 0 1px 3px #72485a38;
 }
+@property --stage-clock-start-color {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #47ce8a;
+}
+@property --stage-clock-end-color {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #3497ec;
+}
 .stage-clock-fill {
-  --start-color: #47ce8a;
-  --end-color: #3497ec;
+  --stage-clock-start-color: #47ce8a;
+  --stage-clock-end-color: #3497ec;
   display: block;
   height: 100%;
-  border-radius: inherit;
   background:
     linear-gradient(to bottom, rgb(255 255 255 / .42), transparent 56%, rgb(50 20 66 / .14)),
-    linear-gradient(to right, var(--start-color), var(--end-color));
+    linear-gradient(to right, var(--stage-clock-start-color), var(--stage-clock-end-color));
   box-shadow: inset 0 1px #ffffff8c, inset 0 -1px #52344b30, 1px 0 2px #653c744a;
-  transition: width 100ms linear;
+  transition: width 100ms linear, --stage-clock-start-color 600ms ease-in-out, --stage-clock-end-color 600ms ease-in-out;
 }
-.stage-clock-fill--2 { --start-color: #ed5aa2; --end-color: #f88b34; }
-.stage-clock-fill--1 { --start-color: #9560d8; --end-color: #e9475a; }
+.stage-clock-fill--2 { --stage-clock-start-color: #ed5aa2; --stage-clock-end-color: #f88b34; }
+.stage-clock-fill--1 { --stage-clock-start-color: #9560d8; --stage-clock-end-color: #e9475a; }
 .game-board {
   display: grid;
   flex: 1;
