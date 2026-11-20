@@ -154,7 +154,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     const completed = new Set(result.events.flatMap(event => event.type === 'orderCompleted' ? [event.orderId] : []));
     const feedback = effects.play(root.current, current, result.events, orderId => {
       flushSync(() => revealDeliveries(orderId));
-      if (soundEnabled && completed.delete(orderId)) playSound('order');
+      if (soundEnabled) playSound(completed.delete(orderId) ? 'order' : 'delivery');
     });
     flushSync(() => {
       if (action.type === 'CLEAR_TRAY' && remaining !== undefined) {
@@ -215,6 +215,12 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !boardVisible && !waitingForGoodbye;
+  const playTrayFullSound = useEffectEvent(() => {
+    if (soundEnabled) playSound('blocked');
+  });
+  useEffect(() => {
+    if (status === 'blocked') playTrayFullSound();
+  }, [status]);
   const resultWasShown = useRef(false);
   useEffect(() => {
     const newlyShown = showResult && !resultWasShown.current;

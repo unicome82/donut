@@ -63,8 +63,11 @@ let audio: AudioContext | undefined;
 let output: GainNode | undefined;
 let noise: AudioBuffer | undefined;
 let selectedAt = -Infinity;
+let resuming: Promise<void> | undefined;
+let soundEnabled = readSoundPreference();
 
 export function saveSoundPreference(enabled: boolean) {
+  soundEnabled = enabled;
   try {
     localStorage.setItem(preferenceKey, enabled ? 'on' : 'off');
   } catch {
@@ -76,13 +79,16 @@ export function saveSoundPreference(enabled: boolean) {
 export function unlockSound() {
   try {
     if (!audio) {
-      if (!window.AudioContext) return;
-      audio = new AudioContext();
+      const Context = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Context) return;
+      audio = new Context();
       output = audio.createGain();
-      output.gain.value = readSoundPreference() ? masterVolume : 0;
+      output.gain.value = soundEnabled ? masterVolume : 0;
       output.connect(audio.destination);
     }
-    if (audio.state !== 'running') void audio.resume().catch(() => undefined);
+    if (audio.state !== 'running' && !resuming) {
+      resuming = audio.resume().catch(() => undefined).finally(() => { resuming = undefined; });
+    }
   } catch {
     // Audio may be unavailable in the current browser or device.
   }
@@ -147,7 +153,14 @@ function playCue(context: AudioContext, target: GainNode, cue: Cue) {
 }
 
 export function playSound(sound: SoundName) {
-  if (!audio || !output || audio.state !== 'running' || document.hidden) return;
+  if (!soundEnabled || !audio || !output || document.hidden) return;
+  if (audio.state !== 'running') {
+    const pendingResume = resuming;
+    if (pendingResume) void pendingResume.then(() => {
+      if (audio?.state === 'running') playSound(sound);
+    });
+    return;
+  }
   const now = audio.currentTime;
   if (sound === 'select') {
     if (now - selectedAt < 0.035) return;
