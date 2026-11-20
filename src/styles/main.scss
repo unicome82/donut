@@ -610,6 +610,19 @@
 .tray-full-dialog::backdrop { background: #3f261d66; }
 .tray-full-dialog h2 { margin-bottom: 18px; font-size: clamp(19px, 5vw, 24px); }
 .tray-full-dialog .result-actions { width: 100%; }
+.tray-clear-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  margin-inline-start: .35em;
+  padding-inline: .3em;
+  border-radius: 999px;
+  background: #9e1638;
+  color: #fff;
+  font-size: .8em;
+  line-height: 1;
+}
 
 .result-panel {
   flex: 1;

@@ -256,7 +256,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     <dialog className="tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button" onClick={() => act({ type: 'CLEAR_TRAY' })}>트레이 비우기</button>
+        <button type="button" className="primary-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
+          트레이 비우기 <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
+        </button>
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>포기하기</button>
       </div>
     </dialog>
