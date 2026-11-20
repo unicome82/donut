@@ -11,7 +11,7 @@ const overscan = 2;
 const stageOptions = [practiceStage, ...stages];
 const rowCount = Math.ceil(stageOptions.length / columns);
 
-export function StageSelectPage({ onBack, onGame, stars, unlockAllStages }: { onBack: () => void; onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean }) {
+export function StageSelectPage({ onBack, onGame, stars, unlockAllStages, soundEnabled, onToggleSound }: { onBack: () => void; onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void }) {
   const currentStage = getCurrentStage(stars);
   const currentRow = Math.floor(stageOptions.findIndex(stage => stage.id === currentStage) / columns);
   const scrollArea = useRef<HTMLDivElement>(null);
@@ -37,17 +37,10 @@ export function StageSelectPage({ onBack, onGame, stars, unlockAllStages }: { on
     if (scrollArea.current) scrollArea.current.scrollTop = currentRow * rowHeight - endPadding;
   }, [currentRow, endPadding]);
 
-  function goToProgress() {
-    const element = scrollArea.current;
-    if (!element) return;
-    element.scrollTop = currentRow * rowHeight - endPadding;
-    element.focus({ preventScroll: true });
-  }
-
   return <main className="stage-page">
     <nav className="stage-navigation" aria-label="스테이지 선택 메뉴">
-      <button type="button" className="secondary-button navigation-icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
-      <button type="button" className="secondary-button navigation-icon-button" onClick={goToProgress} aria-label="내 진행 위치"><Icon name="current-location" /></button>
+      <button type="button" className="icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
+      <button type="button" className="icon-button" onClick={onToggleSound} aria-label="게임 소리" aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>
     </nav>
     <div className="stage-hero" aria-hidden="true" />
     <div className="stage-list-frame" data-scrolled={viewport.top > 0}>
