@@ -4,7 +4,6 @@ import type { StageDefinition } from '../types';
 export const practiceStage: StageDefinition = {
   id: 0,
   revision: 2,
-  previewPatienceMs: 10_000,
   donutTypes: ['strawberry', 'chocolate'],
   targetOrders: 1,
   trayCapacity: BASE_TRAY_CAPACITY,

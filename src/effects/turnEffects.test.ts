@@ -56,10 +56,19 @@ describe('빠른 이동과 깜빡임 방지', () => {
   });
   it('바로 매칭되는 도넛도 복제 하나로 160ms 안에 트레이를 거쳐 주문으로 이동한다', async () => {
     const s = scene(); const effects = createEffects();
-    await effects.play(s.root, s.state, [
+    const arrived = vi.fn();
+    const feedback = effects.play(s.root, s.state, [
       { type: 'moved', donutId: s.source.dataset.tokenId ?? '', queueIndex: 0 },
       { type: 'consumed', donutId: s.source.dataset.tokenId ?? '', orderId: s.state.orders[0]?.definitionId ?? '' },
-    ]);
+    ], orderId => {
+      expect(s.overlays.filter(element => element.className === 'flying-donut').every(element => element.removed)).toBe(true);
+      arrived(orderId);
+    });
+    expect(s.overlays.filter(element => element.className === 'effect-particle')).toHaveLength(0);
+    expect(arrived).not.toHaveBeenCalled();
+    await feedback;
+    expect(arrived).toHaveBeenCalledExactlyOnceWith(s.state.orders[0]?.definitionId);
+    expect(s.overlays.filter(element => element.className === 'effect-particle')).toHaveLength(5);
     expect(s.overlays.filter(element => element.className === 'flying-donut')).toHaveLength(1);
     expect(Math.max(...s.calls.map(call => Number(call.duration)))).toBe(MATCH_DURATION);
     effects.cleanup();

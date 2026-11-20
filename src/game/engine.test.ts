@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, expandTray, expireOrders, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
+import { createGame, expandTray, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, getCurrentStage, isUnlocked, reduceSession } from './session';
 import { authoredStages, stages, practiceStage } from './stages';
@@ -61,71 +61,6 @@ describe('스테이지 공용 시간', () => {
     expect(failed.game.tray).toEqual(game.tray);
     expect(failed.stars[stage.id]).toBeUndefined();
     expect(reduceGame(failed.game, { type: 'RESTART' }, stage).timeExpired).toBeUndefined();
-  });
-});
-
-describe('손님 대기 시간과 주문 취소', () => {
-  const stage: StageDefinition = {
-    ...fixture([{ strawberry: 2, chocolate: 1 }, { vanilla: 1 }, { strawberry: 1 }]),
-    difficulty: 'normal',
-    trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY.normal,
-    queues: [
-      [
-        { id: 's0', type: 'strawberry' }, { id: 'c0', type: 'chocolate' },
-        { id: 's1', type: 'strawberry' }, { id: 's2', type: 'strawberry' },
-        { id: 'v0', type: 'vanilla' },
-      ],
-      ...Array.from({ length: QUEUE_COUNT - 1 }, () => []),
-    ],
-  };
-
-  it('취소한 주문의 여분만 뒤로 보내고 트레이는 다른 주문에 계속 사용할 수 있다', () => {
-    const initial = createGame(stage);
-    expect(initial.orders[0]?.patienceMs).toBe(9_000);
-    expect(createGame({ ...stage, difficulty: 'hard', trayCapacity: 8 }).orders[0]?.patienceMs).toBe(9_000);
-    const queued = selectDonut(initial, stage, 0, 's0', true).state;
-    let state = expireOrders(queued, stage, ['o0']);
-    expect(state.tray).toEqual(queued.tray);
-    expect(state.pendingMatchIds).toEqual(['s0']);
-    expect(state.queues[0]?.map(token => token.id)).toEqual(['s1', 'v0', 'c0', 's2']);
-    expect(expireOrders(state, stage, ['o0'])).toBe(state);
-
-    state = matchTray(state, stage, 's0').state;
-    expect(state.completedOrders).toBe(1);
-    state = select(state, stage, 0).state;
-    state = select(state, stage, 0).state;
-    expect(state.status).toBe('clear');
-    expect(state.tray.map(token => token.id)).toEqual(['s1']);
-    expect(getStars(state)).toBe(2);
-  });
-
-  it('주문이 남아 있어도 세 번째 손님이 떠나면 실패한다', () => {
-    const regular = stages.find(candidate => candidate.id === 2)!;
-    const initial = createGame(regular);
-    const ids = initial.orders.flatMap(order => order ? [order.definitionId] : []);
-    const waiting = expireOrders(initial, regular, ids.slice(0, 2));
-    expect(waiting.status).toBe('playing');
-    const failed = expireOrders(waiting, regular, ids.slice(2, 3));
-    expect(failed.status).toBe('gameover');
-    expect(failed.orders.some(Boolean)).toBe(true);
-    expect(getStars(failed)).toBe(0);
-  });
-
-  it('연습 손님이 시간 초과로 떠나면 다시 시작할 수 있다', () => {
-    const initial = createGame(practiceStage);
-    const orderId = initial.orders[0]!.definitionId;
-    const expired = expireOrders(initial, practiceStage, [orderId]);
-    expect(expired.status).toBe('gameover');
-    expect(expired.departedOrderIds).toEqual([orderId]);
-    const restarted = reduceGame(expired, { type: 'RESTART' }, practiceStage);
-    expect(restarted.status).toBe('playing');
-    expect(restarted.orders[0]?.definitionId).toBe(orderId);
-  });
-
-  it('모든 손님이 떠나면 완료한 주문 없이 클리어할 수 없다', () => {
-    const state = expireOrders(createGame(stage), stage, ['o0', 'o1', 'o2']);
-    expect(state.status).toBe('gameover');
-    expect(getStars(state)).toBe(0);
   });
 });
 

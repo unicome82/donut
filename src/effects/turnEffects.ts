@@ -18,17 +18,18 @@ export function createEffects() {
     await Promise.race([animation.finished.catch(() => undefined), new Promise<void>(resolve => { timeout = setTimeout(resolve, duration + 100); })]);
     if (timeout) clearTimeout(timeout);
   }
-  function burst(target: Element, color = '#ed96a6') {
+  async function burst(box: DOMRect, color = '#ed96a6') {
     if (disposed || reduceMotion()) return;
-    const box = target.getBoundingClientRect();
+    const particles: Promise<void>[] = [];
     for (let i = 0; i < 5; i++) {
       const dot = document.createElement('span');
       dot.className = 'effect-particle'; dot.setAttribute('aria-hidden', 'true');
       dot.style.cssText = `left:${box.x + box.width / 2}px;top:${box.y + box.height / 2}px;background:${color}`;
       document.body.append(dot); elements.add(dot);
       const angle = i * Math.PI * 2 / 5;
-      void animate(dot, [{ transform: 'translate(-50%,-50%) scale(.7)', opacity: .8 }, { transform: `translate(${Math.cos(angle) * 16}px,${Math.sin(angle) * 14}px) scale(0)`, opacity: 0 }], MOVE_DURATION);
+      particles.push(animate(dot, [{ transform: 'translate(-50%,-50%) scale(.7)', opacity: .8 }, { transform: `translate(${Math.cos(angle) * 16}px,${Math.sin(angle) * 14}px) scale(0)`, opacity: 0 }], MOVE_DURATION));
     }
+    await Promise.all(particles);
   }
   function tokenElement(root: HTMLElement, id: string) {
     return Array.from(root.querySelectorAll<HTMLElement>('[data-token-id]')).find(el => el.dataset.tokenId === id);
@@ -69,6 +70,11 @@ export function createEffects() {
     frames.push({ transform: end });
     await animate(ghost, frames, via ? MATCH_DURATION : MOVE_DURATION);
 
+    if (!landing) {
+      ghost.remove();
+      elements.delete(ghost);
+    }
+
     // An earlier pickup can compact the tray while this dessert is still in flight.
     const latest = landing?.()?.getBoundingClientRect();
     if (landedArt && latest && Math.hypot(latest.x - to.x, latest.y - to.y) > 1) {
@@ -78,7 +84,7 @@ export function createEffects() {
       ], 65);
     }
   }
-  async function play(root: HTMLElement, before: GameState, events: GameEvent[]) {
+  async function play(root: HTMLElement, before: GameState, events: GameEvent[], onArrival?: (orderId: string) => void) {
     if (reduceMotion()) return;
     const moved = events.find(event => event.type === 'moved');
     const traySlot = root.querySelector<HTMLElement>(`[data-tray-slot="${before.tray.length}"]`);
@@ -90,6 +96,12 @@ export function createEffects() {
       return card?.querySelector('.order-delivery') ?? card;
     };
     const jobs: Promise<unknown>[] = [];
+    const deliveries = new Map<string, { box: DOMRect; flights: Promise<void>[] }>();
+    function deliver(orderId: string, target: Element, flight?: Promise<void>) {
+      const delivery = deliveries.get(orderId) ?? { box: target.getBoundingClientRect(), flights: [] };
+      if (flight) delivery.flights.push(flight);
+      deliveries.set(orderId, delivery);
+    }
     if (moved) {
       const origin = tokenElement(root, moved.donutId);
       const match = events.find(event => event.type === 'consumed' && event.donutId === moved.donutId);
@@ -99,7 +111,8 @@ export function createEffects() {
           const tray = root.querySelector<HTMLElement>('.tray');
           return tray ? tokenElement(tray, moved.donutId)?.querySelector('img, svg') ?? null : null;
         };
-        jobs.push(fly(origin, target ?? traySlot, target ? traySlot : undefined, landing));
+        if (target && match?.type === 'consumed') deliver(match.orderId, target, fly(origin, target, traySlot));
+        else jobs.push(fly(origin, traySlot, undefined, landing));
       }
     }
     // Match existing tray tokens concurrently. Feedback never adds a second input lock.
@@ -107,17 +120,21 @@ export function createEffects() {
       if (event.type === 'consumed') {
         const target = targetOrder(event.orderId);
         if (target) {
-          burst(target);
-          if (event.donutId !== moved?.donutId) {
-            const origin = tokenElement(root, event.donutId);
-            if (origin) jobs.push(fly(origin, target));
-          }
+          const origin = event.donutId === moved?.donutId ? undefined : tokenElement(root, event.donutId);
+          deliver(event.orderId, target, origin ? fly(origin, target) : undefined);
         }
       }
       if (event.type === 'trayExpanded') {
         const target = root.querySelector('.tray');
-        if (target) { burst(target, '#8cb69a'); jobs.push(animate(target, [{ transform: 'scale(1)' }, { transform: 'scale(1.02)', offset: .5 }, { transform: 'scale(1)' }], MOVE_DURATION)); }
+        if (target) { jobs.push(burst(target.getBoundingClientRect(), '#8cb69a')); jobs.push(animate(target, [{ transform: 'scale(1)' }, { transform: 'scale(1.02)', offset: .5 }, { transform: 'scale(1)' }], MOVE_DURATION)); }
       }
+    }
+    for (const [orderId, { box, flights }] of deliveries) {
+      jobs.push(Promise.all(flights).then(() => {
+        if (disposed) return;
+        onArrival?.(orderId);
+        return burst(box);
+      }));
     }
     await Promise.all(jobs);
   }

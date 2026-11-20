@@ -469,35 +469,6 @@
   background: #fffdf9;
   box-shadow: 0 1px #eed3bd80;
 }
-.order-card--urgent .speech-bubble { animation: customer-bubble-warning 650ms ease-out; }
-.order-card--urgent .customer-scene {
-  container-type: size;
-  transform-origin: center bottom;
-  animation: customer-impatient-bounce 400ms ease-in-out infinite;
-}
-@keyframes customer-impatient-bounce {
-  0%, 100% { scale: 1.025 .97; }
-  45% { scale: .99 1.018; }
-}
-.customer-expression {
-  position: absolute;
-  inset: auto 0 0;
-  margin-inline: auto;
-  pointer-events: none;
-}
-.customer-face-flush {
-  position: absolute;
-  translate: -50% -50%;
-  width: 28%;
-  height: 14%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, #ee5e55ab 16%, #ef685e60 54%, transparent 76%);
-  filter: blur(1px);
-  mix-blend-mode: multiply;
-}
-@keyframes customer-bubble-warning {
-  30% { border-color: #e87e87; box-shadow: 0 0 0 3px #e87e8740; }
-}
 .speech-bubble::before, .speech-bubble::after {
   content: '';
   position: absolute;
@@ -701,7 +672,7 @@
   object-fit: contain;
 }
 .game-status--clear .result-actions { width: min(100%, 320px); }
-.game-status--clear .result-actions > button {
+.game-status--clear .result-actions > button:not(.next-stage-button) {
   --clear-pop-scale: 1.05;
   animation: clear-scale-in 440ms cubic-bezier(.22,.72,.26,1) var(--action-delay, 430ms) both;
 }

@@ -1,5 +1,6 @@
 import displayShelf from '../assets/game/display-shelf.webp';
 import { useLayoutEffect, useRef } from 'react';
+import { MOVE_DURATION } from '../effects/turnEffects';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
@@ -25,6 +26,22 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
 }) {
   const root = useRef<HTMLElement>(null);
   const { definitionId: orderId, sequence } = order;
+
+  const previousRemaining = useRef(order.remaining);
+  useLayoutEffect(() => {
+    const previous = previousRemaining.current;
+    previousRemaining.current = order.remaining;
+    if (!canAnimate()) return;
+    for (const type of DONUT_TYPES) {
+      const remaining = order.remaining[type] ?? 0;
+      if (remaining > 0 && remaining < (previous[type] ?? 0)) {
+        root.current?.querySelector(`[data-order-item="${type}"] strong`)?.animate(
+          [{ scale: '1.22', color: '#b94164' }, { scale: '1', color: 'inherit' }],
+          { duration: 180, easing: 'ease-out' },
+        );
+      }
+    }
+  }, [order.remaining]);
 
   useLayoutEffect(() => {
     const container = root.current;
@@ -58,13 +75,13 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
   return <article ref={root} className="order-card" style={{ gridColumn: slot + 1, gridRow: 1 }}
     data-order-id={orderId} data-order-slot={slot} aria-label={`${sequence}번 손님 주문`}>
     <div className="customer-visit"><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
-      <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
+      <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} data-order-item={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
     </div></div>
   </article>;
 }
 interface CardSnapshot { node: HTMLElement; left: number; top: number; width: number; height: number }
 
-function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot, abandoned: boolean) {
+function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot) {
   const { node, left, top, width, height } = snapshot;
   node.classList.add('customer-leaving');
   node.removeAttribute('data-order-id');
@@ -73,7 +90,7 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot, abandoned: 
   Object.assign(node.style, { left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
 
   const scene = node.querySelector('.customer-scene');
-  if (scene && !abandoned) {
+  if (scene) {
     const hearts = document.createElement('span');
     hearts.className = 'customer-hearts';
     for (const [direction, glyph] of [['left', '♥'], ['center', '♥'], ['right', '♥'], ['spark-left', '✦'], ['spark-right', '✦']] as const) {
@@ -86,17 +103,17 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot, abandoned: 
   }
   grid.append(node);
   node.querySelector('.speech-bubble')?.animate([{ opacity: 1 }, { opacity: 0 }], {
-    duration: BUBBLE_FADE_DURATION, easing: 'ease-out', fill: 'forwards',
+    duration: BUBBLE_FADE_DURATION, delay: MOVE_DURATION, easing: 'ease-out', fill: 'forwards',
   });
   const animation = node.animate([
     { transform: 'translateX(0)', opacity: 1 },
-    { transform: 'translateX(0)', opacity: 1, offset: abandoned ? .1 : .28 },
+    { transform: 'translateX(0)', opacity: 1, offset: .28 },
     { transform: 'translateX(-24px)', opacity: 0 },
   ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-out', fill: 'forwards' });
   void animation.finished.then(() => node.remove(), () => node.remove());
 }
 
-export function OrderBoard({ orders, stageId, onOrderReady, departedOrderIds }: { departedOrderIds?: readonly string[]; orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
+export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
   const grid = useRef<HTMLDivElement>(null);
   const snapshots = useRef(new Map<string, CardSnapshot>());
   const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
@@ -115,11 +132,11 @@ export function OrderBoard({ orders, stageId, onOrderReady, departedOrderIds }: 
     }
     if (animate) {
       for (const [id, snapshot] of previous) {
-        if (!current.has(id)) animateDeparture(element, snapshot, departedOrderIds?.includes(id) ?? false);
+        if (!current.has(id)) animateDeparture(element, snapshot);
       }
     }
     snapshots.current = current;
-  }, [departedOrderIds, orders]);
+  }, [orders]);
 
   return <section className="order-section" aria-label="손님 주문">
     <div ref={grid} className="order-grid">
