@@ -36,10 +36,12 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const [round, setRound] = useState(0);
   const timeLimit = getStageTimeLimit(getStage(state.stageId));
   const [deadline, setDeadline] = useState(() => performance.now() + timeLimit);
+  const [pausedTimeMs, setPausedTimeMs] = useState<number>();
   const [remainingTimeMs, setRemainingTimeMs] = useState(timeLimit);
-  const timerRunning = timeLimit > 0 && (state.status === 'playing' || state.status === 'blocked');
+  const timerRunning = timeLimit > 0 && state.status === 'playing';
+  const showClock = timerRunning || (timeLimit > 0 && state.status === 'blocked');
   const expireStage = useEffectEvent(() => dispatch({ type: 'TIME_EXPIRED' }));
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!timerRunning) return;
     const updateClock = () => {
       const remaining = Math.max(0, deadline - performance.now());
@@ -98,14 +100,18 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       setRound(previous => previous + 1);
       setDeadline(performance.now() + timeLimit);
       setRemainingTimeMs(timeLimit);
+      setPausedTimeMs(undefined);
       nextPickupAt.current.clear();
     }
-    const remaining = timeLimit > 0 ? Math.max(0, deadline - performance.now()) : undefined;
+    const current = latest.current;
+    const now = performance.now();
+    const remaining = timeLimit > 0
+      ? (current.status === 'blocked' ? pausedTimeMs : undefined) ?? Math.max(0, deadline - now)
+      : undefined;
     if (action.type !== 'RESTART' && remaining === 0) {
       dispatch({ type: 'TIME_EXPIRED' });
       return;
     }
-    const current = latest.current;
     const currentStage = getStage(current.stageId);
     const committedAction: GameAction = action.type === 'SELECT_DONUT' ? { ...action, type: 'QUEUE_DONUT' } : action;
     const result = action.type === 'SELECT_DONUT'
@@ -115,8 +121,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       : action.type === 'CLEAR_TRAY' ? clearTray(current, currentStage) : null;
     if (!result) { dispatch(action); return; }
     if (result.state === current || !root.current) return;
+    if (result.state.status === 'blocked' && current.status !== 'blocked') {
+      setPausedTimeMs(remaining);
+    }
     if (action.type === 'TRAY_READY') {
-      dispatch(action);
+      dispatch({ ...action, remainingTimeMs: remaining });
       return;
     }
     if (action.type === 'PICKUP_TRAY') {
@@ -148,6 +157,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       if (soundEnabled && completed.delete(orderId)) playSound('order');
     });
     flushSync(() => {
+      if (action.type === 'CLEAR_TRAY' && remaining !== undefined) {
+        setDeadline(now + remaining);
+        setRemainingTimeMs(remaining);
+        setPausedTimeMs(undefined);
+      }
       if (animateDelivery && returned.length) setReturning(new Set(returned));
       if (animateDelivery && deliveries.length) setPendingDeliveries(previous => [...previous, ...deliveries]);
       if (moved && result.state.tray.some(token => token.id === moved.donutId)) {
@@ -222,7 +236,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
-    {timerRunning && <StageClock limitMs={timeLimit} remainingMs={remainingTimeMs} />}
+    {showClock && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
     {showResult && <section className="result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
@@ -253,10 +267,10 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
-    <dialog className="tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
+    <dialog className="glass-popup tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
+        <button type="button" className="primary-button stage-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
           트레이 비우기 <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
         </button>
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>포기하기</button>

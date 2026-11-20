@@ -20,7 +20,7 @@ export function reduceGame(state: GameState, action: GameAction, stage: StageDef
   const { remainingTimeMs } = action;
   const timeLimit = getStageTimeLimit(stage);
   if (action.type === 'TIME_EXPIRED' || (timeLimit > 0 && remainingTimeMs !== undefined && remainingTimeMs <= 0 && action.type !== 'RESTART')) {
-    return timeLimit > 0 && (state.status === 'playing' || state.status === 'blocked')
+    return timeLimit > 0 && state.status === 'playing'
       ? { ...state, status: 'gameover', timeExpired: true, transitionId: state.transitionId + 1 }
       : state;
   }

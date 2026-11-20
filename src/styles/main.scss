@@ -152,7 +152,7 @@
 .stage-button:active {
   box-shadow: inset 0 2px 4px #2d15365c, inset 0 -2px 1px #2d153633, 0 1px var(--button-depth), 0 3px 5px #371d2e35;
 }
-.start-actions .secondary-button {
+.start-actions .secondary-button, .glass-popup .secondary-button {
   --secondary-top: rgb(255 255 255 / .88);
   --secondary-bottom: rgb(255 247 240 / .72);
   backdrop-filter: blur(8px);
@@ -595,21 +595,41 @@
 .queue-front .donut { width: min(100%, 40px); }
 .queue-back .donut { width: min(92%, 36px); }
 
+.glass-popup {
+  border: 1px solid rgb(255 255 255 / .82);
+  background: rgb(255 255 255 / .68);
+  backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px rgb(255 255 255 / .8), 0 14px 36px #512b2140;
+}
+.glass-popup[open] { animation: glass-popup-arrive 260ms cubic-bezier(.2,.75,.3,1) both; }
+.glass-popup::backdrop { background: rgb(63 38 29 / .3); }
+.glass-popup[open]::backdrop { animation: glass-backdrop-arrive 200ms ease-out both; }
+@keyframes glass-popup-arrive {
+  from { opacity: 0; transform: translateY(18px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes glass-backdrop-arrive {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 .tray-full-dialog {
   inset: 0;
   margin: auto;
   width: min(calc(100% - 32px), 320px);
   padding: 26px 22px;
-  border: 1px solid #e8c099;
   border-radius: 22px;
-  background: #fff8ee;
   color: var(--secondary-text);
   text-align: center;
-  box-shadow: 0 14px 36px #512b2140;
 }
-.tray-full-dialog::backdrop { background: #3f261d66; }
 .tray-full-dialog h2 { margin-bottom: 18px; font-size: clamp(19px, 5vw, 24px); }
 .tray-full-dialog .result-actions { width: 100%; }
+.tray-full-dialog .stage-button {
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.tray-full-dialog .stage-button .tray-clear-count { transform: none; }
 .tray-clear-count {
   display: inline-grid;
   place-items: center;
@@ -750,5 +770,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .glass-popup[open]::backdrop { animation: none; }
   .confetti, .effect-particle, .flying-donut { display: none; }
 }
