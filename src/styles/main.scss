@@ -77,14 +77,16 @@
   color: #904a36;
 }
 .icon-button:disabled { opacity: .35; }
+.navigation-icon-button {
+  flex: 0 0 44px;
+  width: 44px;
+  padding: 0;
+}
 .back-button {
   position: absolute;
   top: calc(12px + var(--safe-top));
   left: max(16px, env(safe-area-inset-left));
   z-index: 4;
-  background: #fff9f3ed;
-  color: #865335;
-  box-shadow: 0 2px 7px #71492b30;
 }
 .donut { display: block; width: 100%; height: auto; }
 .donut--widened { scale: 1.18 1; }
@@ -226,10 +228,6 @@
 }
 .stage-navigation button { pointer-events: auto; }
 .stage-navigation .back-button { position: static; }
-.stage-navigation .secondary-button {
-  width: auto;
-  padding-inline: 14px;
-}
 .stage-option {
   position: relative;
   display: grid;
@@ -629,6 +627,8 @@
   font-weight: 800;
   line-height: 1.2;
 }
+.tray-full-dialog .stage-button:focus { outline: none; }
+.tray-full-dialog .stage-button:focus-visible { filter: brightness(1.08); }
 .tray-full-dialog .stage-button .tray-clear-count { transform: none; }
 .tray-clear-count {
   display: inline-grid;

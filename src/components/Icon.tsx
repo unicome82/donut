@@ -1,6 +1,7 @@
-export function Icon({ name }: { name: 'back' | 'pause' | 'arrow' | 'star' | 'lock' | 'check' | 'play' | 'retry' | 'list' | 'sound' | 'sound-off' }) {
+export function Icon({ name }: { name: 'back' | 'current-location' | 'pause' | 'arrow' | 'star' | 'lock' | 'check' | 'play' | 'retry' | 'list' | 'sound' | 'sound-off' }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {name === 'back' && <path d="m14 6-6 6 6 6" />}
+    {name === 'current-location' && <><circle cx="12" cy="12" r="7" /><circle cx="12" cy="12" r="2.5" fill="currentColor" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3" /></>}
     {name === 'pause' && <><path d="M9 5v14M15 5v14" /></>}
     {name === 'arrow' && <path d="M5 12h14m-5-5 5 5-5 5" />}
     {name === 'star' && <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z" />}
