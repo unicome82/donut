@@ -635,7 +635,7 @@
   pointer-events: none;
 }
 .popup-cat { width: min(54%, 174px); }
-.popup-ribbon { width: min(40%, 126px); }
+.popup-ribbon { width: min(40%, 126px); translate: -50% -45%; }
 .tray-full-dialog h2 { margin-bottom: 20px; font-size: clamp(19px, 5.7vw, 26px); }
 .tray-full-dialog .result-actions { width: 100%; }
 .glass-popup .popup-primary-button {
@@ -789,7 +789,7 @@
   .result-panel { width: min(100%, 580px); grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; max-height: 100%; }
   .result-actions { grid-column: 2; grid-row: 1 / span 4; align-self: center; }
   .result-panel > :not(.result-actions) { grid-column: 1; }
-  .popup-ribbon { width: 74px; translate: -50% -58%; }
+  .popup-ribbon { width: 74px; }
   .popup-cat { width: 112px; }
   .tray-full-dialog { padding-top: 30px; }
   .game-status--clear { padding-top: calc(38px + var(--safe-top)); padding-bottom: 14px; }
