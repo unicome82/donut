@@ -149,7 +149,7 @@ function findSolution(stage, random) {
     peak = Math.max(peak, selected.tray.length);
     state = matchTray(selected, stage, token.id, true).state;
     while (true) {
-      const pickedUp = pickupTray(state, stage, readyOrders).state;
+      const pickedUp = pickupTray(state, stage, readyOrders, true).state;
       if (pickedUp === state) break;
       state = pickedUp;
     }

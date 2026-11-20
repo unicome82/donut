@@ -11,7 +11,7 @@ import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
 import { getStage, stages, stagesById } from '../game/stages';
-import { getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
+import { getReadyTrayPickupOrders, getStars, selectDonut, expandTray, matchTray, pickupTray } from '../game/engine';
 import type { GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { useOrderPatience } from '../hooks/useOrderPatience';
@@ -33,14 +33,21 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const [round, setRound] = useState(0);
   const { remainingMs, resetPatience } = useOrderPatience(state.status === 'playing', state.orders, readyOrders,
     orderIds => dispatch({ type: 'EXPIRE_ORDERS', orderIds }));
-  const nextPickupAt = useRef(0);
+  const nextPickupAt = useRef(new Map<string, number>());
   const onOrderReady = useCallback((id: string) => {
     setReadyOrders(previous => previous.includes(id) ? previous : [...previous, id]);
   }, []);
-  const pickup = useEffectEvent(() => act({ type: 'PICKUP_TRAY', readyOrders }));
+  const pickup = useEffectEvent(() => {
+    const now = performance.now();
+    const eligibleOrders = readyOrders.filter(id => (nextPickupAt.current.get(id) ?? 0) <= now);
+    act({ type: 'PICKUP_TRAY', readyOrders: eligibleOrders, parallel: true });
+  });
   useEffect(() => {
-    if (state.status !== 'playing' || !state.tray.length || !readyOrders.length) return;
-    const timer = setTimeout(() => pickup(), Math.max(0, nextPickupAt.current - performance.now()));
+    if (state.status !== 'playing') return;
+    const candidates = getReadyTrayPickupOrders(state, readyOrders);
+    if (!candidates.length) return;
+    const nextTime = Math.min(...candidates.map(id => nextPickupAt.current.get(id) ?? 0));
+    const timer = setTimeout(() => pickup(), Math.max(0, Math.ceil(nextTime - performance.now())));
     return () => clearTimeout(timer);
   }, [state, readyOrders]);
   const [inFlight, setInFlight] = useState<ReadonlySet<string>>(new Set());
@@ -60,7 +67,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       setReadyOrders([]);
       setRound(previous => previous + 1);
       resetPatience();
-      nextPickupAt.current = 0;
+      nextPickupAt.current.clear();
     }
     const current = latest.current;
     const currentStage = getStage(current.stageId);
@@ -68,7 +75,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     const result = action.type === 'SELECT_DONUT'
       ? selectDonut(current, currentStage, action.queueIndex, action.expectedDonutId, true)
       : action.type === 'TRAY_READY' ? matchTray(current, currentStage, action.donutId, true)
-      : action.type === 'PICKUP_TRAY' ? pickupTray(current, currentStage, action.readyOrders)
+      : action.type === 'PICKUP_TRAY' ? pickupTray(current, currentStage, action.readyOrders, action.parallel)
       : action.type === 'EXPAND_TRAY' ? expandTray(current, currentStage) : null;
     if (!result) { dispatch(action); return; }
     if (result.state === current || !root.current) return;
@@ -76,7 +83,13 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       dispatch(action);
       return;
     }
-    if (action.type === 'PICKUP_TRAY') nextPickupAt.current = performance.now() + PICKUP_INTERVAL;
+    if (action.type === 'PICKUP_TRAY') {
+      const unlockTime = performance.now() + PICKUP_INTERVAL;
+      for (const event of result.events) {
+        if (event.type === 'consumed') nextPickupAt.current.set(event.orderId, unlockTime);
+        if (event.type === 'orderCompleted') nextPickupAt.current.delete(event.orderId);
+      }
+    }
     const effects = createEffects();
     activeEffects.current.add(effects);
     const moved = result.events.find(event => event.type === 'moved');

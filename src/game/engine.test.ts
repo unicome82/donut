@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, expandTray, expireOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
+import { createGame, expandTray, expireOrders, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, getCurrentStage, isUnlocked, reduceSession } from './session';
 import { authoredStages, stages, practiceStage } from './stages';
@@ -92,6 +92,29 @@ describe('손님 대기 시간과 주문 취소', () => {
 });
 
 describe('자동 매칭과 상태 전이', () => {
+  it('손님별 첫 디저트는 동시에 나가고 다음 디저트는 해당 손님이 준비될 때까지 기다린다', () => {
+    const stage = fixture([{ strawberry: 2 }, { chocolate: 1 }, { strawberry: 1, vanilla: 1 }]);
+    const state = createGame(stage);
+    state.tray = [
+      { id: 'a', type: 'strawberry' }, { id: 'b', type: 'strawberry' },
+      { id: 'c', type: 'chocolate' }, { id: 'd', type: 'vanilla' },
+    ];
+    state.pendingMatchIds = ['d'];
+
+    const first = pickupTray(state, stage, ['o0', 'o1', 'o2'], true);
+    expect(first.events.filter(event => event.type === 'consumed')).toEqual([
+      { type: 'consumed', donutId: 'a', orderId: 'o0' },
+      { type: 'consumed', donutId: 'c', orderId: 'o1' },
+    ]);
+    const landed = matchTray(first.state, stage, 'd', true).state;
+    expect(getReadyTrayPickupOrders(landed, ['o2'])).toEqual(['o2']);
+    const second = pickupTray(landed, stage, ['o2'], true);
+    expect(second.events).toContainEqual({ type: 'consumed', donutId: 'd', orderId: 'o2' });
+    expect(second.state.tray.map(token => token.id)).toEqual(['b']);
+    expect(pickupTray(second.state, stage, ['o0', 'o2'], true).events)
+      .toContainEqual({ type: 'consumed', donutId: 'b', orderId: 'o0' });
+  });
+
   it('주문 도넛도 먼저 트레이에 남고 준비 완료 후에만 소비한다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const queued = selectDonut(createGame(stage), stage, 0, '0-0', true).state;
@@ -317,9 +340,10 @@ describe('스테이지 해법과 게임 불변식', () => {
         state = matchTray(state, stage, front.id, true).state;
         const orderIds = stage.orders.map(order => order.id);
         for (;;) {
-          const pickup = pickupTray(state, stage, orderIds);
+          const pickup = pickupTray(state, stage, orderIds, true);
           if (pickup.state === state) break;
-          expect(pickup.events.filter(event => event.type === 'consumed')).toHaveLength(1);
+          const recipients = pickup.events.flatMap(event => event.type === 'consumed' ? [event.orderId] : []);
+          expect(new Set(recipients).size).toBe(recipients.length);
           state = pickup.state;
         }
       }

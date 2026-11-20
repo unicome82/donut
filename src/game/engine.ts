@@ -77,14 +77,27 @@ function settle(state: GameState, stage: StageDefinition, events: GameEvent[]): 
   updateStatus(state, stage, events);
 }
 
-// Find the oldest matchable token. An older token with no active order can wait in the tray.
-function firstPickup(state: GameState) {
+// Reserve each token for the oldest order that still needs its type.
+function* trayPickups(state: GameState) {
   const orders = state.orders.filter((order): order is ActiveOrder => order !== null)
     .sort((a, b) => a.sequence - b.sequence);
-  for (const [index, token] of state.tray.entries()) {
+  const seen = new Set<string>();
+  for (const token of state.tray) {
     const order = orders.find(candidate => (candidate.remaining[token.type] ?? 0) > 0);
-    if (order) return { index, token, order };
+    if (!order || seen.has(order.definitionId)) continue;
+    seen.add(order.definitionId);
+    yield { token, order };
   }
+}
+
+function availablePickup(state: GameState, tokenId: string, orderId: string, readyOrders: readonly string[]) {
+  return !state.pendingMatchIds?.includes(tokenId) && readyOrders.includes(orderId);
+}
+
+export function getReadyTrayPickupOrders(state: GameState, readyOrders: readonly string[]): string[] {
+  return Array.from(trayPickups(state))
+    .filter(({ token, order }) => availablePickup(state, token.id, order.definitionId, readyOrders))
+    .map(({ order }) => order.definitionId);
 }
 
 function updateStatus(state: GameState, stage: StageDefinition, events: GameEvent[]) {
@@ -94,7 +107,7 @@ function updateStatus(state: GameState, stage: StageDefinition, events: GameEven
   } else if (state.completedOrders + departures === stage.targetOrders) {
     state.status = state.completedOrders > 0 ? 'clear' : 'gameover';
     if (state.status === 'clear') events.push({ type: 'stageCleared' });
-  } else if (state.pendingMatchIds?.length || firstPickup(state)) {
+  } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done) {
     state.status = 'playing';
   } else if (state.queues.every(queue => queue.length === 0)) {
     state.status = 'gameover';
@@ -142,24 +155,29 @@ export function matchTray(state: GameState, stage: StageDefinition, donutId: str
   return { state: next, events };
 }
 
-export function pickupTray(state: GameState, stage: StageDefinition, readyOrders: readonly string[]): TransitionResult {
-  const pickup = state.status === 'playing' && state.stageId === stage.id ? firstPickup(state) : undefined;
-  if (!pickup || state.pendingMatchIds?.includes(pickup.token.id) || !readyOrders.includes(pickup.order.definitionId)) {
-    return { state, events: [] };
-  }
+export function pickupTray(
+  state: GameState, stage: StageDefinition, readyOrders: readonly string[], parallel = false,
+): TransitionResult {
+  if (state.status !== 'playing' || state.stageId !== stage.id) return { state, events: [] };
+  const candidates = Array.from(trayPickups(state));
+  const pickups = (parallel ? candidates : candidates.slice(0, 1))
+    .filter(({ token, order }) => availablePickup(state, token.id, order.definitionId, readyOrders));
+  if (!pickups.length) return { state, events: [] };
 
   const next = structuredClone(state);
-  const slot = state.orders.indexOf(pickup.order);
-  const order = next.orders[slot]!;
-  const { token, index } = pickup;
-  next.tray.splice(index, 1);
-  order.remaining[token.type] = (order.remaining[token.type] ?? 0) - 1;
+  const pickedIds = new Set(pickups.map(({ token }) => token.id));
+  next.tray = next.tray.filter(token => !pickedIds.has(token.id));
   next.transitionId += 1;
-  const events: GameEvent[] = [{ type: 'consumed', donutId: token.id, orderId: order.definitionId }];
+  const events: GameEvent[] = [];
+  for (const { token, order } of pickups) {
+    const slot = state.orders.indexOf(order);
+    const active = next.orders[slot]!;
+    active.remaining[token.type] = (active.remaining[token.type] ?? 0) - 1;
+    events.push({ type: 'consumed', donutId: token.id, orderId: active.definitionId });
 
-  if (!Object.values(order.remaining).some(count => count > 0)) {
+    if (Object.values(active.remaining).some(count => count > 0)) continue;
     next.completedOrders += 1;
-    events.push({ type: 'orderCompleted', orderId: order.definitionId });
+    events.push({ type: 'orderCompleted', orderId: active.definitionId });
     const replacement = orderFrom(stage, next.nextOrderIndex);
     next.orders[slot] = replacement;
     if (replacement) {

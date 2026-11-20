@@ -6,7 +6,7 @@ export type GameAction =
   | { type: 'QUEUE_DONUT'; queueIndex: number; expectedDonutId: string }
   | { type: 'MATCH_TRAY'; donutId: string }
   | { type: 'TRAY_READY'; donutId: string }
-  | { type: 'PICKUP_TRAY'; readyOrders: readonly string[] }
+  | { type: 'PICKUP_TRAY'; readyOrders: readonly string[]; parallel?: boolean }
   | { type: 'EXPIRE_ORDERS'; orderIds: readonly string[] }
   | { type: 'EXPAND_TRAY' }
   | { type: 'DECLINE_EXPAND' }
@@ -20,7 +20,7 @@ export function reduceGame(state: GameState, action: GameAction, stage: StageDef
     case 'QUEUE_DONUT': return selectDonut(state, stage, action.queueIndex, action.expectedDonutId, true).state;
     case 'MATCH_TRAY': return matchTray(state, stage, action.donutId).state;
     case 'TRAY_READY': return matchTray(state, stage, action.donutId, true).state;
-    case 'PICKUP_TRAY': return pickupTray(state, stage, action.readyOrders).state;
+    case 'PICKUP_TRAY': return pickupTray(state, stage, action.readyOrders, action.parallel).state;
     case 'EXPIRE_ORDERS': return expireOrders(state, stage, action.orderIds);
     case 'EXPAND_TRAY': return expandTray(state, stage).state;
     case 'DECLINE_EXPAND': return state.status === 'blocked' ? { ...state, status: 'gameover' } : state;
