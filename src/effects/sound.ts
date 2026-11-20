@@ -58,41 +58,10 @@ const cues = {
 type SoundName = keyof typeof cues;
 type Cue = { strikes: Strike[]; texture: Texture[]; ambience?: boolean };
 
-const alternateCues: Partial<Record<SoundName, Cue>> = {
-  delivery: { strikes: [], texture: [[0, 410, 0.043, 0.56, 0.001], [0, 1570, 0.018, 0.26, 0.001]] },
-  blocked: {
-    strikes: [[0, 164.81, 0.97, 0.13, 0.04], [0, 246.94, 0.91, 0.11, 0.045],
-      [0.035, 329.63, 0.64, 0.17, 0.023], [0.29, 392, 0.87, 0.15, 0.044]],
-    texture: [[0, 710, 0.105, 0.16, 0.015]],
-    ambience: true,
-  },
-  failed: {
-    strikes: [
-      [0, 110, 1.35, 0.14, 0.055], [0, 220, 1.26, 0.10, 0.05], [0, 329.63, 1.14, 0.077, 0.06],
-      [0.045, 493.88, 0.87, 0.14, 0.034], [0.34, 440, 0.92, 0.13, 0.036],
-      [0.71, 329.63, 1.17, 0.14, 0.045], [0.71, 261.63, 1.12, 0.10, 0.055],
-    ],
-    texture: [],
-    ambience: true,
-  },
-  clear: {
-    strikes: [
-      [0, 146.83, 1.48, 0.13, 0.056], [0, 220, 1.36, 0.085, 0.063], [0, 369.99, 1.34, 0.091, 0.067],
-      [0.052, 587.33, 0.84, 0.132, 0.025], [0.29, 739.99, 0.91, 0.13, 0.031],
-      [0.57, 880, 0.94, 0.14, 0.036], [0.88, 987.77, 1.09, 0.13, 0.041],
-      [0.88, 587.33, 1.18, 0.095, 0.055], [0.88, 739.99, 1.13, 0.085, 0.06],
-    ],
-    texture: [[0.83, 2400, 0.36, 0.12, 0.12, 5700]],
-    ambience: true,
-  },
-};
-
 let audio: AudioContext | undefined;
 let output: GainNode | undefined;
 let noise: AudioBuffer | undefined;
 let selectedAt = -Infinity;
-let preview: GainNode | undefined;
-let previewRequest = 0;
 
 export function saveSoundPreference(enabled: boolean) {
   try {
@@ -185,30 +154,4 @@ export function playSound(sound: SoundName) {
   }
 
   playCue(audio, output, cues[sound]);
-}
-
-export function stopSoundPreview() {
-  previewRequest += 1;
-  preview?.disconnect();
-  preview = undefined;
-}
-
-export async function previewSound(sound: SoundName, alternate: boolean) {
-  stopSoundPreview();
-  const request = previewRequest;
-  unlockSound();
-  const context = audio;
-  if (!context) return false;
-  try {
-    if (context.state !== 'running') await context.resume();
-  } catch {
-    return false;
-  }
-  if (request !== previewRequest) return true;
-  preview = context.createGain();
-  preview.gain.value = masterVolume;
-  preview.connect(context.destination);
-  const cue = alternate ? alternateCues[sound] ?? cues[sound] : cues[sound];
-  playCue(context, preview, cue);
-  return true;
 }

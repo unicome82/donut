@@ -1,15 +1,8 @@
 import { Icon } from '../components/Icon';
 import { stagesById } from '../game/stages';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
-import { useEffect, useRef, useState } from 'react';
-import { previewSound, stopSoundPreview } from '../effects/sound';
-
-const soundSamples = [
-  { cue: 'delivery', label: '디저트 전달' },
-  { cue: 'blocked', label: '트레이 가득 참' },
-  { cue: 'failed', label: '스테이지 실패' },
-  { cue: 'clear', label: '스테이지 성공' },
-] as const;
+import { useRef, useState } from 'react';
+import { soundSampleGroups } from '../effects/soundSamples';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
   eager: true, import: 'default', query: '?url&no-inline',
@@ -34,15 +27,9 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
 }) {
   const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
   const soundDialog = useRef<HTMLDialogElement>(null);
-  const [sample, setSample] = useState(0);
-  const [alternate, setAlternate] = useState(false);
-  const [previewUnavailable, setPreviewUnavailable] = useState(false);
-  useEffect(() => stopSoundPreview, []);
-
-  async function listen() {
-    const cue = soundSamples[sample]?.cue;
-    if (cue) setPreviewUnavailable(!(await previewSound(cue, alternate)));
-  }
+  const [{ group, sample }, setSelection] = useState({ group: 0, sample: 0 });
+  const samples = soundSampleGroups[group]?.samples ?? soundSampleGroups[0].samples;
+  const selected = samples[sample] ?? samples[0];
 
   return <main className="start-page" style={{ backgroundImage: poster?.background }}>
     <h1 className="sr-only">Sweet Order</h1>
@@ -51,7 +38,7 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
       aria-label="게임 소리 설정" aria-haspopup="dialog">
       <Icon name={soundEnabled ? 'sound' : 'sound-off'} />
     </button>
-    <dialog ref={soundDialog} className="sound-dialog" aria-labelledby="sound-dialog-title" onClose={stopSoundPreview}>
+    <dialog ref={soundDialog} className="sound-dialog" aria-labelledby="sound-dialog-title">
       <div className="sound-dialog-header">
         <h2 id="sound-dialog-title">효과음</h2>
         <form method="dialog"><button type="submit" className="secondary-button">닫기</button></form>
@@ -61,20 +48,19 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
         <input type="checkbox" checked={soundEnabled} onChange={onToggleSound} />
       </label>
       <div className="sound-samples">
-        <label>효과음 선택
-          <select value={sample} onChange={event => { stopSoundPreview(); setSample(event.currentTarget.selectedIndex); }}>
-            {soundSamples.map(({ cue, label }, index) => <option key={cue} value={index}>{label}</option>)}
+        <label>효과음 종류
+          <select value={group} onChange={event => setSelection({ group: event.currentTarget.selectedIndex, sample: 0 })}>
+            {soundSampleGroups.map(({ label }, index) => <option key={label} value={index}>{label}</option>)}
           </select>
         </label>
-        <label>버전
-          <select value={alternate ? 'b' : 'a'} onChange={event => { stopSoundPreview(); setAlternate(event.currentTarget.value === 'b'); }}>
-            <option value="a">A · 게임 적용본</option>
-            <option value="b">B · 다른 후보</option>
+        <label>Pixabay 샘플
+          <select value={sample} onChange={event => setSelection({ group, sample: event.currentTarget.selectedIndex })}>
+            {samples.map(([title, path], index) => <option key={path} value={index}>{index + 1}. {title}</option>)}
           </select>
         </label>
       </div>
-      <button type="button" className="primary-button" onClick={() => { void listen(); }}>샘플 듣기</button>
-      {previewUnavailable && <p role="status">이 기기에서 소리를 재생할 수 없어요.</p>}
+      <a className="primary-button sound-sample-link" href={`https://pixabay.com/sound-effects/${selected[1]}/`}
+        target="_blank" rel="noopener noreferrer">Pixabay에서 듣기 (새 탭)</a>
     </dialog>
     <div className="start-actions">
       <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>
