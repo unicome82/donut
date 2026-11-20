@@ -47,7 +47,16 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     const candidates = getReadyTrayPickupOrders(state, readyOrders);
     if (!candidates.length) return;
     const nextTime = Math.min(...candidates.map(id => nextPickupAt.current.get(id) ?? 0));
-    const timer = setTimeout(() => pickup(), Math.max(0, Math.ceil(nextTime - performance.now())));
+    let timer: ReturnType<typeof setTimeout>;
+    const runPickup = () => {
+      const remaining = Math.ceil(nextTime - performance.now());
+      if (remaining > 0) {
+        timer = setTimeout(runPickup, remaining);
+        return;
+      }
+      pickup();
+    };
+    timer = setTimeout(runPickup, Math.max(0, Math.ceil(nextTime - performance.now())));
     return () => clearTimeout(timer);
   }, [state, readyOrders]);
   const [inFlight, setInFlight] = useState<ReadonlySet<string>>(new Set());
@@ -93,10 +102,6 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     const effects = createEffects();
     activeEffects.current.add(effects);
     const moved = result.events.find(event => event.type === 'moved');
-    if (soundEnabled) {
-      if (moved) playSound('select');
-      if (result.events.some(event => event.type === 'consumed')) playSound('delivery');
-    }
     // Capture all geometry before the DOM changes, but commit the action immediately.
     const feedback = effects.play(root.current, current, result.events);
     flushSync(() => {
@@ -105,6 +110,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       }
       dispatch(committedAction);
     });
+    if (soundEnabled) {
+      if (moved) playSound('select');
+      // Check the previous transition for delivery events, including grouped pickups.
+      if (result.events.some(event => event.type === 'consumed')) playSound('delivery');
+    }
     void feedback.catch(() => undefined).finally(() => {
       if (!activeEffects.current.delete(effects)) return;
       if (!mounted.current || !moved || latest.current.stageId !== current.stageId) {

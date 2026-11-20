@@ -20,7 +20,7 @@ type Texture = [
 const cues = {
   select: { strikes: [], texture: [[0, 1550, 0.025, 0.08]] },
   // The low body and dry surface click start together as one wooden contact.
-  delivery: { strikes: [], texture: [[0, 430, 0.049, 0.56, 0.0015], [0, 1850, 0.016, 0.38, 0.0006]] },
+  delivery: { strikes: [], texture: [[0, 310, 0.052, 0.62, 0.0015], [0, 1120, 0.016, 0.27, 0.0006]] },
   order: {
     strikes: [[0.03, 523.25, 0.22, 0.12], [0.03, 659.25, 0.22, 0.085], [0.03, 783.99, 0.25, 0.065]],
     texture: [[0, 1800, 0.08, 0.075, 0.015]],
@@ -154,5 +154,9 @@ export function playSound(sound: SoundName) {
     selectedAt = now;
   }
 
-  playCue(audio, output, cues[sound]);
+  try {
+    playCue(audio, output, cues[sound]);
+  } catch {
+    // Playback can fail when the browser suspends or loses its audio device.
+  }
 }
