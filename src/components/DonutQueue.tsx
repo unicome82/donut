@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { DonutToken } from '../game/types';
 import { Donut } from './Donut/Donut';
 import { itemNames } from './Donut/donutThemes';
-export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[][]; disabled: boolean; onSelect: (queueIndex: number, expectedDonutId: string) => void }) {
+export function DonutQueue({ queues, disabled, returning, onSelect }: { queues: DonutToken[][]; disabled: boolean; returning: ReadonlySet<string>; onSelect: (queueIndex: number, expectedDonutId: string) => void }) {
   const presses = useRef(new Map<number, number>());
   function selectColumn(column: number) {
     const front = queues[column]?.[0];
@@ -11,7 +11,7 @@ export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[
 
   const depth = Math.max(1, ...queues.map(queue => queue.length));
   return <section className="queue-section" aria-label="메뉴 대기열 — 세로줄 어디서나 맨 위 메뉴 선택">
-    <div className="queue-grid">{queues.map((queue, i) => <button type="button" className="queue-column" key={i}
+    <div className="queue-grid">{queues.map((queue, i) => <button type="button" className={`queue-column${queue.some(donut => returning.has(donut.id)) ? ' queue-column--returning' : ''}`} key={i} data-queue-index={i}
       style={{ gridTemplateRows: depth === 1 ? 'var(--queue-head)' : `var(--queue-head) repeat(${depth - 1}, var(--queue-step))` }}
       disabled={disabled || !queue.length}
       onPointerDown={event => {
@@ -35,7 +35,7 @@ export function DonutQueue({ queues, disabled, onSelect }: { queues: DonutToken[
         className={position === 0 ? 'queue-front' : 'queue-back'}
         key={donut.id}
         data-token-id={donut.id}
-        style={{ zIndex: position }}>
+        style={{ zIndex: position, visibility: returning.has(donut.id) ? 'hidden' : undefined }}>
         <Donut type={donut.type} />
       </span>)}
     </button>)}</div>

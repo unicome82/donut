@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { createGame, expandTray, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
+import { createGame, clearTray, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, getCurrentStage, isUnlocked, reduceSession } from './session';
 import { authoredStages, stages, practiceStage } from './stages';
 import { solutions } from './stages/solutions';
-import { BASE_TRAY_CAPACITY, TRAY_EXPANSION, QUEUE_COUNT } from './constants';
+import { BASE_TRAY_CAPACITY, QUEUE_COUNT } from './constants';
 import { TRAY_CAPACITY_BY_DIFFICULTY } from './trayCapacity';
 import { getStageTimeLimit, getTimeStars } from './stageTime';
 import { validateStage } from './validation';
@@ -143,7 +143,7 @@ describe('자동 매칭과 상태 전이', () => {
     expect(matched.status).toBe('playing');
     expect(matched.tray).toHaveLength(BASE_TRAY_CAPACITY - 1);
   });
-  it('마지막 준비 도넛도 주문에 없으면 가득 찬 트레이의 확장 기회를 제공한다', () => {
+  it('마지막 준비 도넛도 주문에 없으면 가득 찬 트레이를 비울 수 있다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const initial = createGame(stage);
     initial.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
@@ -218,28 +218,36 @@ describe('자동 매칭과 상태 전이', () => {
     expect(next.status).toBe('playing');
     expect(next.tray).toHaveLength(BASE_TRAY_CAPACITY - 1);
   });
-  it('가득 찬 트레이는 확장 기회를 제공하고 선택을 차단한다', () => {
+  it('가득 찬 트레이를 비우면 디저트가 원래 열의 맨 뒤로 돌아가고 남은 횟수가 줄어든다', () => {
     const stage = fixture([{ strawberry: 2 }]);
-    const state = createGame(stage);
-    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
-    const blocked = select(state, stage, 2).state;
-    expect(blocked.status).toBe('blocked');
-    expect(select(blocked, stage, 0).state).toBe(blocked);
-    const expanded = expandTray(blocked, stage).state;
-    expect(expanded.status).toBe('playing');
-    expect(expanded.trayCapacity).toBe(BASE_TRAY_CAPACITY + TRAY_EXPANSION);
-    expect(expanded.expandUsed).toBe(true);
-    expect(expandTray(expanded, stage).state).toBe(expanded);
-    const nine = select(expanded, stage, 2).state;
-    const ten = select(nine, stage, 2).state;
-    expect(ten.status).toBe('gameover');
+    let state = createGame(stage);
+    const columns = Array.from({ length: BASE_TRAY_CAPACITY }, (_, index) => index % 2 + 1);
+    for (const column of columns) state = select(state, stage, column).state;
+    expect(state.status).toBe('blocked');
+    expect(select(state, stage, 0).state).toBe(state);
+
+    const full = state;
+    const returned = clearTray(full, stage);
+    expect(returned.events.map(event => event.type === 'returned' ? event.queueIndex : null)).toEqual(columns);
+    state = returned.state;
+    expect(state.status).toBe('playing');
+    expect(state.tray).toEqual([]);
+    expect(state.trayCapacity).toBe(BASE_TRAY_CAPACITY);
+    expect(state.trayClearsLeft).toBe(0);
+    for (const column of [1, 2]) {
+      const originalIds = new Set(stage.queues[column]!.map(token => token.id));
+      expect(state.queues[column]).toEqual([
+        ...full.queues[column]!,
+        ...full.tray.filter(token => originalIds.has(token.id)),
+      ]);
+    }
+    for (const column of columns) state = select(state, stage, column).state;
+    expect(state.status).toBe('gameover');
   });
-  it('확장 거절과 비정상 액션을 안전하게 처리한다', () => {
+  it('비울 수 없는 상태와 비정상 액션을 안전하게 처리한다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const state = createGame(stage);
-    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
-    const blocked = select(state, stage, 2).state;
-    expect(reduceGame(blocked, { type: 'DECLINE_EXPAND' }, stage).status).toBe('gameover');
+    expect(reduceGame(state, { type: 'CLEAR_TRAY' }, stage)).toBe(state);
     for (const index of [-1, 0.5, QUEUE_COUNT, NaN]) expect(selectDonut(state, stage, index, 'bad').state).toBe(state);
     expect(selectDonut(state, stage, 0, '0-1').state).toBe(state);
     expect(selectDonut({ ...state, status: 'clear' }, stage, 0, '0-0').events).toEqual([]);
@@ -251,18 +259,20 @@ describe('자동 매칭과 상태 전이', () => {
     state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
     expect(select(state, stage, 0).state.status).toBe('clear');
   });
-  it('목표 미달에서 대기열 소진 시 실패한다', () => {
+  it('대기열이 소진돼도 트레이에 공간이 있으면 타이머가 실패를 판정한다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const state = createGame(stage);
     state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
-    expect(select(state, stage, 0).state.status).toBe('gameover');
+    const exhausted = select(state, stage, 0).state;
+    expect(exhausted.status).toBe('playing');
+    expect(reduceGame(exhausted, { type: 'TIME_EXPIRED' }, stage).timeExpired).toBe(true);
   });
   it('일시정지·재개·재시작은 입력을 제어하고 스테이지 원본을 보존한다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const initial = createGame(stage);
     const paused = reduceGame(initial, { type: 'PAUSE' }, stage);
     expect(select(paused, stage, 0).state).toBe(paused);
-    expect(expandTray(paused, stage).state).toBe(paused);
+    expect(clearTray(paused, stage).state).toBe(paused);
     expect(reduceGame(paused, { type: 'RESUME' }, stage).status).toBe('playing');
     const played = select(initial, stage, 0).state;
     const restarted = reduceGame(played, { type: 'RESTART' }, stage);
@@ -295,7 +305,7 @@ describe('스테이지 해법과 게임 불변식', () => {
         expect(state.status).toBe('playing');
         state = select(state, stage, queue).state;
         expect(state.tray.length).toBeLessThan(stage.trayCapacity);
-        expect(state.expandUsed).toBe(false);
+        expect(state.trayClearsLeft).toBe(1);
       }
       expect(state.status).toBe('clear');
       expect(state.completedOrders).toBe(stage.targetOrders);
@@ -342,8 +352,8 @@ describe('스테이지 해법과 게임 불변식', () => {
         let state = createGame(stage);
         const total = stage.queues.flat().length;
         let consumed = 0;
-        for (let turn = 0; turn <= total; turn += 1) {
-          if (state.status === 'blocked') state = expandTray(state, stage).state;
+        for (let turn = 0; turn <= total + stage.trayCapacity; turn += 1) {
+          if (state.status === 'blocked') state = clearTray(state, stage).state;
           if (state.status !== 'playing') break;
           const choices = state.queues.map((q, i) => q.length ? i : -1).filter(i => i >= 0);
           n = (n * 1664525 + 1013904223) >>> 0;
@@ -381,7 +391,7 @@ describe('세션 진행', () => {
     expect(cleared.stars).toEqual(initial.stars);
   });
 
-  it('테스트 스테이지에서 기본 트레이와 확장된 트레이를 모두 채울 수 있다', () => {
+  it('테스트 스테이지에서 트레이 비우기를 한 번 사용하고 다시 가득 차면 실패한다', () => {
     let state = createGame(practiceStage);
     function fillTray() {
       while (state.status === 'playing') {
@@ -393,10 +403,10 @@ describe('세션 진행', () => {
     fillTray();
     expect(state.status).toBe('blocked');
     expect(state.tray).toHaveLength(BASE_TRAY_CAPACITY);
-    state = expandTray(state, practiceStage).state;
+    state = clearTray(state, practiceStage).state;
     fillTray();
     expect(state.status).toBe('gameover');
-    expect(state.tray).toHaveLength(BASE_TRAY_CAPACITY + TRAY_EXPANSION);
+    expect(state.tray).toHaveLength(BASE_TRAY_CAPACITY);
   });
 
   it('게임 시작 직후 첫 주문과 대기열 선두에 크루아상과 초코 아이스크림가 있다', () => {

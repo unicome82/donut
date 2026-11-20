@@ -9,5 +9,5 @@ export const mockGame: GameState = {
   stageId: stage01.id, stageRevision: stage01.revision, status: 'ready',
   orders: stage01.orders.slice(0, ORDER_SLOTS).map(o => ({ definitionId: o.id, sequence: o.sequence, remaining: { ...o.items } })),
   nextOrderIndex: ORDER_SLOTS, queues: structuredClone(stage01.queues), tray: [],
-  trayCapacity: stage01.trayCapacity, completedOrders: 0, expandUsed: false, transitionId: 0,
+  trayCapacity: stage01.trayCapacity, completedOrders: 0, trayClearsLeft: 1, transitionId: 0,
 };

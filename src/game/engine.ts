@@ -1,4 +1,4 @@
-import { ORDER_SLOTS, TRAY_EXPANSION } from './constants';
+import { ORDER_SLOTS } from './constants';
 import { DONUT_TYPES, type ActiveOrder, type GameState, type StageDefinition } from './types';
 import { validateStage } from './validation';
 
@@ -7,7 +7,7 @@ export type GameEvent =
   | { type: 'consumed'; donutId: string; orderId: string }
   | { type: 'orderCompleted'; orderId: string }
   | { type: 'orderAdded'; orderId: string; slot: number }
-  | { type: 'trayExpanded' }
+  | { type: 'returned'; donutId: string; queueIndex: number }
   | { type: 'stageCleared' };
 export interface TransitionResult { state: GameState; events: GameEvent[] }
 
@@ -26,7 +26,7 @@ export function createGame(stage: StageDefinition): GameState {
     nextOrderIndex: Math.min(ORDER_SLOTS, stage.targetOrders),
     queues: stage.queues.map(queue => queue.map(token => ({ ...token }))),
     tray: [], trayCapacity: stage.trayCapacity, completedOrders: 0,
-    expandUsed: false, transitionId: 0,
+    trayClearsLeft: 1, transitionId: 0,
   };
 }
 
@@ -99,10 +99,8 @@ function updateStatus(state: GameState, stage: StageDefinition, events: GameEven
     events.push({ type: 'stageCleared' });
   } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done) {
     state.status = 'playing';
-  } else if (state.queues.every(queue => queue.length === 0)) {
-    state.status = 'gameover';
   } else if (state.tray.length >= state.trayCapacity) {
-    state.status = state.expandUsed ? 'gameover' : 'blocked';
+    state.status = state.trayClearsLeft > 0 ? 'blocked' : 'gameover';
   } else {
     state.status = 'playing';
   }
@@ -179,15 +177,21 @@ export function pickupTray(
   return { state: next, events };
 }
 
-export function expandTray(state: GameState, stage: StageDefinition): TransitionResult {
-  if ((state.status !== 'playing' && state.status !== 'blocked') || state.expandUsed || state.stageId !== stage.id) return { state, events: [] };
-  const next = structuredClone(state);
-  next.expandUsed = true;
-  next.trayCapacity += TRAY_EXPANSION;
-  next.transitionId += 1;
-  const events: GameEvent[] = [{ type: 'trayExpanded' }];
-  settle(next, stage, events);
-  return { state: next, events };
+export function clearTray(state: GameState, stage: StageDefinition): TransitionResult {
+  if (state.status !== 'blocked' || state.trayClearsLeft <= 0 || state.stageId !== stage.id) return { state, events: [] };
+  const sources = new Map(stage.queues.flatMap((queue, index) => queue.map(token => [token.id, index] as const)));
+  const queues = state.queues.map(queue => [...queue]);
+  const events: GameEvent[] = [];
+  for (const token of state.tray) {
+    const queueIndex = sources.get(token.id);
+    if (queueIndex === undefined) return { state, events: [] };
+    queues[queueIndex]!.push(token);
+    events.push({ type: 'returned', donutId: token.id, queueIndex });
+  }
+  return {
+    state: { ...state, queues, tray: [], trayClearsLeft: state.trayClearsLeft - 1, status: 'playing', transitionId: state.transitionId + 1 },
+    events,
+  };
 }
 
 export function getStars(state: GameState): number {

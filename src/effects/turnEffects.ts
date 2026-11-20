@@ -34,7 +34,7 @@ export function createEffects() {
   function tokenElement(root: HTMLElement, id: string) {
     return Array.from(root.querySelectorAll<HTMLElement>('[data-token-id]')).find(el => el.dataset.tokenId === id);
   }
-  async function fly(origin: HTMLElement, target: Element, via?: Element, landing?: () => Element | null) {
+  async function fly(origin: HTMLElement, target: Element, via?: Element, landing?: () => Element | null, clip?: Element) {
     const artwork = origin.querySelector('img, svg');
     if (!artwork || disposed || reduceMotion()) return;
     const from = artwork.getBoundingClientRect();
@@ -46,13 +46,16 @@ export function createEffects() {
     ghost.style.width = `${from.width}px`; ghost.style.height = `${from.height}px`;
     document.body.append(ghost); elements.add(ghost);
 
-    // The source is captured before React replaces it. Measure the real tray art after it commits.
+    // The source is captured before React replaces it. Measure the landing artwork after it commits.
     if (landing) await Promise.resolve();
     if (disposed) return;
     const landedArt = landing?.();
     const to = (landedArt ?? target).getBoundingClientRect();
     const x = to.x + (to.width - from.width) / 2 - from.x;
-    const y = to.y + (to.height - from.height) / 2 - from.y;
+    const bottom = clip?.getBoundingClientRect().bottom;
+    const centerY = to.y + to.height / 2;
+    const clippedY = bottom === undefined ? centerY : Math.min(centerY, bottom - to.height / 2);
+    const y = clippedY - from.height / 2 - from.y;
     const endScaleX = landedArt ? to.width / from.width : 1;
     const endScaleY = landedArt ? to.height / from.height : 1;
     const end = `translate(${x}px,${y}px) scale(${endScaleX},${endScaleY})`;
@@ -67,7 +70,7 @@ export function createEffects() {
         offset: .56,
       });
     }
-    frames.push({ transform: end });
+    frames.push({ transform: end, opacity: clippedY < centerY ? 0 : 1 });
     await animate(ghost, frames, via ? MATCH_DURATION : MOVE_DURATION);
 
     if (!landing) {
@@ -77,7 +80,7 @@ export function createEffects() {
 
     // An earlier pickup can compact the tray while this dessert is still in flight.
     const latest = landing?.()?.getBoundingClientRect();
-    if (landedArt && latest && Math.hypot(latest.x - to.x, latest.y - to.y) > 1) {
+    if (!clip && landedArt && latest && Math.hypot(latest.x - to.x, latest.y - to.y) > 1) {
       await animate(ghost, [
         { transform: end },
         { transform: `translate(${x + latest.x - to.x}px,${y + latest.y - to.y}px) scale(${endScaleX},${endScaleY})` },
@@ -85,8 +88,16 @@ export function createEffects() {
     }
   }
   async function play(root: HTMLElement, before: GameState, events: GameEvent[], onArrival?: (orderId: string) => void) {
-    if (reduceMotion()) return;
+    if (reduceMotion()) {
+      await Promise.resolve();
+      if (!disposed) {
+        const orders = new Set(events.flatMap(event => event.type === 'consumed' ? [event.orderId] : []));
+        for (const orderId of orders) onArrival?.(orderId);
+      }
+      return;
+    }
     const moved = events.find(event => event.type === 'moved');
+    const queueSection = events.some(event => event.type === 'returned') ? root.querySelector('.queue-section') : null;
     const traySlot = root.querySelector<HTMLElement>(`[data-tray-slot="${before.tray.length}"]`);
     const slots = new Map<string, number>();
     before.orders.forEach((order, index) => { if (order) slots.set(order.definitionId, index); });
@@ -124,9 +135,12 @@ export function createEffects() {
           deliver(event.orderId, target, origin ? fly(origin, target) : undefined);
         }
       }
-      if (event.type === 'trayExpanded') {
-        const target = root.querySelector('.tray');
-        if (target) { jobs.push(burst(target.getBoundingClientRect(), '#8cb69a')); jobs.push(animate(target, [{ transform: 'scale(1)' }, { transform: 'scale(1.02)', offset: .5 }, { transform: 'scale(1)' }], MOVE_DURATION)); }
+      if (event.type === 'returned') {
+        const origin = tokenElement(root, event.donutId);
+        const queue = root.querySelector<HTMLElement>(`[data-queue-index="${event.queueIndex}"]`);
+        if (origin && queue) {
+          jobs.push(fly(origin, queue, undefined, () => tokenElement(queue, event.donutId)?.querySelector('img, svg') ?? null, queueSection ?? undefined));
+        }
       }
     }
     for (const [orderId, { box, flights }] of deliveries) {

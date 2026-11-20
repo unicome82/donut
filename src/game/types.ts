@@ -17,5 +17,5 @@ export interface GameState {
   pendingMatchIds?: string[];
   timeExpired?: boolean;
   clearStars?: number;
-  completedOrders: number; expandUsed: boolean; transitionId: number;
+  completedOrders: number; trayClearsLeft: number; transitionId: number;
 }
