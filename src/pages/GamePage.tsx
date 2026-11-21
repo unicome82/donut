@@ -17,7 +17,7 @@ import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { getStageTimeLimit, getTimeStars } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
-import { playSound, setMusicMood } from '../effects/sound';
+import { playSound, setMusicMood, speak } from '../effects/sound';
 import { haptic } from '../effects/haptics';
 import { useMessages } from '../i18n/language';
 import { createEffects } from '../effects/turnEffects';
@@ -26,7 +26,8 @@ import { SoundControls } from '../components/SoundControls';
 // Keep the standard pickup cadence independent of visual effect duration.
 const TRAY_READY_DELAY = 235;
 const PICKUP_INTERVAL = 100;
-const BONUS_INTRO_MS = 1800;
+// Every stage but practice opens with its title in the middle; the clock starts once it has gone.
+const INTRO_MS = 1800;
 
 interface Delivery { orderId: string; type: DonutType }
 
@@ -47,7 +48,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const [readyOrders, setReadyOrders] = useState<string[]>([]);
   const [round, setRound] = useState(0);
   const timeLimit = getStageTimeLimit(getStage(state.stageId));
-  const [deadline, setDeadline] = useState(() => performance.now() + timeLimit);
+  const hasIntro = state.stageId !== practiceStage.id;
+  const introMs = hasIntro ? INTRO_MS : 0;
+  const [introRound, setIntroRound] = useState<number | null>(hasIntro ? 0 : null);
+  const showIntro = introRound === round;
+  const [deadline, setDeadline] = useState(() => performance.now() + timeLimit + introMs);
   const [pausedTimeMs, setPausedTimeMs] = useState<number>();
   const [remainingTimeMs, setRemainingTimeMs] = useState(timeLimit);
   const timerRunning = timeLimit > 0 && state.status === 'playing';
@@ -56,7 +61,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   useLayoutEffect(() => {
     if (!timerRunning) return;
     const updateClock = () => {
-      const remaining = Math.max(0, deadline - performance.now());
+      const remaining = Math.min(timeLimit, Math.max(0, deadline - performance.now()));
       setRemainingTimeMs(remaining);
       if (remaining === 0) expireStage();
     };
@@ -111,8 +116,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       setPendingDeliveries([]);
       setReadyOrders([]);
       setRound(previous => previous + 1);
-      setDeadline(performance.now() + timeLimit);
+      setDeadline(performance.now() + timeLimit + introMs);
       setRemainingTimeMs(timeLimit);
+      setIntroRound(hasIntro ? round + 1 : null);
       setPausedTimeMs(undefined);
       nextPickupAt.current.clear();
       deferredMatches.current = [];
@@ -120,7 +126,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     const current = latest.current;
     const now = performance.now();
     const remaining = timeLimit > 0
-      ? (current.status === 'blocked' || current.status === 'paused' ? pausedTimeMs : undefined) ?? Math.max(0, deadline - now)
+      ? (current.status === 'blocked' || current.status === 'paused' ? pausedTimeMs : undefined) ?? Math.min(timeLimit, Math.max(0, deadline - now))
       : undefined;
     if (action.type !== 'RESTART' && remaining === 0) {
       dispatch({ type: 'TIME_EXPIRED' });
@@ -297,18 +303,19 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }
   const lastStage = state.stageId === STAGE_COUNT;
   const bonus = isBonusStage(state.stageId);
-  // A bonus stage opens with its title in the middle; taps wait until it has gone.
-  const [bonusIntro, setBonusIntro] = useState(bonus);
   // Every stage opens with a chime (practice excepted); bonus stages get a grander one.
   const playStartSound = useEffectEvent(() => {
-    if (soundEnabled && state.stageId !== practiceStage.id) playSound(bonus ? 'bonusStart' : 'stageStart');
+    if (!soundEnabled || !hasIntro) return;
+    playSound(bonus ? 'bonusStart' : 'stageStart');
+    // The voice lands as the title pops.
+    if (bonus) speak('Bonus!', 380);
   });
   useEffect(() => { playStartSound(); }, [round]);
   useEffect(() => {
-    if (!bonusIntro) return;
-    const timer = setTimeout(() => setBonusIntro(false), BONUS_INTRO_MS);
+    if (!showIntro) return;
+    const timer = setTimeout(() => setIntroRound(null), INTRO_MS);
     return () => clearTimeout(timer);
-  }, [bonusIntro]);
+  }, [showIntro]);
   useEffect(() => {
     if (!showGoodbye) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -347,7 +354,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }, [showResult, status, urgent]);
   useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
-    {!showResult && <GameHeader stage={state.stageId} title={bonus ? 'Bonus Stage' : undefined} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
+    {!showResult && <GameHeader stage={state.stageId} title={bonus ? 'Bonus Stage' : undefined} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye && !showIntro} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
@@ -385,7 +392,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} difficulty={stage.difficulty} clearsLeft={state.trayClearsLeft}
       canClear={playing && !waitingForGoodbye && state.tray.length > 0 && !state.pendingMatchIds?.length && inFlight.size === 0 && returning.size === 0}
       onClear={() => act({ type: 'CLEAR_TRAY' })} />
-    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || waitingForGoodbye || returning.size > 0 || bonusIntro} locked={trayFull} onReject={(_, element) => rejectSelection(element)} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
+    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || waitingForGoodbye || returning.size > 0 || showIntro} locked={trayFull} onReject={(_, element) => rejectSelection(element)} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>
       <h2 id="pause-heading">{t.pause}</h2>
@@ -407,7 +414,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>{t.giveUp}</button>
       </div>
     </dialog>
-    {bonusIntro && <div className="bonus-intro" aria-hidden="true"><span>Bonus Stage!</span></div>}
+    {showIntro && <div className={`stage-intro${bonus ? ' stage-intro--bonus' : ''}`} aria-hidden="true">
+      <span>{bonus ? 'Bonus Stage!' : `Stage ${String(state.stageId).padStart(2, '0')}`}</span>
+    </div>}
     {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
   </main>;
 }
