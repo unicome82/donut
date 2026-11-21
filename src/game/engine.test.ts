@@ -267,13 +267,30 @@ describe('자동 매칭과 상태 전이', () => {
     state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
     expect(select(state, stage, 0).state.status).toBe('clear');
   });
-  it('대기열이 소진돼도 트레이에 공간이 있으면 타이머가 실패를 판정한다', () => {
+  it('대기열이 소진돼 필요한 디저트가 없으면 트레이에 공간이 있어도 막힘으로 판정한다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const state = createGame(stage);
     state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
     const exhausted = select(state, stage, 0).state;
-    expect(exhausted.status).toBe('playing');
-    expect(reduceGame(exhausted, { type: 'TIME_EXPIRED' }, stage).timeExpired).toBe(true);
+    expect(exhausted).toMatchObject({ status: 'blocked', blockedReason: 'stuck' });
+    expect(exhausted.tray.length).toBeLessThan(exhausted.trayCapacity);
+  });
+  it('남은 칸으로 필요한 디저트에 닿을 수 없으면 막힘, 닿을 수 있으면 계속 진행한다', () => {
+    const stage = fixture([{ strawberry: 2 }]);
+    const blockers = (count: number) => Array.from({ length: count }, (_, i) => ({ id: 'b' + i, type: 'vanilla' as DonutType }));
+    const base = createGame(stage);
+    // A strawberry sits behind three blockers: four free slots reach it, three do not.
+    const queues = [[...blockers(3), { id: 'goal', type: 'strawberry' as DonutType }], [], [], [], [], stage.queues[5]!.slice(0, 1)];
+    const reachable = select({ ...base, queues, trayCapacity: 5 }, stage, 5).state;
+    expect(reachable.status).toBe('playing');
+    const stuck = select({ ...base, queues, trayCapacity: 4 }, stage, 5).state;
+    expect(stuck).toMatchObject({ status: 'blocked', blockedReason: 'stuck' });
+
+    const cleared = clearTray(stuck, stage).state;
+    expect(cleared).toMatchObject({ status: 'playing', trayClearsLeft: 0 });
+    expect(cleared.blockedReason).toBeUndefined();
+    const lost = select({ ...base, queues, trayCapacity: 4, trayClearsLeft: 0 }, stage, 5).state;
+    expect(lost).toMatchObject({ status: 'gameover', blockedReason: 'stuck' });
   });
   it('일시정지·재개·재시작은 입력을 제어하고 스테이지 원본을 보존한다', () => {
     const stage = fixture([{ strawberry: 2 }]);

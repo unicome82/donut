@@ -18,5 +18,7 @@ export interface GameState {
   pendingMatchIds?: string[];
   timeExpired?: boolean;
   clearStars?: number;
+  // Why play stopped while blocked or lost: the tray filled, or no reachable dessert can be picked up.
+  blockedReason?: 'full' | 'stuck';
   completedOrders: number; trayClearsLeft: number; transitionId: number;
 }

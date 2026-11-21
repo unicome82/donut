@@ -93,16 +93,28 @@ export function getReadyTrayPickupOrders(state: GameState, readyOrders: readonly
     .map(({ order }) => order.definitionId);
 }
 
+// Orders only change after a pickup, so without one the needed types stay fixed. A needed dessert
+// at depth d costs d + 1 tray slots to reach; if none fits in the free slots, play cannot continue.
+function canReachNeededDessert(state: GameState): boolean {
+  const needed = new Set(state.orders.flatMap(order => order
+    ? Object.entries(order.remaining).filter(([, count]) => count > 0).map(([type]) => type) : []));
+  const freeSlots = state.trayCapacity - state.tray.length;
+  return state.queues.some(queue => {
+    const depth = queue.findIndex(token => needed.has(token.type));
+    return depth >= 0 && depth < freeSlots;
+  });
+}
+
 function updateStatus(state: GameState, stage: StageDefinition, events: GameEvent[]) {
+  delete state.blockedReason;
   if (state.completedOrders === stage.targetOrders) {
     state.status = 'clear';
     events.push({ type: 'stageCleared' });
-  } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done) {
+  } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done || canReachNeededDessert(state)) {
     state.status = 'playing';
-  } else if (state.tray.length >= state.trayCapacity) {
-    state.status = state.trayClearsLeft > 0 ? 'blocked' : 'gameover';
   } else {
-    state.status = 'playing';
+    state.status = state.trayClearsLeft > 0 ? 'blocked' : 'gameover';
+    state.blockedReason = state.tray.length >= state.trayCapacity ? 'full' : 'stuck';
   }
 }
 
@@ -191,10 +203,9 @@ export function clearTray(state: GameState, stage: StageDefinition): TransitionR
     queues[queueIndex]!.push({ id: token.id, type: token.type });
     events.push({ type: 'returned', donutId: token.id, queueIndex });
   }
-  return {
-    state: { ...state, queues, tray: [], trayClearsLeft: state.trayClearsLeft - 1, status: 'playing', transitionId: state.transitionId + 1 },
-    events,
-  };
+  const next: GameState = { ...state, queues, tray: [], trayClearsLeft: state.trayClearsLeft - 1, transitionId: state.transitionId + 1 };
+  updateStatus(next, stage, events);
+  return { state: next, events };
 }
 
 export function getStars(state: GameState): number {
