@@ -1,10 +1,11 @@
 import summerDay from '../assets/audio/bgm-summer-day.mp3?url';
 import dreamyFlashback from '../assets/audio/bgm-dreamy-flashback.mp3?url';
+import dreamCulture from '../assets/audio/bgm-dream-culture.mp3?url';
 
 // Menus (start and stage select) play one track, the game screen another.
-export type MusicScene = 'menu' | 'game';
-const sceneTracks: Record<MusicScene, string> = { menu: summerDay, game: dreamyFlashback };
-export const MUSIC_CREDIT = '"Summer Day", "Dreamy Flashback" Kevin MacLeod (incompetech.com) · CC BY 4.0';
+export type MusicScene = 'menu' | 'game' | 'bonus';
+const sceneTracks: Record<MusicScene, string> = { menu: summerDay, game: dreamyFlashback, bonus: dreamCulture };
+export const MUSIC_CREDIT = '"Summer Day", "Dreamy Flashback", "Dream Culture" Kevin MacLeod (incompetech.com) · CC BY 4.0';
 
 const preferenceKey = 'sweet-order-sound';
 const volumeKeys = { sfx: 'sweet-order-sfx-volume', music: 'sweet-order-music-volume' } as const;

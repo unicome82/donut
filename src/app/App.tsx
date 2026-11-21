@@ -40,7 +40,9 @@ export function App() {
     if (button && !button.disabled && button.dataset.sfx !== 'none') playSound('tap');
   }
   const { screen, game, stars } = session;
-  useEffect(() => setMusicScene(screen === 'game' ? 'game' : 'menu'), [screen]);
+  // Bonus stages have their own track.
+  const musicScene = screen !== 'game' ? 'menu' : isBonusStage(game.stageId) ? 'bonus' : 'game';
+  useEffect(() => setMusicScene(musicScene), [musicScene]);
   const currentStage = getCurrentStage(stars);
   const [loadingStage, setLoadingStage] = useState<number>();
   const [outOfHearts, setOutOfHearts] = useState(false);

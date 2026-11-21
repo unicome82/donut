@@ -5,3 +5,4 @@ Re-encoded (80 kbps, loudness-normalized) for the game.
 
 bgm-summer-day.mp3        "Summer Day"        (start and stage select screens)
 bgm-dreamy-flashback.mp3  "Dreamy Flashback"  (game screen)
+bgm-dream-culture.mp3     "Dream Culture"     (bonus stages)
