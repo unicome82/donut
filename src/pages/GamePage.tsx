@@ -323,7 +323,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     if (soundEnabled) playSound(second <= 3 ? 'tickUrgent' : 'tick');
   }, [remainingTimeMs, soundEnabled, timeLimit, timeStars, timed]);
   useEffect(() => {
-    setMusicMood(status === 'paused' || status === 'blocked' || showResult ? 'dim' : urgent ? 'urgent' : 'normal');
+    setMusicMood(status === 'paused' || status === 'blocked' || showResult ? 'muted' : urgent ? 'urgent' : 'normal');
   }, [showResult, status, urgent]);
   useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>

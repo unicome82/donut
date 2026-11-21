@@ -13,7 +13,7 @@ const masterVolume = 0.6;
 const silence = 0.0001;
 
 export type VolumeKind = keyof typeof volumeKeys;
-export type MusicMood = 'normal' | 'dim' | 'urgent';
+export type MusicMood = 'normal' | 'muted' | 'urgent';
 
 export function readSoundPreference() {
   try {
@@ -211,7 +211,7 @@ function ramp(param: AudioParam, value: number, smoothing = 0.02) {
 }
 
 function musicLevel() {
-  return volumes.music * (mood === 'dim' ? 0.35 : 1);
+  return mood === 'muted' ? 0 : volumes.music;
 }
 
 function syncMusic() {
@@ -247,11 +247,12 @@ export function setVolume(kind: VolumeKind, value: number) {
   syncMusic();
 }
 
-// Dim the music under pause and result popups; speed it up slightly in the last seconds.
+// Silence the music under game popups; speed it up slightly in the last seconds.
 export function setMusicMood(next: MusicMood) {
   if (mood === next) return;
   mood = next;
-  if (moodGain) ramp(moodGain.gain, next === 'dim' ? 0.35 : 1, 0.25);
+  // Popups silence the music with a short fade; it keeps playing underneath and fades back in.
+  if (moodGain) ramp(moodGain.gain, next === 'muted' ? 0 : 1, next === 'muted' ? 0.06 : 0.2);
   syncMusic();
 }
 
@@ -273,7 +274,7 @@ function startMusic(context: AudioContext) {
   music.preservesPitch = true;
   try {
     moodGain = context.createGain();
-    moodGain.gain.value = mood === 'dim' ? 0.35 : 1;
+    moodGain.gain.value = mood === 'muted' ? 0 : 1;
     context.createMediaElementSource(music).connect(moodGain).connect(musicBus!);
     musicRouted = true;
   } catch {
