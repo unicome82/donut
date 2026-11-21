@@ -289,7 +289,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       <div className="result-actions">
-        {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>다음 스테이지 <Icon name="arrow" /></button>}
+        {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>다음 스테이지</button>}
         <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시하기</button>
         <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />스테이지 선택</button>
       </div>
