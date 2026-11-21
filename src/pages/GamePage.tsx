@@ -26,6 +26,7 @@ import { SoundControls } from '../components/SoundControls';
 // Keep the standard pickup cadence independent of visual effect duration.
 const TRAY_READY_DELAY = 235;
 const PICKUP_INTERVAL = 100;
+const BONUS_INTRO_MS = 1800;
 
 interface Delivery { orderId: string; type: DonutType }
 
@@ -296,6 +297,13 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }
   const lastStage = state.stageId === STAGE_COUNT;
   const bonus = isBonusStage(state.stageId);
+  // A bonus stage opens with its title in the middle; taps wait until it has gone.
+  const [bonusIntro, setBonusIntro] = useState(bonus);
+  useEffect(() => {
+    if (!bonusIntro) return;
+    const timer = setTimeout(() => setBonusIntro(false), BONUS_INTRO_MS);
+    return () => clearTimeout(timer);
+  }, [bonusIntro]);
   useEffect(() => {
     if (!showGoodbye) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -372,7 +380,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} difficulty={stage.difficulty} clearsLeft={state.trayClearsLeft}
       canClear={playing && !waitingForGoodbye && state.tray.length > 0 && !state.pendingMatchIds?.length && inFlight.size === 0 && returning.size === 0}
       onClear={() => act({ type: 'CLEAR_TRAY' })} />
-    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || waitingForGoodbye || returning.size > 0} locked={trayFull} onReject={(_, element) => rejectSelection(element)} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
+    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || waitingForGoodbye || returning.size > 0 || bonusIntro} locked={trayFull} onReject={(_, element) => rejectSelection(element)} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>
       <h2 id="pause-heading">{t.pause}</h2>
@@ -394,6 +402,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>{t.giveUp}</button>
       </div>
     </dialog>
+    {bonusIntro && <div className="bonus-intro" aria-hidden="true"><span>Bonus Stage!</span></div>}
     {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}
   </main>;
 }

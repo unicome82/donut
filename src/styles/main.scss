@@ -1065,3 +1065,29 @@
 .no-hearts-dialog h2 > span { padding-top: 3px; line-height: 1; }
 .no-hearts-dialog .result-actions { margin-top: 18px; }
 .no-hearts-wait { color: var(--muted); font-size: 15px; text-align: center; }
+
+// Bonus stage opening title: pops in, holds, then floats away before play starts (GamePage BONUS_INTRO_MS).
+.bonus-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  background: rgb(76 42 28 / .28);
+  animation: bonus-intro-backdrop 1800ms ease both;
+}
+.bonus-intro span {
+  color: white;
+  font-family: var(--stage-script);
+  font-size: clamp(44px, 13vw, 64px);
+  line-height: 1;
+  text-shadow: 0 3px 0 #c42a58, 0 6px 14px #5a322199;
+  animation: bonus-intro-title 1800ms cubic-bezier(.22,.72,.26,1) both;
+}
+@keyframes bonus-intro-backdrop { 0%, 100% { opacity: 0; } 15%, 75% { opacity: 1; } }
+@keyframes bonus-intro-title {
+  0% { opacity: 0; scale: .4; }
+  20% { opacity: 1; scale: 1.12; }
+  30%, 72% { opacity: 1; scale: 1; translate: 0 0; }
+  100% { opacity: 0; scale: 1.05; translate: 0 -40px; }
+}
