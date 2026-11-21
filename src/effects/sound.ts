@@ -54,18 +54,87 @@ const pure: readonly Overtone[] = [[1, 1, 1]];
 const deliverySteps = [392, 440, 493.88, 587.33, 659.25, 783.99, 880, 987.77];
 const semitone = 2 ** (1 / 12);
 
-const cueBuilders = {
-  // Bubbly "pop": a short downward pitch glide with a crisp contact click.
-  select: (): Cue => {
-    const pitch = 820 * (0.96 + Math.random() * 0.08);
+// Temporary: candidates for the "dessert placed on the tray" sound, selectable in sound settings.
+export const placeSoundIds = ['b', 'a', 'd', 'e'] as const;
+export type PlaceSoundId = typeof placeSoundIds[number];
+const placeKey = 'sweet-order-place-sound';
+const defaultPlace: PlaceSoundId = 'b';
+
+export function readPlaceSound(): PlaceSoundId {
+  try {
+    const saved = localStorage.getItem(placeKey);
+    const found = placeSoundIds.find(id => id === saved);
+    if (found) return found;
+  } catch {
+    // Fall back to the default.
+  }
+  return defaultPlace;
+}
+
+let placeSound = readPlaceSound();
+
+export function setPlaceSound(id: PlaceSoundId) {
+  placeSound = id;
+  try {
+    localStorage.setItem(placeKey, id);
+  } catch {
+    // The choice still applies for the current session.
+  }
+}
+
+// Small random detune so rapid taps don't sound mechanical.
+const detune = (spread: number) => 1 - spread / 2 + Math.random() * spread;
+
+const placeCues: Record<PlaceSoundId, () => Cue> = {
+  // A: a light porcelain plate clink with a soft contact under it.
+  a: () => {
+    const v = detune(0.06);
     return {
       tones: [
-        { at: 0, freq: pitch, to: pitch * 0.62, dur: 0.09, level: 0.34, attack: 0.0015, partials: pure },
-        { at: 0, freq: pitch * 2.02, to: pitch * 1.3, dur: 0.045, level: 0.07, attack: 0.001, wave: 'triangle', partials: pure },
+        { at: 0, freq: 2350 * v, dur: 0.14, level: 0.14, attack: 0.001, partials: [[1, 1, 1], [2.32, 0.45, 0.6], [4.1, 0.2, 0.35]] },
+        { at: 0.004, freq: 3520 * v, dur: 0.07, level: 0.055, attack: 0.001, partials: pure },
+        { at: 0, freq: 190, to: 140, dur: 0.06, level: 0.22, attack: 0.002, partials: pure },
       ],
-      noises: [{ at: 0, freq: 3200, dur: 0.014, level: 0.16, attack: 0.0005, q: 0.9 }],
+      noises: [{ at: 0, freq: 4200, dur: 0.008, level: 0.1, attack: 0.0005, q: 1.2 }],
     };
   },
+  // B: a round, squishy rising "pong", like a soft jelly landing.
+  b: () => {
+    const v = detune(0.1);
+    return {
+      tones: [
+        { at: 0, freq: 360 * v, to: 760 * v, dur: 0.11, level: 0.3, attack: 0.004, partials: pure },
+        { at: 0, freq: 180 * v, to: 380 * v, dur: 0.09, level: 0.06, attack: 0.004, wave: 'triangle', partials: pure },
+      ],
+    };
+  },
+  // D: B's round body, but falling, so it lands with a soft "tuk".
+  d: () => {
+    const v = detune(0.1);
+    return {
+      tones: [
+        { at: 0, freq: 520 * v, to: 260 * v, dur: 0.075, level: 0.32, attack: 0.002, partials: pure },
+        { at: 0, freq: 1040 * v, to: 620 * v, dur: 0.03, level: 0.04, attack: 0.001, partials: pure },
+      ],
+      noises: [{ at: 0, freq: 900, dur: 0.02, level: 0.16, attack: 0.0008, filter: 'lowpass', q: 0.7 }],
+    };
+  },
+  // E: a dessert set down on a wooden tray: short knock with a tiny body.
+  e: () => {
+    const v = detune(0.08);
+    return {
+      tones: [
+        { at: 0, freq: 340 * v, to: 230 * v, dur: 0.06, level: 0.28, attack: 0.0015, partials: pure },
+        { at: 0, freq: 760 * v, dur: 0.035, level: 0.07, attack: 0.001, partials: [[1, 1, 1], [2.4, 0.3, 0.5]] },
+      ],
+      noises: [{ at: 0, freq: 1500, dur: 0.018, level: 0.3, attack: 0.0006, q: 1.1 }],
+    };
+  },
+};
+
+const cueBuilders = {
+  // Placing a dessert on the tray; the voice is the player's chosen candidate.
+  select: (): Cue => placeCues[placeSound](),
   // Wooden contact plus a marimba note that climbs with the delivery streak.
   delivery: (step: number): Cue => ({
     tones: [{ at: 0.004, freq: deliverySteps[Math.min(step, deliverySteps.length - 1)]!, dur: 0.3, level: 0.16, attack: 0.002, partials: marimba }],

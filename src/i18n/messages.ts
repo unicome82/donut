@@ -1,4 +1,5 @@
 import type { DonutType } from '../game/types';
+import type { PlaceSoundId } from '../effects/sound';
 import { itemNames as koItemNames } from '../components/Donut/donutThemes';
 
 export type Language = 'ko' | 'en';
@@ -11,6 +12,8 @@ const ko = {
   soundSettings: '소리 설정',
   sfxVolume: '효과음',
   musicVolume: '배경음악',
+  placeSound: '놓는 소리',
+  placeSoundNames: { b: 'B · 말랑 퐁 (기본)', a: 'A · 접시 톡', d: 'D · 말랑 툭', e: 'E · 쟁반 툭' } as Record<PlaceSoundId, string>,
   soundOn: '소리 켜기',
   soundOff: '소리 끄기',
   close: '닫기',
@@ -72,6 +75,8 @@ const en: Messages = {
   soundSettings: 'Sound',
   sfxVolume: 'Effects',
   musicVolume: 'Music',
+  placeSound: 'Place',
+  placeSoundNames: { b: 'B · Soft pong (default)', a: 'A · Plate clink', d: 'D · Soft tuk', e: 'E · Tray knock' },
   soundOn: 'Sound On',
   soundOff: 'Sound Off',
   close: 'Close',
