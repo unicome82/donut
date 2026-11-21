@@ -162,7 +162,8 @@
   display: flex;
   gap: 8px;
 }
-.language-button { font-family: Jua, sans-serif; font-size: 15px; line-height: 1; }
+// Jua draws its glyphs about 1px above the line box's middle; the padding re-centres them.
+.language-button { padding-top: 2px; font-family: Jua, sans-serif; font-size: 15px; line-height: 1; }
 .start-actions {
   position: relative;
   z-index: 1;
@@ -1024,6 +1025,7 @@
   white-space: nowrap;
   pointer-events: auto;
 }
+.heart-counter-count, .heart-counter-timer { padding-top: 2.5px; }
 .heart-counter-extra { margin-left: 1px; color: #e94873; font-size: 15px; }
 .heart-counter-timer { padding-left: 6px; border-left: 1px solid #e7c9b6; color: #a0715a; font-size: 14px; font-variant-numeric: tabular-nums; }
 .top-hearts {
