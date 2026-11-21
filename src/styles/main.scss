@@ -441,17 +441,17 @@
 .speech-bubble::before, .speech-bubble::after {
   content: '';
   position: absolute;
-  left: calc(50% - 5px);
-  bottom: -7px;
-  width: 13px;
+  left: calc(50% - 7px);
+  bottom: -8px;
+  width: 14px;
   height: 8px;
   background: #e4c8b5;
-  clip-path: polygon(0 0, 100% 0, 35% 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 .speech-bubble::after {
-  left: calc(50% - 4px);
-  bottom: -5px;
-  width: 10px;
+  left: calc(50% - 6px);
+  bottom: -6px;
+  width: 12px;
   height: 7px;
   background: #fffdf9;
 }
@@ -561,7 +561,12 @@
 }
 .tray-clear-shortcut .material-symbol { width: 24px; height: 24px; }
 .tray-clear-shortcut:not(:disabled):active { transform: translateY(2px); box-shadow: inset 0 -2px #cf4d6c, 0 1px 2px #aa6b3b15; }
-.tray-clear-shortcut:disabled { color: #ffd2dc; }
+.tray-clear-shortcut:disabled {
+  border-color: #d9d4d1;
+  background: linear-gradient(#f4f2f0, #e6e2df);
+  color: #c4bdb8;
+  box-shadow: inset 0 -4px #d4cec9, 0 2px 3px #aa6b3b15;
+}
 .tray-clear-shortcut-count {
   position: absolute;
   top: -7px;
