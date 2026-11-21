@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import type { DonutToken } from '../game/types';
 import { Donut } from './Donut/Donut';
 import { useMessages } from '../i18n/language';
-import { HeartIcon } from './HeartIcon';
+import { RewardHeart } from './RewardHeart';
 import { Icon } from './Icon';
 export function DonutQueue({ queues, disabled, locked = false, returning, onSelect, onReject }: {
   queues: DonutToken[][]; disabled: boolean; locked?: boolean; returning: ReadonlySet<string>;
@@ -49,9 +49,8 @@ export function DonutQueue({ queues, disabled, locked = false, returning, onSele
         key={donut.id}
         data-token-id={donut.id}
         style={{ zIndex: position, visibility: returning.has(donut.id) ? 'hidden' : undefined }}>
-        {donut.reward ? <span className={`donut reward-tile reward-tile--${donut.reward}`}>
-          {donut.reward === 'heart' ? <HeartIcon /> : <Icon name="basket" />}
-        </span> : donut.hidden && position > 0 ? <span className="donut donut--mystery">?</span> : <Donut type={donut.type} />}
+        {donut.reward === 'heart' ? <span className="donut reward-tile reward-tile--heart"><RewardHeart /></span>
+          : donut.reward ? <span className="donut reward-tile reward-tile--trayClear"><Icon name="basket" /></span> : donut.hidden && position > 0 ? <span className="donut donut--mystery">?</span> : <Donut type={donut.type} />}
       </span>)}
     </button>)}</div>
   </section>;

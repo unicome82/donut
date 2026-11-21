@@ -1143,27 +1143,19 @@
   animation: float-pop 1000ms ease-out both;
 }
 
-// A reward takes a dessert-sized slot in its queue, raised like the tray-clear button.
-.reward-tile {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  padding-bottom: 3px;
-  border: 1px solid;
-  border-radius: 12px;
-}
-.reward-tile--heart {
-  border-color: #f2b3c3;
-  background: linear-gradient(#ffeef3, #ffd9e3);
-  box-shadow: inset 0 -3px #f4b5c6, 0 2px 3px #aa6b3b20;
-}
+// A reward takes a dessert-sized slot in its queue. The tray clear copies the active tray-clear
+// button; the heart is a raised heart in the same pink.
+.reward-tile { display: grid; place-items: center; aspect-ratio: 1; }
 .reward-tile--trayClear {
-  border-color: #a9cdec;
-  background: linear-gradient(#eef7ff, #d4e9fb);
-  box-shadow: inset 0 -3px #a7cbea, 0 2px 3px #3b6baa20;
+  padding-bottom: 3px;
+  border: 1px solid #e88aa0;
+  border-radius: 12px;
+  background: linear-gradient(#ff9bb0, #ec6a86);
+  color: #fff;
+  box-shadow: inset 0 -4px #cf4d6c, 0 2px 3px #aa6b3b15;
 }
-.reward-tile .heart-icon { width: 62%; height: 62%; filter: drop-shadow(0 1px 0 #ac204630); }
-.reward-tile .material-symbol { width: 62%; height: 62%; background: #3d82c4; }
+.reward-tile--trayClear .material-symbol { width: 60%; height: 60%; }
+.reward-heart { display: block; width: 100%; height: 100%; filter: drop-shadow(0 2px 2px #aa3b5a40); }
 .reward-pop {
   position: fixed;
   z-index: 20;
