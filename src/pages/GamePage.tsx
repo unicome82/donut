@@ -244,7 +244,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
     {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
-    {showClock && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
+    {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <img className="popup-ribbon" src={popupRibbon} alt="" draggable={false} />}
