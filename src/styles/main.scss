@@ -312,6 +312,16 @@
   padding-bottom: 0;
   overflow: clip;
 }
+.game-page--danger::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  box-shadow: inset 0 0 48px 10px rgb(233 52 82 / .6);
+  animation: danger-pulse 1.4s ease-in-out infinite;
+}
+@keyframes danger-pulse { 50% { opacity: .45; } }
 .game-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -365,6 +375,7 @@
 @keyframes star-vanish {
   0% { scale: 1; opacity: 1; }
   25% { scale: 1.25; opacity: 1; }
+  70% { scale: .45; opacity: .9; }
   100% { scale: 0; opacity: 0; }
 }
 .stage-clock-time {
@@ -402,10 +413,12 @@
   display: block;
   height: 100%;
   border-radius: inherit;
+  position: relative;
+  // Glossy: a bright upper band with a hard edge at the middle, slight shade at the bottom.
   background:
-    linear-gradient(to bottom, rgb(255 255 255 / .42), transparent 56%, rgb(50 20 66 / .14)),
+    linear-gradient(to bottom, rgb(255 255 255 / .75) 0%, rgb(255 255 255 / .35) 46%, rgb(255 255 255 / 0) 50%, rgb(50 20 66 / .08) 80%, rgb(50 20 66 / .16) 100%),
     linear-gradient(to right, var(--stage-clock-start-color), var(--stage-clock-end-color));
-  box-shadow: inset 0 1px #ffffff8c, inset 0 -1px #52344b30, 1px 0 2px #653c744a;
+  box-shadow: inset 0 1px #ffffffb3, inset 0 -1px #52344b30, 0 0 2px #653c744a;
   transition: width 100ms linear, --stage-clock-start-color 600ms ease-in-out, --stage-clock-end-color 600ms ease-in-out;
 }
 .game-board {
@@ -638,7 +651,7 @@
 .tray-slots li { display: grid; place-items: center; min-width: 0; height: clamp(24px, 4.2dvh, 36px); }
 .tray-slots li:empty::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #dfbd99; }
 .tray-donut {
-  translate: 0 -2px;
+  translate: 0 -4px;
   // Size against a 12-slot row so desserts look the same at every capacity.
   width: min(calc(100cqw / 12 * 1.4), 44px);
   justify-self: center;
@@ -894,4 +907,5 @@
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .glass-popup[open]::backdrop { animation: none; }
   .confetti, .effect-particle, .flying-donut { display: none; }
+  .stage-clock-star.star--unearned { opacity: 0; }
 }

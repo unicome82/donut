@@ -14,7 +14,7 @@ import { getStage, stages } from '../game/stages';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
-import { getStageTimeLimit } from '../game/stageTime';
+import { getStageTimeLimit, getTimeStars } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
 import { playSound } from '../effects/sound';
 import { haptic } from '../effects/haptics';
@@ -291,7 +291,8 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   useEffect(() => {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
-  return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}`} ref={root}>
+  const danger = playing && !waitingForGoodbye && timeLimit > 0 && getTimeStars(remainingTimeMs, timeLimit) === 1;
+  return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}`} ref={root}>
     {!showResult && <GameHeader stage={state.stageId} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>

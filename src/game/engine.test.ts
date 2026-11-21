@@ -399,6 +399,23 @@ describe('세션 진행', () => {
     expect(retried.game.trayClearsLeft).toBe(2);
   });
 
+  it('무료 트레이 비우기는 스테이지에 들어올 때만 주고 재도전에는 주지 않는다', () => {
+    const stage = stages[0]!;
+    const broke = { ...createSession(), trayClears: 0 };
+    const started = reduceSession(broke, { type: 'START', stageId: stage.id });
+    expect(started.game.trayClearsLeft).toBe(1);
+    expect(reduceSession(started, { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(0);
+
+    const carried = reduceSession(createSession(), { type: 'START', stageId: stage.id });
+    const game = structuredClone(carried.game);
+    const queues = game.queues.map(queue => [...queue]);
+    game.tray = queues[0]!.splice(0, 1);
+    const used = reduceSession({ ...carried, game: { ...game, queues } }, { type: 'GAME', action: { type: 'CLEAR_TRAY' } });
+    expect(used.game.trayClearsLeft).toBe(0);
+    expect(used.trayClears).toBe(0);
+    expect(reduceSession(used, { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(0);
+  });
+
   it('게임 중에도 트레이를 비울 수 있지만 비어 있으면 비울 수 없다', () => {
     const stage = fixture([{ strawberry: 2 }]);
     const empty = createGame(stage);
