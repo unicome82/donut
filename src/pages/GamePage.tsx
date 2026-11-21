@@ -392,8 +392,14 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />
       {timeBonusPops.map(id => <span key={id} className="time-bonus-pop" role="status">+5s<span className="sr-only">{t.timeBonus}</span></span>)}
     </div>}
+    {/* An even 2px white outline for masked icons, which can't carry a stroke or their own shadows. */}
+    <svg className="sr-only" aria-hidden="true"><filter id="white-outline" x="-20%" y="-20%" width="140%" height="140%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="grown" />
+      <feFlood floodColor="#fff" /><feComposite in2="grown" operator="in" />
+      <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter></svg>
     {rewardPops.map(pop => <span key={pop.id} className={`reward-pop reward-pop--${pop.reward}`} role="status" style={{ left: pop.x, top: pop.y }}>
-      {pop.reward === 'heart' ? <HeartIcon /> : <Icon name="basket" />}<span aria-hidden="true">+1</span>
+      {pop.reward === 'heart' ? <HeartIcon /> : <span className="reward-pop-basket"><Icon name="basket" /></span>}<span aria-hidden="true">+1</span>
       <span className="sr-only">{pop.reward === 'heart' ? t.rewardHeart : t.rewardTrayClear}</span>
     </span>)}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>

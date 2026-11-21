@@ -1172,11 +1172,10 @@
   pointer-events: none;
   animation: float-pop 1000ms ease-out both;
 }
-.reward-pop .heart-icon { width: 22px; height: 22px; fill: #ec6a86; stroke: #fff; stroke-width: 2.5px; paint-order: stroke fill; filter: none; }
-.reward-pop .material-symbol {
-  width: 21px; height: 21px; background: #ec6a86;
-  filter: drop-shadow(1.5px 0 #fff) drop-shadow(-1.5px 0 #fff) drop-shadow(0 1.5px #fff) drop-shadow(0 -1.5px #fff);
-}
+.reward-pop .heart-icon { width: 22px; height: 22px; fill: #ec6a86; stroke: #fff; stroke-width: 4.4px; stroke-linejoin: round; paint-order: stroke fill; filter: none; }
+.reward-pop .material-symbol { display: block; width: 21px; height: 21px; background: #ec6a86; }
+// The icon is drawn through a mask, which would clip its own outline, so a wrapper carries it.
+.reward-pop-basket { filter: url(#white-outline); }
 @keyframes float-pop {
   0% { opacity: 0; transform: translateY(6px) scale(.6); }
   20% { opacity: 1; transform: translateY(0) scale(1.15); }
