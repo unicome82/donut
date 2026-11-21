@@ -17,7 +17,7 @@ import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { getStageTimeLimit, getTimeStars } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
-import { playSound, setMusicMood, speak } from '../effects/sound';
+import { playSound, setMusicMood } from '../effects/sound';
 import { haptic } from '../effects/haptics';
 import { useMessages } from '../i18n/language';
 import { createEffects } from '../effects/turnEffects';
@@ -307,8 +307,6 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const playStartSound = useEffectEvent(() => {
     if (!soundEnabled || !hasIntro) return;
     playSound(bonus ? 'bonusStart' : 'stageStart');
-    // The voice lands as the title pops.
-    if (bonus) speak('Bonus!', 380);
   });
   useEffect(() => { playStartSound(); }, [round]);
   useEffect(() => {

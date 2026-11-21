@@ -179,27 +179,38 @@ const cueBuilders = {
     noises: [{ at: 0.24, freq: 7000, dur: 0.3, level: 0.06, attack: 0.02, q: 0.8, filter: 'highpass' }],
     echo: true,
   }),
-  // Bonus stage opening: a game-show jingle unlike stageStart — two retro coin blips, a bouncy
-  // marimba run, then a bright G major chord with glitter as the title pops.
-  bonusStart: (): Cue => ({
-    tones: [
-      { at: 0, freq: 987.77, dur: 0.07, level: 0.05, attack: 0.002, wave: 'square', partials: pure },
-      { at: 0.07, freq: 1318.51, dur: 0.16, level: 0.05, attack: 0.002, wave: 'square', partials: pure },
-      ...[783.99, 987.77, 1174.66, 1567.98].map((freq, index) => ({
-        at: 0.16 + index * 0.045, freq, dur: 0.2, level: 0.12, attack: 0.004, partials: marimba,
-      })),
-      { at: 0.38, freq: 196, dur: 1.1, level: 0.1, attack: 0.02, partials: bell },
-      { at: 0.38, freq: 392, dur: 1.05, level: 0.1, attack: 0.015, partials: bell },
-      { at: 0.38, freq: 493.88, dur: 1.0, level: 0.1, attack: 0.015, partials: bell },
-      { at: 0.38, freq: 587.33, dur: 1.0, level: 0.1, attack: 0.015, partials: bell },
-      { at: 0.38, freq: 1567.98, dur: 1.1, level: 0.11, attack: 0.01, partials: bell },
-      ...[3951.07, 3135.96, 2349.32, 3135.96, 3951.07].map((freq, index) => ({
-        at: 0.5 + index * 0.08, freq, dur: 0.28, level: 0.026, attack: 0.004, partials: pure,
-      })),
-    ],
-    noises: [{ at: 0.36, freq: 7500, dur: 0.6, level: 0.07, attack: 0.03, q: 0.7, filter: 'highpass' }],
-    echo: true,
-  }),
+  // Bonus stage opening: sparkling "twinkle-twinkle" runs that swap between a low and a high
+  // register, then play together over a long, full chord.
+  bonusStart: (): Cue => {
+    const run = (at: number, notes: number[], level: number, partials: readonly Overtone[]) =>
+      notes.map((freq, index) => ({ at: at + index * 0.04, freq, dur: 0.26, level, attack: 0.004, partials }));
+    const low = [261.63, 329.63, 392, 523.25, 659.25];
+    const high = [1046.5, 1318.51, 1567.98, 2093, 2637.02];
+    return {
+      tones: [
+        ...run(0, low, 0.11, marimba),
+        ...run(0.24, high, 0.06, bell),
+        ...run(0.5, low.map(freq => freq * 1.5), 0.1, marimba),
+        ...run(0.74, high.map(freq => freq * 0.75), 0.06, bell),
+        // Both registers together, landing on the chord.
+        ...run(1.0, low, 0.08, marimba),
+        ...run(1.0, high, 0.045, bell),
+        { at: 1.2, freq: 130.81, dur: 1.4, level: 0.09, attack: 0.03, partials: bell },
+        { at: 1.2, freq: 261.63, dur: 1.35, level: 0.09, attack: 0.02, partials: bell },
+        { at: 1.2, freq: 329.63, dur: 1.3, level: 0.085, attack: 0.02, partials: bell },
+        { at: 1.2, freq: 392, dur: 1.3, level: 0.085, attack: 0.02, partials: bell },
+        { at: 1.2, freq: 1046.5, dur: 1.3, level: 0.08, attack: 0.015, partials: bell },
+        ...[3135.96, 2637.02, 2093, 2637.02, 3135.96, 4186.01].map((freq, index) => ({
+          at: 1.3 + index * 0.09, freq, dur: 0.3, level: 0.022, attack: 0.004, partials: pure,
+        })),
+      ],
+      noises: [
+        { at: 0.2, freq: 8000, dur: 0.5, level: 0.035, attack: 0.05, q: 0.7, filter: 'highpass' },
+        { at: 1.15, freq: 7500, dur: 0.9, level: 0.06, attack: 0.04, q: 0.7, filter: 'highpass' },
+      ],
+      echo: true,
+    };
+  },
   clear: (): Cue => ({
     tones: [
       { at: 0, freq: 440, dur: 0.54, level: 0.115, attack: 0.012, partials: bell },
@@ -434,26 +445,6 @@ function nextStep(sound: SoundName, now: number) {
   streak = now - streakAt < STREAK_GAP ? streak + 1 : 0;
   streakAt = now;
   return streak;
-}
-
-/** Says a short word with the device's speech voice, at the effects volume. Silently skipped where unsupported. */
-export function speak(text: string, delayMs = 0) {
-  if (!soundEnabled || volumes.sfx <= 0 || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-  setTimeout(() => {
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      const voice = speechSynthesis.getVoices().find(candidate => candidate.lang.startsWith('en'));
-      if (voice) utterance.voice = voice;
-      utterance.pitch = 1.6;
-      utterance.rate = 1.05;
-      utterance.volume = Math.min(1, volumes.sfx * 1.4);
-      speechSynthesis.cancel();
-      speechSynthesis.speak(utterance);
-    } catch {
-      // Speech is a nicety; the jingle still plays.
-    }
-  }, delayMs);
 }
 
 export function playSound(sound: SoundName, delayMs = 0) {
