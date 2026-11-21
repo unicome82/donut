@@ -1,6 +1,7 @@
 export const DONUT_TYPES = ['strawberry', 'chocolate', 'vanilla', 'matcha', 'blueberry', 'caramel', 'lemon', 'sprinkle', 'mint', 'orange', 'raspberry', 'sesame', 'coconut', 'coffee', 'croissant', 'cake', 'pudding', 'cinnamonCroffle', 'matchaCroffle', 'chocolateCake', 'matchaPudding', 'raspberryMacaron', 'lemonMacaron', 'blueberryCupcake', 'chocolateCupcake', 'strawberryTart', 'blueberryTart', 'chocolateCroissant', 'chocolateCookie', 'whiteCookie', 'berryScone', 'matchaScone', 'vanillaIceCream', 'chocolateIceCream'] as const;
 export type DonutType = typeof DONUT_TYPES[number];
-export interface DonutToken { id: string; type: DonutType }
+// hidden: shown as "?" until the token reaches the front of its queue.
+export interface DonutToken { id: string; type: DonutType; hidden?: boolean }
 export interface OrderDefinition { id: string; sequence: number; items: Partial<Record<DonutType, number>> }
 export interface ActiveOrder { definitionId: string; sequence: number; remaining: Partial<Record<DonutType, number>> }
 export type StageDifficulty = 'easy' | 'normal' | 'hard';

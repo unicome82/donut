@@ -45,7 +45,7 @@ export function DonutQueue({ queues, disabled, locked = false, returning, onSele
         key={donut.id}
         data-token-id={donut.id}
         style={{ zIndex: position, visibility: returning.has(donut.id) ? 'hidden' : undefined }}>
-        <Donut type={donut.type} />
+        {donut.hidden && position > 0 ? <span className="donut donut--mystery">?</span> : <Donut type={donut.type} />}
       </span>)}
     </button>)}</div>
   </section>;

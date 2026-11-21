@@ -14,11 +14,11 @@ const { ORDER_SLOTS, QUEUE_COUNT } = await import('../src/game/constants.ts');
 const { TRAY_CAPACITY_BY_DIFFICULTY } = await import('../src/game/trayCapacity.ts');
 const { createGame, selectDonut } = await import('../src/game/engine.ts');
 const { DONUT_TYPES } = await import('../src/game/types.ts');
-const { difficultyForStage, campaignProgress } = await import('../src/game/stages/schedule.ts');
+const { difficultyForStage, campaignProgress, hasHiddenDesserts } = await import('../src/game/stages/schedule.ts');
 
 const firstId = 2;
-// Bump to regenerate every stored layout with the current rules.
-const layoutRevision = 20;
+// Bump a difficulty's revision to regenerate its stored layouts with the current rules.
+const layoutRevisions = { easy: 20, normal: 20, hard: 21 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -115,15 +115,22 @@ function arrangeStage(id, difficulty, random, menu, orders, knobs) {
       run += 1;
     }
   }
-  return {
-    id, difficulty, revision: layoutRevision, donutTypes: menu, targetOrders: orders.length,
+  const stage = {
+    id, difficulty, revision: layoutRevisions[difficulty], donutTypes: menu, targetOrders: orders.length,
     trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY[difficulty], queues, orders,
   };
+  if (hasHiddenDesserts(id, difficulty)) {
+    // Cover a share of the desserts behind each queue's first two; the share grows later on.
+    const share = lerp(0.25, 0.4, campaignProgress(id));
+    stage.hidden = queues.map(queue => queue.flatMap((_, index) => index >= 2 && random(1000) < share * 1000 ? [index] : []));
+  }
+  return stage;
 }
 
 // Fast replica of the engine's instant-settle rules, used only to score candidates.
 function simulate(stage, policy, random) {
   const kinds = stage.donutTypes.length;
+  const hidden = stage.queues.map((_, column) => new Set(stage.hidden?.[column]));
   const demand = stage.orders.map(order => {
     const remaining = new Array(kinds).fill(0);
     for (const [type, quantity] of Object.entries(order.items)) remaining[stage.donutTypes.indexOf(type)] = quantity;
@@ -151,7 +158,9 @@ function simulate(stage, policy, random) {
         const queue = stage.queues[column];
         if (fronts[column] >= queue.length) continue;
         let depth = 0;
-        while (fronts[column] + depth < queue.length && !needed(queue[fronts[column] + depth])) depth += 1;
+        // A covered dessert behind the front is unknown, so the bot cannot plan for it.
+        const unknownOrUnneeded = position => (position > fronts[column] && hidden[column].has(position)) || !needed(queue[position]);
+        while (fronts[column] + depth < queue.length && unknownOrUnneeded(fronts[column] + depth)) depth += 1;
         const score = (fronts[column] + depth < queue.length ? depth : 1e6) + random(1000) / 1000;
         if (score < best) { best = score; choice = column; }
       }
@@ -249,7 +258,8 @@ const lock = new URL('generated.lock/', file);
 mkdirSync(lock);
 try {
   const stored = JSON.parse(readFileSync(file, 'utf8'));
-  const keep = stored.stages.filter(stage => stage.id >= firstId && stage.revision === layoutRevision);
+  const keep = stored.stages.filter(stage => stage.id >= firstId && stage.revision === layoutRevisions[stage.difficulty]
+    && Boolean(stage.hidden) === hasHiddenDesserts(stage.id, stage.difficulty));
   const kept = new Set(keep.map(stage => stage.id));
   const generated = [...keep];
   const solutions = Object.fromEntries(Object.entries(stored.solutions).filter(([id]) => kept.has(Number(id))));

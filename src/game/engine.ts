@@ -187,7 +187,8 @@ export function clearTray(state: GameState, stage: StageDefinition): TransitionR
   for (const token of state.tray) {
     const queueIndex = sources.get(token.id);
     if (queueIndex === undefined) return { state, events: [] };
-    queues[queueIndex]!.push(token);
+    // The player has already seen a returned dessert, so it comes back uncovered.
+    queues[queueIndex]!.push({ id: token.id, type: token.type });
     events.push({ type: 'returned', donutId: token.id, queueIndex });
   }
   return {

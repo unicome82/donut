@@ -14,3 +14,9 @@ export function difficultyForStage(id: number): StageDifficulty {
 export function campaignProgress(id: number): number {
   return Math.min(1, Math.max(0, (id - 1) / (campaignEnd - 1)));
 }
+
+// Covered ("?") desserts appear only in hard stages after stage 20.
+export const hiddenDessertsAfterStage = 20;
+export function hasHiddenDesserts(id: number, difficulty: StageDifficulty): boolean {
+  return difficulty === 'hard' && id > hiddenDessertsAfterStage;
+}

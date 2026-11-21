@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { stage01 } from './stages/stage01';
 import { stages } from './stages';
 import { validateStage } from './validation';
-import { difficultyForStage } from './stages/schedule';
+import { difficultyForStage, hasHiddenDesserts } from './stages/schedule';
+import { clearTray, createGame } from './engine';
 describe('고정 스테이지 데이터 계약', () => {
   it.each([['easy', 10, 12, 126, 140], ['normal', 15, 10, 160, 176], ['hard', 20, 8, 200, 216]] as const)(
     '%s는 종류별 준비량과 주문량이 같고 지정된 트레이를 사용한다', (difficulty, variety, capacity, minDesserts, maxDesserts) => {
@@ -38,4 +39,22 @@ describe('고정 스테이지 데이터 계약', () => {
     for (const stage of stages) expect(stage.difficulty).toBe(difficultyForStage(stage.id));
     expect(stages.find(stage => stage.difficulty === 'hard')?.id).toBe(11);
   });
+  it('가려진 디저트는 20번 이후 Hard에만 있고 줄의 앞 두 칸에는 없다', () => {
+    for (const stage of stages) {
+      const covered = stage.queues.flatMap(queue => queue.flatMap((token, index) => token.hidden ? [index] : []));
+      expect(covered.length > 0).toBe(hasHiddenDesserts(stage.id, stage.difficulty ?? 'easy'));
+      expect(covered.every(index => index >= 2)).toBe(true);
+    }
+  });
+  it('트레이를 비우면 돌아온 디저트는 가려지지 않는다', () => {
+    const stage = stages.find(candidate => candidate.queues.some(queue => queue.some(token => token.hidden)))!;
+    const column = stage.queues.findIndex(queue => queue.some(token => token.hidden));
+    const token = stage.queues[column]!.find(candidate => candidate.hidden)!;
+    const game = createGame(stage);
+    const queues = game.queues.map(queue => queue.filter(candidate => candidate.id !== token.id));
+    const returned = clearTray({ ...game, queues, tray: [{ ...token }] }, stage).state;
+    expect(returned.tray).toHaveLength(0);
+    expect(returned.queues[column]!.at(-1)).toEqual({ id: token.id, type: token.type });
+  });
+
 });

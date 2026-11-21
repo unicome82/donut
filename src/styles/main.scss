@@ -111,6 +111,18 @@
 .icon-button:disabled { opacity: .55; }
 .donut { display: block; width: 100%; height: auto; }
 .donut--widened { scale: 1.18 1; }
+.donut--mystery {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 2px dashed #d7a98b;
+  border-radius: 50%;
+  background: #fbe9da;
+  color: #b0785a;
+  font-family: Jua, sans-serif;
+  font-size: 18px;
+  line-height: 1;
+}
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 @font-face {
