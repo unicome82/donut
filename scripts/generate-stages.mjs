@@ -1,5 +1,7 @@
 import { registerHooks } from 'node:module';
-import { mkdirSync, readFileSync, rmdirSync, renameSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { availableParallelism } from 'node:os';
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -14,15 +16,19 @@ const { ORDER_SLOTS, QUEUE_COUNT } = await import('../src/game/constants.ts');
 const { TRAY_CAPACITY_BY_DIFFICULTY } = await import('../src/game/trayCapacity.ts');
 const { createGame, selectDonut } = await import('../src/game/engine.ts');
 const { DONUT_TYPES } = await import('../src/game/types.ts');
-const { difficultyForStage, campaignProgress, hasHiddenDesserts, hiddenDessertCount } = await import('../src/game/stages/schedule.ts');
+const { difficultyForStage, campaignProgress, hiddenDessertCount, STAGE_COUNT, CHUNK_SIZE } = await import('../src/game/stages/schedule.ts');
 
-const firstId = 2;
 // Bump a difficulty's revision to regenerate its stored layouts with the current rules.
 const layoutRevisions = { easy: 20, normal: 20, hard: 22 };
-const endId = Number(process.argv[2] ?? 101);
-const campaignSeed = Number(process.argv[3] ?? 2026);
-if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
-  throw new Error('Usage: npm run stages:generate -- <last-stage-id> [seed (0–4294967295)]');
+// Usage: stages:generate -- <chunks, e.g. 1-100 or 7> [--seed N] [--jobs N] [--force]
+const args = process.argv.slice(2);
+const option = name => { const index = args.indexOf(name); return index < 0 ? undefined : args[index + 1]; };
+const campaignSeed = Number(option('--seed') ?? 2026);
+const force = args.includes('--force');
+const lastChunk = Math.ceil(STAGE_COUNT / CHUNK_SIZE);
+const [chunkFrom, chunkTo = chunkFrom] = (args.find(arg => /^\d+(-\d+)?$/.test(arg)) ?? `1-${lastChunk}`).split('-').map(Number);
+if (!(chunkFrom >= 1 && chunkTo >= chunkFrom && chunkTo <= lastChunk) || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
+  throw new Error(`Usage: npm run stages:generate -- <chunk or range within 1–${lastChunk}> [--seed N] [--jobs N] [--force]`);
 }
 
 // Layout knobs are sampled from these ranges; bot success bands decide which candidate is kept.
@@ -43,7 +49,9 @@ function band(center, tolerance) {
   return [Math.max(0, center - tolerance), Math.min(100, center + tolerance)];
 }
 
-const file = new URL('../src/game/stages/generated.json', import.meta.url);
+const chunkName = chunk => String(chunk).padStart(4, '0') + '.json';
+const stageFile = chunk => new URL(`../src/game/stages/chunks/${chunkName(chunk)}`, import.meta.url);
+const solutionFile = chunk => new URL(`../src/game/stages/solutions/${chunkName(chunk)}`, import.meta.url);
 
 function randomFor(seed) {
   let state = seed >>> 0;
@@ -255,45 +263,75 @@ function findSolution(candidate, random) {
   return undefined;
 }
 
-const lock = new URL('generated.lock/', file);
-mkdirSync(lock);
-try {
-  const stored = JSON.parse(readFileSync(file, 'utf8'));
-  const keep = stored.stages.filter(stage => stage.id >= firstId && stage.revision === layoutRevisions[stage.difficulty]
-    && Boolean(stage.hidden) === hasHiddenDesserts(stage.id, stage.difficulty));
-  const kept = new Set(keep.map(stage => stage.id));
-  const generated = [...keep];
-  const solutions = Object.fromEntries(Object.entries(stored.solutions).filter(([id]) => kept.has(Number(id))));
-  const lastId = Math.max(endId, ...stored.stages.map(stage => stage.id));
-  for (let id = firstId; id <= lastId; id += 1) {
-    if (kept.has(id)) continue;
-    const difficulty = difficultyForStage(id);
-    const progress = campaignProgress(id);
-    const targets = targetsFor(difficulty, progress);
-    const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
-    let best;
-    for (let attempt = 0; attempt < 3000 && !(best && best.miss === 0); attempt += 1) {
-      const candidate = makeCandidate(id, difficulty, progress, random);
-      const quick = measure(candidate, 60, campaignSeed + attempt);
-      if (best && miss(quick, targets) > best.miss + 10) continue;
-      const rates = measure(candidate, 400, campaignSeed ^ id);
-      const score = miss(rates, targets);
-      if (!best || score < best.miss) best = { candidate, rates, miss: score };
-    }
-    const solution = findSolution(best.candidate, random);
-    if (!solution) throw new Error(`No verified ${difficulty} layout for stage ${id}.`);
-    generated.push(best.candidate);
-    solutions[id] = solution;
-    console.log(`stage ${id} ${difficulty}: skilled ${best.rates.skilled.toFixed(0)}% novice ${best.rates.novice.toFixed(0)}%`
-      + ` (target ${targets.skilled.map(Math.round).join('–')} / ${targets.novice.map(Math.round).join('–')})${best.miss ? ' *' : ''}`);
+function readJson(url, fallback) {
+  return existsSync(url) ? JSON.parse(readFileSync(url, 'utf8')) : fallback;
+}
+function writeJson(url, entries, open, close, format) {
+  const temporary = new URL(url.href + '.tmp');
+  writeFileSync(temporary, `${open}\n${entries.map(format).join(',\n')}\n${close}\n`);
+  renameSync(temporary, url);
+}
+
+function generateStage(id) {
+  const difficulty = difficultyForStage(id);
+  const progress = campaignProgress(id);
+  const targets = targetsFor(difficulty, progress);
+  const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
+  let best;
+  for (let attempt = 0; attempt < 3000 && !(best && best.miss === 0); attempt += 1) {
+    const candidate = makeCandidate(id, difficulty, progress, random);
+    const quick = measure(candidate, 60, campaignSeed + attempt);
+    if (best && miss(quick, targets) > best.miss + 10) continue;
+    const rates = measure(candidate, 400, campaignSeed ^ id);
+    const score = miss(rates, targets);
+    if (!best || score < best.miss) best = { candidate, rates, miss: score };
   }
-  generated.sort((left, right) => left.id - right.id);
-  const format = entries => entries.map(entry => '    ' + JSON.stringify(entry)).join(',\n');
-  const data = `{\n  "stages": [\n${format(generated)}\n  ],\n  "solutions": {\n${generated.map(({ id }) => `    "${id}": ${JSON.stringify(solutions[id])}`).join(',\n')}\n  }\n}\n`;
-  const temporary = new URL('generated.json.tmp', file);
-  writeFileSync(temporary, data);
-  renameSync(temporary, file);
-  console.log(`Saved ${generated.length} verified stage layouts.`);
-} finally {
-  rmdirSync(lock);
+  const solution = findSolution(best.candidate, random);
+  if (!solution) throw new Error(`No verified ${difficulty} layout for stage ${id}.`);
+  console.log(`stage ${id} ${difficulty}: skilled ${best.rates.skilled.toFixed(0)}% novice ${best.rates.novice.toFixed(0)}%`
+    + ` (target ${targets.skilled.map(Math.round).join('–')} / ${targets.novice.map(Math.round).join('–')})${best.miss ? ' *' : ''}`);
+  return { stage: best.candidate, solution };
+}
+
+// Released stages stay frozen: a stored stage is kept unless its rules revision changed or --force.
+function generateChunk(chunk) {
+  const firstId = Math.max(2, (chunk - 1) * CHUNK_SIZE + 1);
+  const lastId = Math.min(STAGE_COUNT, chunk * CHUNK_SIZE);
+  const stored = readJson(stageFile(chunk), { stages: [] }).stages;
+  const storedSolutions = readJson(solutionFile(chunk), {});
+  const stages = [];
+  const solutions = {};
+  for (let id = firstId; id <= lastId; id += 1) {
+    const previous = stored.find(stage => stage.id === id);
+    const difficulty = difficultyForStage(id);
+    const keep = !force && previous && storedSolutions[id] && previous.revision === layoutRevisions[difficulty]
+      && (previous.hidden?.flat().length ?? 0) === hiddenDessertCount(id, difficulty);
+    const result = keep ? { stage: previous, solution: storedSolutions[id] } : generateStage(id);
+    stages.push(result.stage);
+    solutions[id] = result.solution;
+  }
+  mkdirSync(new URL('.', stageFile(chunk)), { recursive: true });
+  mkdirSync(new URL('.', solutionFile(chunk)), { recursive: true });
+  writeJson(stageFile(chunk), stages, '{\n  "stages": [', '  ]\n}', stage => '    ' + JSON.stringify(stage));
+  writeJson(solutionFile(chunk), stages, '{', '}', ({ id }) => `  "${id}": ${JSON.stringify(solutions[id])}`);
+  console.log(`Saved chunk ${chunk} (stages ${firstId}–${lastId}).`);
+}
+
+if (chunkFrom === chunkTo) {
+  generateChunk(chunkFrom);
+} else {
+  // Stage seeds depend only on the stage id, so chunks can be generated in parallel processes.
+  const jobs = Number(option('--jobs') ?? availableParallelism());
+  const pending = Array.from({ length: chunkTo - chunkFrom + 1 }, (_, index) => chunkFrom + index);
+  const passOn = [...(force ? ['--force'] : []), '--seed', String(campaignSeed)];
+  let failed = false;
+  const worker = async () => {
+    for (let chunk = pending.shift(); chunk !== undefined && !failed; chunk = pending.shift()) {
+      const child = spawn(process.execPath, [new URL(import.meta.url).pathname, String(chunk), ...passOn], { stdio: ['ignore', 'inherit', 'inherit'] });
+      const code = await new Promise(resolve => child.on('close', resolve));
+      if (code !== 0) failed = true;
+    }
+  };
+  await Promise.all(Array.from({ length: jobs }, worker));
+  if (failed) process.exit(1);
 }

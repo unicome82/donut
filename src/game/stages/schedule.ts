@@ -10,9 +10,19 @@ export function difficultyForStage(id: number): StageDifficulty {
   return id <= opening.length ? opening[id - 1]! : cadence[(id - opening.length - 1) % cadence.length]!;
 }
 
-// 0 at stage 1 and 1 from the end of the campaign; generator targets tighten along it.
+// The campaign has a fixed number of stages, stored in chunks of 100 (chunk 1 = stages 1–100).
+export const STAGE_COUNT = 10_000;
+export const CHUNK_SIZE = 100;
+export const isStageId = (id: number) => Number.isInteger(id) && id >= 1 && id <= STAGE_COUNT;
+export const chunkOf = (id: number) => Math.ceil(id / CHUNK_SIZE);
+
+// Generator targets tighten along this 0–1 value: a ramp over the first 101 stages, then each
+// later 100-stage chapter climbs again from 0.75 to 1 so long play keeps a rise-and-rest rhythm.
+const chapterFloor = 0.75;
 export function campaignProgress(id: number): number {
-  return Math.min(1, Math.max(0, (id - 1) / (campaignEnd - 1)));
+  if (id <= campaignEnd) return Math.min(1, Math.max(0, (id - 1) / (campaignEnd - 1)));
+  const position = ((id - 1) % CHUNK_SIZE) / (CHUNK_SIZE - 1);
+  return chapterFloor + (1 - chapterFloor) * position;
 }
 
 // Covered ("?") desserts appear only in hard stages after stage 50: four at first,
