@@ -1,4 +1,4 @@
-import type { RewardKind, StageDefinition } from '../types';
+import type { DonutToken, RewardKind, StageDefinition } from '../types';
 import { isFeaturePreviewStage } from '../constants';
 
 // Features that join the campaign as it goes on. Both are laid over stored layouts at load time,
@@ -7,7 +7,7 @@ export const VIP_FROM_STAGE = 15;
 export const REWARDS_FROM_STAGE = 25;
 /** Seconds a finished VIP order adds to the clock. */
 export const VIP_BONUS_MS = 5_000;
-// A reward never sits within a queue's first few desserts, so it takes some digging to reach.
+// A reward slot never sits within a queue's first few desserts, so it takes some digging to reach.
 const REWARD_MIN_DEPTH = 3;
 
 function randomFor(seed: number) {
@@ -38,8 +38,7 @@ export function decorateStage(stage: StageDefinition): StageDefinition {
       index >= REWARD_MIN_DEPTH && !token.hidden ? [[column, index] as const] : []));
     if (spots.length) {
       const [column, index] = spots[random(spots.length)]!;
-      const reward: RewardKind = random(2) === 0 ? 'heart' : 'trayClear';
-      queues = queues.map((queue, c) => c !== column ? queue : queue.map((token, i) => i === index ? { ...token, reward } : token));
+      queues = withReward(queues, stage.id, column, index, random(2) === 0 ? 'heart' : 'trayClear');
     }
   }
   return { ...stage, orders, queues };
@@ -49,10 +48,15 @@ export function decorateStage(stage: StageDefinition): StageDefinition {
 function previewStage(stage: StageDefinition): StageDefinition {
   const orders = stage.orders.map((order, index) => index === 0 ? { ...order, vip: true } : order);
   if (stage.id < REWARDS_FROM_STAGE) return { ...stage, orders };
-  const rewards: Array<[number, RewardKind]> = [[1, 'heart'], [3, 'trayClear']];
-  const queues = stage.queues.map((queue, column) => {
-    const reward = rewards.find(([c]) => c === column)?.[1];
-    return reward ? queue.map((token, index) => index === 1 ? { ...token, reward } : token) : queue;
-  });
+  const queues = withReward(withReward(stage.queues, stage.id, 1, 1, 'heart'), stage.id, 3, 1, 'trayClear');
   return { ...stage, orders, queues };
+}
+
+/** Inserts a reward slot before the dessert at `index` in a queue. */
+function withReward(queues: DonutToken[][], stageId: number, column: number, index: number, reward: RewardKind): DonutToken[][] {
+  return queues.map((queue, c) => {
+    if (c !== column) return queue;
+    const slot: DonutToken = { id: `s${stageId}-reward-${column}`, type: queue[index]!.type, reward };
+    return [...queue.slice(0, index), slot, ...queue.slice(index)];
+  });
 }

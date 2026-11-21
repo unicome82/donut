@@ -1107,26 +1107,27 @@
   top: 0;
   left: 0;
   z-index: 2;
-  rotate: -10deg;
   display: grid;
+  place-content: center;
   justify-items: center;
-  padding: 2px 5px 1px;
-  border: 1.5px solid #fff6d8;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #ffe07a, #f0a92d);
-  box-shadow: 0 2px 4px #8a4d1040;
-  color: #7a3e0b;
-  font-family: Lobster, Jua, sans-serif;
-  font-size: 11px;
+  width: 40px;
+  aspect-ratio: 1;
+  border: 2px solid #fff6d8;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff1a8, #f7c443 55%, #e79a1f);
+  box-shadow: inset 0 -3px #c97a12, 0 2px 4px #8a4d1040;
+  color: #6b3407;
+  font-family: Jua, sans-serif;
+  font-size: 13px;
   line-height: 1;
   pointer-events: none;
   animation: vip-glow 1.6s ease-in-out infinite;
 }
-.vip-badge small { font-family: Jua, sans-serif; font-size: 9px; }
+.vip-badge small { margin-top: 1px; font-size: 11px; }
 .order-card--vip .customer { filter: drop-shadow(0 0 6px #ffd56acc); }
 @keyframes vip-glow {
-  0%, 100% { box-shadow: 0 2px 4px #8a4d1040, 0 0 0 #ffd56a00; }
-  50% { box-shadow: 0 2px 4px #8a4d1040, 0 0 10px #ffd56acc; }
+  0%, 100% { box-shadow: inset 0 -3px #c97a12, 0 2px 4px #8a4d1040, 0 0 0 #ffd56a00; }
+  50% { box-shadow: inset 0 -3px #c97a12, 0 2px 4px #8a4d1040, 0 0 10px #ffd56acc; }
 }
 .time-bonus-pop {
   position: absolute;
@@ -1142,30 +1143,27 @@
   animation: float-pop 1000ms ease-out both;
 }
 
-// A reward rides on a queued dessert until it is picked from the front of its queue.
-.queue-front, .queue-back { position: relative; }
-.queue-reward {
-  position: absolute;
-  top: -3px;
-  right: 0;
-  z-index: 1;
+// A reward takes a dessert-sized slot in its queue, raised like the tray-clear button.
+.reward-tile {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  border: 1.5px solid #fff;
-  border-radius: 50%;
-  background: #fff4f6;
-  box-shadow: 0 1px 3px #6b2c2c55;
-  animation: reward-bob 1.4s ease-in-out infinite;
+  aspect-ratio: 1;
+  padding-bottom: 3px;
+  border: 1px solid;
+  border-radius: 12px;
 }
-.queue-reward .heart-icon { width: 14px; height: 14px; filter: none; }
-.queue-reward--trayClear { background: #eaf6ff; }
-.queue-reward .material-symbol { width: 14px; height: 14px; background: #3d7fb8; }
-@keyframes reward-bob {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -2px; }
+.reward-tile--heart {
+  border-color: #f2b3c3;
+  background: linear-gradient(#ffeef3, #ffd9e3);
+  box-shadow: inset 0 -3px #f4b5c6, 0 2px 3px #aa6b3b20;
 }
+.reward-tile--trayClear {
+  border-color: #a9cdec;
+  background: linear-gradient(#eef7ff, #d4e9fb);
+  box-shadow: inset 0 -3px #a7cbea, 0 2px 3px #3b6baa20;
+}
+.reward-tile .heart-icon { width: 62%; height: 62%; filter: drop-shadow(0 1px 0 #ac204630); }
+.reward-tile .material-symbol { width: 62%; height: 62%; background: #3d82c4; }
 .reward-pop {
   position: fixed;
   z-index: 20;
@@ -1190,5 +1188,5 @@
   100% { opacity: 0; transform: translateY(-30px) scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .vip-badge, .queue-reward { animation: none; }
+  .vip-badge { animation: none; }
 }

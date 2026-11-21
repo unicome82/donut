@@ -14,6 +14,8 @@ export function validateStage(stage: StageDefinition): string[] {
   const supply: Partial<Record<DonutType, number>> = {};
   const demand: Partial<Record<DonutType, number>> = {};
   for (const token of stage.queues.flat()) {
+    // Reward slots are not desserts.
+    if (token.reward) { if (!token.id || ids.has(token.id)) errors.push('도넛 ID가 비어 있거나 중복됩니다.'); ids.add(token.id); continue; }
     if (!token.id || ids.has(token.id)) errors.push('도넛 ID가 비어 있거나 중복됩니다.');
     ids.add(token.id);
     if (!stage.donutTypes.includes(token.type)) errors.push('허용하지 않은 도넛입니다.');

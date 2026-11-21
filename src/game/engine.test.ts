@@ -24,7 +24,13 @@ function fixture(items: OrderDefinition['items'][]): StageDefinition {
     queues: Array.from({ length: QUEUE_COUNT }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanillaDonut' }))),
   };
 }
+// Stored solutions predate reward slots: collect a reward first when one is in the way.
+function collectReward(state: GameState, stage: StageDefinition, queue: number) {
+  const front = state.queues[queue]?.[0];
+  return front?.reward ? selectDonut(state, stage, queue, front.id).state : state;
+}
 function select(state: GameState, stage: StageDefinition, queue: number) {
+  state = collectReward(state, stage, queue);
   const front = state.queues[queue]?.[0];
   if (!front) throw new Error('빈 대기열');
   return selectDonut(state, stage, queue, front.id);
@@ -38,7 +44,7 @@ describe('스테이지 공용 시간', () => {
     expect(getStageTimeLimit(practiceStage)).toBe(10_000);
     const rate = { easy: 1.0, normal: 1.1, hard: 1.2 };
     for (const stage of stages) {
-      const desserts = stage.queues.flat().length;
+      const desserts = stage.queues.flat().filter(token => !token.reward).length;
       const limit = getStageTimeLimit(stage);
       expect(limit % 5_000).toBe(0);
       expect(limit / 1000).toBeGreaterThanOrEqual(10 + desserts * rate[stage.difficulty ?? 'easy']);
@@ -348,6 +354,7 @@ describe('스테이지 해법과 게임 불변식', () => {
     it('스테이지 ' + stage.id + '는 트레이 대기 후 매칭하는 실제 플레이 경로에서도 클리어한다', () => {
       let state = createGame(stage);
       for (const q of solutions[stage.id] ?? []) {
+        state = collectReward(state, stage, q);
         const front = state.queues[q]?.[0];
         if (!front) throw new Error('해법의 대기열이 비었습니다.');
         state = selectDonut(state, stage, q, front.id, true).state;

@@ -9,7 +9,7 @@ export function getStageTimeLimit(stage: StageDefinition): number {
   if (stage.id === 0) return 10_000;
   // Bonus stages can't be lost, so they get plenty of time.
   if (stage.id === BONUS_STAGE_ID) return 300_000;
-  const desserts = stage.queues.reduce((sum, queue) => sum + queue.length, 0);
+  const desserts = stage.queues.reduce((sum, queue) => sum + queue.filter(token => !token.reward).length, 0);
   const seconds = baseSeconds + desserts * secondsPerDessert[stage.difficulty ?? 'easy'];
   return Math.ceil(seconds / 5) * 5_000;
 }

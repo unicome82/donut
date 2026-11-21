@@ -8,7 +8,7 @@ export type GameEvent =
   | { type: 'orderCompleted'; orderId: string }
   | { type: 'orderAdded'; orderId: string; slot: number }
   | { type: 'returned'; donutId: string; queueIndex: number }
-  | { type: 'rewardCollected'; reward: RewardKind; queueIndex: number }
+  | { type: 'rewardCollected'; reward: RewardKind; donutId: string; queueIndex: number }
   | { type: 'stageCleared' };
 export interface TransitionResult { state: GameState; events: GameEvent[] }
 
@@ -101,7 +101,9 @@ function canReachNeededDessert(state: GameState): boolean {
     ? Object.entries(order.remaining).filter(([, count]) => count > 0).map(([type]) => type) : []));
   const freeSlots = state.trayCapacity - state.tray.length;
   return state.queues.some(queue => {
-    const depth = queue.findIndex(token => needed.has(token.type));
+    // Reward slots are collected without using the tray, so they add no depth.
+    const desserts = queue.filter(token => !token.reward);
+    const depth = desserts.findIndex(token => needed.has(token.type));
     return depth >= 0 && depth < freeSlots;
   });
 }
@@ -111,7 +113,8 @@ function updateStatus(state: GameState, stage: StageDefinition, events: GameEven
   if (state.completedOrders === stage.targetOrders) {
     state.status = 'clear';
     events.push({ type: 'stageCleared' });
-  } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done || canReachNeededDessert(state)) {
+  } else if (state.pendingMatchIds?.length || !trayPickups(state).next().done || canReachNeededDessert(state)
+    || state.queues.some(queue => queue[0]?.reward)) {
     state.status = 'playing';
   } else {
     state.status = state.trayClearsLeft > 0 ? 'blocked' : 'gameover';
@@ -119,43 +122,45 @@ function updateStatus(state: GameState, stage: StageDefinition, events: GameEven
   }
 }
 
-// A picked dessert drops its reward on the way to the tray; a tray clear is added at once, hearts are the session's.
-function takeReward(front: DonutToken, state: GameState, queueIndex: number, events: GameEvent[]) {
-  if (!front.reward) return { token: front, rewardState: {} };
-  const { reward, ...token } = front;
-  events.push({ type: 'rewardCollected', reward, queueIndex });
-  return {
-    token,
-    rewardState: {
-      collectedRewards: [...(state.collectedRewards ?? []), reward],
-      ...(reward === 'trayClear' ? { trayClearsLeft: state.trayClearsLeft + 1 } : {}),
-    },
+// A reward slot tapped at the front is collected on the spot: it never takes a tray slot.
+// A tray clear is added to the attempt at once; hearts belong to the session.
+function collectReward(state: GameState, stage: StageDefinition, queueIndex: number, front: DonutToken): TransitionResult {
+  const reward = front.reward!;
+  const queues = state.queues.slice();
+  queues[queueIndex] = queues[queueIndex]!.slice(1);
+  const next: GameState = {
+    ...state, queues, transitionId: state.transitionId + 1,
+    collectedRewards: [...(state.collectedRewards ?? []), reward],
+    ...(reward === 'trayClear' ? { trayClearsLeft: state.trayClearsLeft + 1 } : {}),
   };
+  const events: GameEvent[] = [{ type: 'rewardCollected', reward, donutId: front.id, queueIndex }];
+  updateStatus(next, stage, events);
+  return { state: next, events };
 }
 
 export function selectDonut(state: GameState, stage: StageDefinition, queueIndex: number, expectedDonutId: string, deferMatch = false): TransitionResult {
   const front = Number.isInteger(queueIndex) ? state.queues[queueIndex]?.[0] : undefined;
-  if (state.status !== 'playing' || state.stageId !== stage.id || !front || front.id !== expectedDonutId || state.tray.length >= state.trayCapacity) return { state, events: [] };
+  if (state.status !== 'playing' || state.stageId !== stage.id || !front || front.id !== expectedDonutId) return { state, events: [] };
+  if (front.reward) return collectReward(state, stage, queueIndex, front);
+  if (state.tray.length >= state.trayCapacity) return { state, events: [] };
   const events: GameEvent[] = [{ type: 'moved', donutId: front.id, queueIndex }];
-  const { token, rewardState } = takeReward(front, state, queueIndex, events);
   if (deferMatch) {
     const queues = state.queues.slice();
     queues[queueIndex] = queues[queueIndex]!.slice(1);
     return {
       state: {
         ...state,
-        ...rewardState,
         queues,
-        tray: [...state.tray, token],
+        tray: [...state.tray, front],
         transitionId: state.transitionId + 1,
         pendingMatchIds: [...(state.pendingMatchIds ?? []), front.id],
       },
       events,
     };
   }
-  const next = structuredClone({ ...state, ...rewardState });
+  const next = structuredClone(state);
   next.queues[queueIndex]?.shift();
-  next.tray.push({ ...token });
+  next.tray.push({ ...front });
   next.transitionId += 1;
   settle(next, stage, events);
   return { state: next, events };

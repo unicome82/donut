@@ -11,11 +11,11 @@ describe('고정 스테이지 데이터 계약', () => {
     '%s는 종류별 준비량과 주문량이 같고 지정된 트레이를 사용한다', (difficulty, variety, capacity, minDesserts, maxDesserts) => {
       for (const stage of stages.filter(stage => stage.difficulty === difficulty)) {
         expect(validateStage(stage)).toEqual([]);
-        expect(new Set(stage.queues.flat().map(token => token.type)).size).toBe(variety);
+        expect(new Set(stage.queues.flat().filter(token => !token.reward).map(token => token.type)).size).toBe(variety);
         expect(new Set(stage.orders.flatMap(order => Object.keys(order.items))).size).toBe(variety);
         expect(stage.trayCapacity).toBe(capacity);
-        expect(stage.queues.flat().length).toBeGreaterThanOrEqual(minDesserts);
-        expect(stage.queues.flat().length).toBeLessThanOrEqual(maxDesserts);
+        expect(stage.queues.flat().filter(token => !token.reward).length).toBeGreaterThanOrEqual(minDesserts);
+        expect(stage.queues.flat().filter(token => !token.reward).length).toBeLessThanOrEqual(maxDesserts);
       }
     },
   );

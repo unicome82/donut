@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createGame, selectDonut } from './engine';
 import { createSession, reduceSession } from './session';
 import { loadStage } from './stages';
 import { REWARDS_FROM_STAGE, VIP_FROM_STAGE, vipCount } from './stages/extras';
@@ -96,5 +97,19 @@ describe.runIf(FEATURE_PREVIEW_STAGES.some(isFeaturePreviewStage))('기능 미�
     const stage25 = await loadStage(25);
     expect(stage25.orders[0]?.vip).toBe(true);
     expect([stage25.queues[1]![1]!.reward, stage25.queues[3]![1]!.reward]).toEqual(['heart', 'trayClear']);
+  });
+});
+
+describe('보상 칸', () => {
+  it('트레이를 쓰지 않고, 트레이가 가득해도 맨 앞에 있으면 받을 수 있다', async () => {
+    const stage = await loadStage(real(REWARDS_FROM_STAGE));
+    const spot = rewardSpot({ queues: stage.queues } as GameState)!;
+    const queues = stage.queues.map((queue, column) => column === spot.column ? queue.slice(spot.index) : queue);
+    const full = { ...createGame(stage), queues, tray: Array.from({ length: stage.trayCapacity }, (_, i) => ({ id: `t${i}`, type: stage.donutTypes[0]! })) };
+    const front = queues[spot.column]![0]!;
+    const { state, events } = selectDonut(full, stage, spot.column, front.id);
+    expect(events).toEqual([{ type: 'rewardCollected', reward: spot.reward, donutId: front.id, queueIndex: spot.column }]);
+    expect(state.tray).toHaveLength(stage.trayCapacity);
+    expect(state.queues[spot.column]).toHaveLength(queues[spot.column]!.length - 1);
   });
 });

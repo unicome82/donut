@@ -43,12 +43,7 @@ function createSessionGame(stageId: number, trayClears: number, rewardedStages: 
 /** A stage whose reward was already collected comes back without it, so retries can't farm it. */
 function withoutSpentRewards(game: GameState, rewardedStages: readonly number[]): GameState {
   if (!rewardedStages.includes(game.stageId) || isFeaturePreviewStage(game.stageId)) return game;
-  return { ...game, queues: game.queues.map(queue => queue.map(token => {
-    if (!token.reward) return token;
-    const { reward, ...rest } = token;
-    void reward;
-    return rest;
-  })) };
+  return { ...game, queues: game.queues.map(queue => queue.filter(token => !token.reward)) };
 }
 /** A heart reward fills the regular hearts first and spills into the bonus pool when they are full. */
 function grantHeart(hearts: Hearts, now: number): Hearts {
