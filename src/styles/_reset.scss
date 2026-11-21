@@ -6,4 +6,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
 button:disabled { cursor: default; }
 button, a { -webkit-tap-highlight-color: transparent; }
 svg { display: block; }
-button:focus-visible { outline: 3px solid #40746a; outline-offset: 4px; }
+button:focus, button:focus-visible { outline: none; }

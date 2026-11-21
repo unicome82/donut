@@ -475,10 +475,10 @@
   min-width: 18px;
   height: 18px;
   padding-inline: 4px;
-  border: 1.5px solid #fff;
+  border: 1.5px solid #f3c1cd;
   border-radius: 999px;
-  background: #e45471;
-  color: #fff;
+  background: #fff;
+  color: #d43c63;
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
@@ -617,7 +617,6 @@
   touch-action: none;
 }
 .queue-column--returning { border-color: #d38c76; background: #ffe2c7; }
-.queue-column:focus-visible { outline-offset: -3px; }
 .queue-column:not(:disabled):active .queue-front .donut { transform: translateY(2px); }
 .queue-front, .queue-back { display: grid; place-items: center; pointer-events: none; width: 100%; min-width: 0; }
 .queue-front .donut { width: min(100%, 40px); }
@@ -675,28 +674,34 @@
   text-shadow: 0 1px 2px #87314680;
 }
 .glass-popup .secondary-button, .start-actions .secondary-button {
-  min-height: 45px;
+  min-height: 54px;
   --secondary-top: #fffaf4;
   --secondary-bottom: #fbe4d4;
   color: #703b27;
-  font-size: clamp(12px, 3.6vw, 15px);
+  font-size: 18px;
   gap: 5px;
 }
-.start-actions .stage-button { min-height: 58px; }
+.start-actions .stage-button { min-height: 62px; font-size: clamp(32px, 9vw, 40px); }
 .glass-popup button .material-symbol { width: 1.25em; height: 1.25em; }
-.tray-clear-button:focus { outline: none; }
-.tray-clear-button:focus-visible { filter: brightness(1.08); }
+.tray-clear-button { position: relative; }
 .tray-clear-count {
-  display: inline-grid;
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: grid;
   place-items: center;
-  min-width: 1.6em;
-  height: 1.6em;
-  margin-inline-start: .25em;
-  padding-inline: .3em;
+  min-width: 24px;
+  height: 24px;
+  padding-inline: 6px;
+  border: 2px solid #fff;
   border-radius: 999px;
-  background: #fff2e6;
-  color: #723f2b;
+  background: #ff2d87;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
   text-shadow: none;
+  box-shadow: 0 1px 3px #8c3f3d50;
 }
 
 .result-panel {
