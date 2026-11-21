@@ -10,7 +10,7 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getStage, isBonusStage, STAGE_COUNT } from '../game/stages';
+import { getStage, isBonusStage, practiceStage, STAGE_COUNT } from '../game/stages';
 import { HeartIcon } from '../components/HeartIcon';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
@@ -299,8 +299,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const bonus = isBonusStage(state.stageId);
   // A bonus stage opens with its title in the middle; taps wait until it has gone.
   const [bonusIntro, setBonusIntro] = useState(bonus);
-  const playBonusIntroSound = useEffectEvent(() => { if (soundEnabled) playSound('bonusStart'); });
-  useEffect(() => { if (bonus) playBonusIntroSound(); }, [bonus]);
+  // Every stage opens with a chime (practice excepted); bonus stages get a grander one.
+  const playStartSound = useEffectEvent(() => {
+    if (soundEnabled && state.stageId !== practiceStage.id) playSound(bonus ? 'bonusStart' : 'stageStart');
+  });
+  useEffect(() => { playStartSound(); }, [round]);
   useEffect(() => {
     if (!bonusIntro) return;
     const timer = setTimeout(() => setBonusIntro(false), BONUS_INTRO_MS);

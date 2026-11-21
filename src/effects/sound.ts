@@ -165,8 +165,8 @@ const cueBuilders = {
     ],
     echo: true,
   }),
-  // Bonus stage opening: a quick sparkling C–E–G–C climb that lands as the title pops.
-  bonusStart: (): Cue => ({
+  // Stage opening: a quick sparkling C–E–G–C climb.
+  stageStart: (): Cue => ({
     tones: [
       { at: 0, freq: 523.25, dur: 0.32, level: 0.11, attack: 0.008, partials: bell },
       { at: 0.08, freq: 659.25, dur: 0.32, level: 0.115, attack: 0.008, partials: bell },
@@ -177,6 +177,30 @@ const cueBuilders = {
       { at: 0.42, freq: 2637.02, dur: 0.35, level: 0.025, attack: 0.006, partials: pure },
     ],
     noises: [{ at: 0.24, freq: 7000, dur: 0.3, level: 0.06, attack: 0.02, q: 0.8, filter: 'highpass' }],
+    echo: true,
+  }),
+  // Bonus stage opening, a grander take on stageStart: a two-octave run up to a full C major chord
+  // as the title pops, then a glittering cascade on top.
+  bonusStart: (): Cue => ({
+    tones: [
+      ...[523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51].map((freq, index) => ({
+        at: index * 0.045, freq, dur: 0.22, level: 0.085 + index * 0.004, attack: 0.006, partials: bell,
+      })),
+      // The chord lands with the title.
+      { at: 0.36, freq: 261.63, dur: 1.1, level: 0.09, attack: 0.02, partials: bell },
+      { at: 0.36, freq: 523.25, dur: 1.05, level: 0.1, attack: 0.015, partials: bell },
+      { at: 0.36, freq: 659.25, dur: 1.0, level: 0.1, attack: 0.015, partials: bell },
+      { at: 0.36, freq: 783.99, dur: 1.0, level: 0.1, attack: 0.015, partials: bell },
+      { at: 0.36, freq: 1567.98, dur: 1.1, level: 0.12, attack: 0.01, partials: bell },
+      // Glitter falling over the chord.
+      ...[3135.96, 2637.02, 2093, 2637.02, 3135.96, 4186.01].map((freq, index) => ({
+        at: 0.44 + index * 0.07, freq, dur: 0.3, level: 0.028, attack: 0.004, partials: pure,
+      })),
+    ],
+    noises: [
+      { at: 0.3, freq: 7500, dur: 0.6, level: 0.07, attack: 0.03, q: 0.7, filter: 'highpass' },
+      { at: 0, freq: 2500, to: 9000, dur: 0.36, level: 0.03, attack: 0.2, q: 0.9, filter: 'bandpass' },
+    ],
     echo: true,
   }),
   clear: (): Cue => ({
