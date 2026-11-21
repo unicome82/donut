@@ -2,7 +2,7 @@ import { memo } from 'react';
 import type { DonutType } from '../../game/types';
 
 const narrowDesserts = new Set<DonutType>([
-  'vanillaIceCream', 'chocolateIceCream', 'blueberryCupcake', 'chocolateCupcake', 'cake', 'chocolateCake',
+  'vanillaIceCream', 'chocolateIceCream', 'blueberryCupcake', 'chocolateCupcake', 'strawberryCake', 'chocolateCake',
 ]);
 const menuImages = import.meta.glob<string>('../../assets/menu/*.webp', { eager: true, import: 'default', query: '?url&no-inline' });
 

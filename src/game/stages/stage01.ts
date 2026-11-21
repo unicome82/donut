@@ -15,8 +15,8 @@ export const stage01: StageDefinition = {
     "cinnamonCroffle",
     "lemonMacaron",
     "strawberryTart",
-    "coconut",
-    "chocolate"
+    "hamSandwich",
+    "chocolateDonut"
   ],
   "targetOrders": 11,
   "trayCapacity": TRAY_CAPACITY_BY_DIFFICULTY.easy,
@@ -92,27 +92,27 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "s1-q0-17",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       },
       {
         "id": "s1-q0-18",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       },
       {
         "id": "s1-q0-19",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       },
       {
         "id": "s1-q0-20",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       },
       {
         "id": "s1-q0-21",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       },
       {
         "id": "s1-q0-22",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       }
     ],
     [
@@ -256,27 +256,27 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "s1-q2-14",
-        "type": "coconut"
+        "type": "hamSandwich"
       },
       {
         "id": "s1-q2-15",
-        "type": "coconut"
+        "type": "hamSandwich"
       },
       {
         "id": "s1-q2-16",
-        "type": "coconut"
+        "type": "hamSandwich"
       },
       {
         "id": "s1-q2-17",
-        "type": "coconut"
+        "type": "hamSandwich"
       },
       {
         "id": "s1-q2-18",
-        "type": "coconut"
+        "type": "hamSandwich"
       },
       {
         "id": "s1-q2-19",
-        "type": "coconut"
+        "type": "hamSandwich"
       }
     ],
     [
@@ -318,7 +318,7 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "s1-q3-9",
-        "type": "coconut"
+        "type": "hamSandwich"
       }
     ],
     [
@@ -476,7 +476,7 @@ export const stage01: StageDefinition = {
       },
       {
         "id": "s1-q6-11",
-        "type": "chocolate"
+        "type": "chocolateDonut"
       }
     ],
     [
@@ -618,7 +618,7 @@ export const stage01: StageDefinition = {
       "sequence": 10,
       "items": {
         "strawberryTart": 6,
-        "chocolate": 7
+        "chocolateDonut": 7
       }
     },
     {
@@ -626,7 +626,7 @@ export const stage01: StageDefinition = {
       "sequence": 11,
       "items": {
         "matchaCroffle": 6,
-        "coconut": 7
+        "hamSandwich": 7
       }
     }
   ]

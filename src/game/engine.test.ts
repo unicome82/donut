@@ -17,11 +17,11 @@ const stages = await loadAllStages();
 const replayed = process.env.STAGES_FULL === '1' ? stages : stages.filter(stage => stage.id <= 200 || stage.id % 97 === 0);
 
 function fixture(items: OrderDefinition['items'][]): StageDefinition {
-  const types: DonutType[] = ['strawberry', 'chocolate', 'vanilla'];
+  const types: DonutType[] = ['strawberryDonut', 'chocolateDonut', 'vanillaDonut'];
   return {
     id: 1, revision: 1, donutTypes: types, targetOrders: items.length, trayCapacity: BASE_TRAY_CAPACITY,
     orders: items.map((item, i) => ({ id: 'o' + i, sequence: i + 1, items: item })),
-    queues: Array.from({ length: QUEUE_COUNT }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanilla' }))),
+    queues: Array.from({ length: QUEUE_COUNT }, (_, q) => Array.from({ length: 20 }, (_, i) => ({ id: q + '-' + i, type: types[q % 3] ?? 'vanillaDonut' }))),
   };
 }
 function select(state: GameState, stage: StageDefinition, queue: number) {
@@ -78,11 +78,11 @@ describe('스테이지 공용 시간', () => {
 
 describe('자동 매칭과 상태 전이', () => {
   it('손님별 첫 디저트는 동시에 나가고 다음 디저트는 해당 손님이 준비될 때까지 기다린다', () => {
-    const stage = fixture([{ strawberry: 2 }, { chocolate: 1 }, { strawberry: 1, vanilla: 1 }]);
+    const stage = fixture([{ strawberryDonut: 2 }, { chocolateDonut: 1 }, { strawberryDonut: 1, vanillaDonut: 1 }]);
     const state = createGame(stage);
     state.tray = [
-      { id: 'a', type: 'strawberry' }, { id: 'b', type: 'strawberry' },
-      { id: 'c', type: 'chocolate' }, { id: 'd', type: 'vanilla' },
+      { id: 'a', type: 'strawberryDonut' }, { id: 'b', type: 'strawberryDonut' },
+      { id: 'c', type: 'chocolateDonut' }, { id: 'd', type: 'vanillaDonut' },
     ];
     state.pendingMatchIds = ['d'];
 
@@ -101,34 +101,34 @@ describe('자동 매칭과 상태 전이', () => {
   });
 
   it('주문 도넛도 먼저 트레이에 남고 준비 완료 후에만 소비한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const queued = selectDonut(createGame(stage), stage, 0, '0-0', true).state;
     expect(queued.tray.map(token => token.id)).toEqual(['0-0']);
-    expect(queued.orders[0]?.remaining.strawberry).toBe(2);
+    expect(queued.orders[0]?.remaining.strawberryDonut).toBe(2);
     const matched = matchTray(queued, stage, '0-0').state;
     expect(matched.tray).toHaveLength(0);
-    expect(matched.orders[0]?.remaining.strawberry).toBe(1);
+    expect(matched.orders[0]?.remaining.strawberryDonut).toBe(1);
   });
   it('두 번 연속 올린 도넛은 각각 준비 완료된 뒤 소비한다', () => {
-    const stage = fixture([{ strawberry: 2 }, { vanilla: 3 }]);
+    const stage = fixture([{ strawberryDonut: 2 }, { vanillaDonut: 3 }]);
     const first = selectDonut(createGame(stage), stage, 0, '0-0', true).state;
     const second = selectDonut(first, stage, 0, '0-1', true).state;
     expect(second.tray).toHaveLength(2);
     const readyFirst = matchTray(second, stage, '0-0').state;
     expect(readyFirst.tray.map(token => token.id)).toEqual(['0-1']);
-    expect(readyFirst.orders[0]?.remaining.strawberry).toBe(1);
+    expect(readyFirst.orders[0]?.remaining.strawberryDonut).toBe(1);
     const readySecond = matchTray(readyFirst, stage, '0-1').state;
     expect(readySecond.tray).toHaveLength(0);
     expect(readySecond.completedOrders).toBe(1);
   });
   it('가장 먼저 담은 매칭 디저트부터 한 개씩 전달하고 새 손님의 준비를 기다린다', () => {
-    const stage = fixture([{ chocolate: 1 }, { strawberry: 1 }, { strawberry: 1 }, { strawberry: 1 }, { chocolate: 1 }]);
+    const stage = fixture([{ chocolateDonut: 1 }, { strawberryDonut: 1 }, { strawberryDonut: 1 }, { strawberryDonut: 1 }, { chocolateDonut: 1 }]);
     const initial = createGame(stage);
     initial.tray = [
-      { id: 'unmatched', type: 'vanilla' },
-      { id: 'first', type: 'chocolate' },
-      { id: 'second', type: 'strawberry' },
-      { id: 'replacement', type: 'chocolate' },
+      { id: 'unmatched', type: 'vanillaDonut' },
+      { id: 'first', type: 'chocolateDonut' },
+      { id: 'second', type: 'strawberryDonut' },
+      { id: 'replacement', type: 'chocolateDonut' },
     ];
     initial.pendingMatchIds = ['first'];
     const readyOrders = ['o0', 'o1', 'o2', 'o3'];
@@ -144,9 +144,9 @@ describe('자동 매칭과 상태 전이', () => {
     expect(pickupTray(second.state, stage, [...readyOrders, 'o4']).state.tray.map(token => token.id)).toEqual(['unmatched']);
   });
   it('트레이가 가득 차도 준비 중인 도넛이 있으면 실패 판정을 기다린다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const initial = createGame(stage);
-    initial.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
+    initial.tray = tray('vanillaDonut', BASE_TRAY_CAPACITY - 1);
     const queued = selectDonut(initial, stage, 0, '0-0', true).state;
     expect(queued.tray).toHaveLength(BASE_TRAY_CAPACITY);
     expect(queued.status).toBe('playing');
@@ -156,21 +156,21 @@ describe('자동 매칭과 상태 전이', () => {
     expect(matched.tray).toHaveLength(BASE_TRAY_CAPACITY - 1);
   });
   it('마지막 준비 도넛도 주문에 없으면 가득 찬 트레이를 비울 수 있다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const initial = createGame(stage);
-    initial.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
+    initial.tray = tray('vanillaDonut', BASE_TRAY_CAPACITY - 1);
     const queued = selectDonut(initial, stage, 2, '2-0', true).state;
     expect(queued.status).toBe('playing');
     expect(matchTray(queued, stage, '2-0').state.status).toBe('blocked');
   });
   it('재시작 후 이전 도넛의 준비 완료 액션은 무시한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const initial = createGame(stage);
     expect(matchTray(initial, stage, '0-0').state).toBe(initial);
   });
 
   it('연속 두 입력은 새 맨 앞 ID로 각각 처리하고 이전 ID 중복만 무시한다', () => {
-    const stage = fixture([{ strawberry: 16 }]);
+    const stage = fixture([{ strawberryDonut: 16 }]);
     const initial = createGame(stage);
     const first = select(initial, stage, 2).state;
     const second = select(first, stage, 2).state;
@@ -180,39 +180,39 @@ describe('자동 매칭과 상태 전이', () => {
   });
 
   it('선택한 토큰은 대기열에서 제거되고 한 번만 소비된다', () => {
-    const stage = fixture([{ strawberry: 2 }, { strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }, { strawberryDonut: 2 }]);
     const original = createGame(stage);
     const snapshot = structuredClone(original);
     const result = select(original, stage, 0);
     expect(original).toEqual(snapshot);
     expect(result.state.queues[0]).toHaveLength(19);
-    expect(result.state.orders[0]?.remaining.strawberry).toBe(1);
-    expect(result.state.orders[1]?.remaining.strawberry).toBe(2);
+    expect(result.state.orders[0]?.remaining.strawberryDonut).toBe(1);
+    expect(result.state.orders[1]?.remaining.strawberryDonut).toBe(2);
     expect(result.state.tray).toHaveLength(0);
     expect(result.events.filter(e => e.type === 'consumed')).toHaveLength(1);
     expect(selectDonut(result.state, stage, 0, '0-0').state).toBe(result.state);
   });
   it('화면 슬롯과 무관하게 주문 번호가 낮은 순서로 배정한다', () => {
-    const stage = fixture([{ strawberry: 2 }, { strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }, { strawberryDonut: 2 }]);
     const state = createGame(stage);
     [state.orders[0], state.orders[1]] = [state.orders[1] ?? null, state.orders[0] ?? null];
     const next = select(state, stage, 0).state;
-    expect(next.orders[1]?.remaining.strawberry).toBe(1);
-    expect(next.orders[0]?.remaining.strawberry).toBe(2);
+    expect(next.orders[1]?.remaining.strawberryDonut).toBe(1);
+    expect(next.orders[0]?.remaining.strawberryDonut).toBe(2);
   });
   it('필요하지 않은 도넛은 트레이에 남는다', () => {
-    const stage = fixture([{ strawberry: 1 }]);
+    const stage = fixture([{ strawberryDonut: 1 }]);
     const next = select(createGame(stage), stage, 2).state;
-    expect(next.tray[0]?.type).toBe('vanilla');
+    expect(next.tray[0]?.type).toBe('vanillaDonut');
     expect(next.completedOrders).toBe(0);
   });
   it('동시 완료 후 새 주문과 남은 트레이를 연쇄 매칭한다', () => {
-    const stage = fixture([{ strawberry: 1 }, { chocolate: 1 }, { strawberry: 1 }, { chocolate: 1 }, { vanilla: 1 }, { vanilla: 1 }]);
+    const stage = fixture([{ strawberryDonut: 1 }, { chocolateDonut: 1 }, { strawberryDonut: 1 }, { chocolateDonut: 1 }, { vanillaDonut: 1 }, { vanillaDonut: 1 }]);
     const state = createGame(stage);
     state.tray = [
-      { id: 'a', type: 'strawberry' }, { id: 'b', type: 'chocolate' },
-      { id: 'c', type: 'strawberry' }, { id: 'd', type: 'chocolate' },
-      { id: 'e', type: 'vanilla' },
+      { id: 'a', type: 'strawberryDonut' }, { id: 'b', type: 'chocolateDonut' },
+      { id: 'c', type: 'strawberryDonut' }, { id: 'd', type: 'chocolateDonut' },
+      { id: 'e', type: 'vanillaDonut' },
     ];
     const result = select(state, stage, 2);
     expect(result.state.status).toBe('clear');
@@ -223,15 +223,15 @@ describe('자동 매칭과 상태 전이', () => {
     expect(result.events.filter(e => e.type === 'orderAdded')).toHaveLength(2);
   });
   it('트레이가 차도 매칭 후 공간이 생기면 실패하지 않는다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const state = createGame(stage);
-    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
+    state.tray = tray('vanillaDonut', BASE_TRAY_CAPACITY - 1);
     const next = select(state, stage, 0).state;
     expect(next.status).toBe('playing');
     expect(next.tray).toHaveLength(BASE_TRAY_CAPACITY - 1);
   });
   it('가득 찬 트레이를 비우면 디저트가 원래 열의 맨 뒤로 돌아가고 남은 횟수가 줄어든다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     let state = createGame(stage);
     const columns = Array.from({ length: BASE_TRAY_CAPACITY }, (_, index) => index % 2 + 1);
     for (const column of columns) state = select(state, stage, column).state;
@@ -259,7 +259,7 @@ describe('자동 매칭과 상태 전이', () => {
     expect(state.status).toBe('gameover');
   });
   it('비울 수 없는 상태와 비정상 액션을 안전하게 처리한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const state = createGame(stage);
     expect(reduceGame(state, { type: 'CLEAR_TRAY' }, stage)).toBe(state);
     for (const index of [-1, 0.5, QUEUE_COUNT, NaN]) expect(selectDonut(state, stage, index, 'bad').state).toBe(state);
@@ -267,26 +267,26 @@ describe('자동 매칭과 상태 전이', () => {
     expect(selectDonut({ ...state, status: 'clear' }, stage, 0, '0-0').events).toEqual([]);
   });
   it('클리어를 트레이 용량과 대기열 소진보다 먼저 판정한다', () => {
-    const stage = fixture([{ strawberry: 1 }]);
+    const stage = fixture([{ strawberryDonut: 1 }]);
     const state = createGame(stage);
-    state.tray = tray('vanilla', BASE_TRAY_CAPACITY - 1);
-    state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
+    state.tray = tray('vanillaDonut', BASE_TRAY_CAPACITY - 1);
+    state.queues = [[{ id: 'last', type: 'strawberryDonut' }], [], [], [], [], []];
     expect(select(state, stage, 0).state.status).toBe('clear');
   });
   it('대기열이 소진돼 필요한 디저트가 없으면 트레이에 공간이 있어도 막힘으로 판정한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const state = createGame(stage);
-    state.queues = [[{ id: 'last', type: 'strawberry' }], [], [], [], [], []];
+    state.queues = [[{ id: 'last', type: 'strawberryDonut' }], [], [], [], [], []];
     const exhausted = select(state, stage, 0).state;
     expect(exhausted).toMatchObject({ status: 'blocked', blockedReason: 'stuck' });
     expect(exhausted.tray.length).toBeLessThan(exhausted.trayCapacity);
   });
   it('남은 칸으로 필요한 디저트에 닿을 수 없으면 막힘, 닿을 수 있으면 계속 진행한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
-    const blockers = (count: number) => Array.from({ length: count }, (_, i) => ({ id: 'b' + i, type: 'vanilla' as DonutType }));
+    const stage = fixture([{ strawberryDonut: 2 }]);
+    const blockers = (count: number) => Array.from({ length: count }, (_, i) => ({ id: 'b' + i, type: 'vanillaDonut' as DonutType }));
     const base = createGame(stage);
     // A strawberry sits behind three blockers: four free slots reach it, three do not.
-    const queues = [[...blockers(3), { id: 'goal', type: 'strawberry' as DonutType }], [], [], [], [], stage.queues[5]!.slice(0, 1)];
+    const queues = [[...blockers(3), { id: 'goal', type: 'strawberryDonut' as DonutType }], [], [], [], [], stage.queues[5]!.slice(0, 1)];
     const reachable = select({ ...base, queues, trayCapacity: 5 }, stage, 5).state;
     expect(reachable.status).toBe('playing');
     const stuck = select({ ...base, queues, trayCapacity: 4 }, stage, 5).state;
@@ -299,7 +299,7 @@ describe('자동 매칭과 상태 전이', () => {
     expect(lost).toMatchObject({ status: 'gameover', blockedReason: 'stuck' });
   });
   it('일시정지·재개·재시작은 입력을 제어하고 스테이지 원본을 보존한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const initial = createGame(stage);
     const paused = reduceGame(initial, { type: 'PAUSE' }, stage);
     expect(select(paused, stage, 0).state).toBe(paused);
@@ -311,14 +311,14 @@ describe('자동 매칭과 상태 전이', () => {
     expect(stage.queues[0]).toHaveLength(20);
   });
   it('동일 입력에는 동일한 상태와 이벤트를 반환한다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const state = createGame(stage);
     expect(select(state, stage, 0)).toEqual(select(state, stage, 0));
   });
   it.each([[0, 3], [1, 2], [2, 2], [3, 1]])('잔여량 %i의 별점은 %i이다', (count, expected) => {
-    const state = createGame(fixture([{ strawberry: 1 }]));
+    const state = createGame(fixture([{ strawberryDonut: 1 }]));
     state.status = 'clear';
-    state.tray = tray('vanilla', count);
+    state.tray = tray('vanillaDonut', count);
     expect(getStars(state)).toBe(expected);
     expect(getStars({ ...state, status: 'gameover' })).toBe(0);
   });
@@ -444,7 +444,7 @@ describe('세션 진행', () => {
   });
 
   it('게임 중에도 트레이를 비울 수 있지만 비어 있으면 비울 수 없다', () => {
-    const stage = fixture([{ strawberry: 2 }]);
+    const stage = fixture([{ strawberryDonut: 2 }]);
     const empty = createGame(stage);
     expect(clearTray(empty, stage).state).toBe(empty);
     const queues = empty.queues.map(queue => [...queue]);
@@ -457,7 +457,7 @@ describe('세션 진행', () => {
   it('테스트 스테이지은 손님 한 명의 디저트 하나로 완료되며 일반 진행에 영향을 주지 않는다', () => {
     const initial = createSession();
     const practice = reduceSession(initial, { type: 'START', stageId: practiceStage.id });
-    const queueIndex = practice.game.queues.findIndex(queue => queue[0]?.type === 'strawberry');
+    const queueIndex = practice.game.queues.findIndex(queue => queue[0]?.type === 'strawberryDonut');
     const front = practice.game.queues[queueIndex]?.[0];
     if (!front) throw new Error('테스트 디저트가 없습니다.');
     expect(practice.game.orders.filter(Boolean)).toHaveLength(1);
@@ -472,7 +472,7 @@ describe('세션 진행', () => {
     let state = createGame(practiceStage);
     function fillTray() {
       while (state.status === 'playing') {
-        const column = state.queues.findIndex(queue => queue[0]?.type === 'chocolate');
+        const column = state.queues.findIndex(queue => queue[0]?.type === 'chocolateDonut');
         expect(column).toBeGreaterThanOrEqual(0);
         state = select(state, practiceStage, column).state;
       }
