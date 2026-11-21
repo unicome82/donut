@@ -1,3 +1,14 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-export default defineConfig({ base: './', plugins: [react()] });
+
+// Every supported browser reads WOFF2, so drop the WOFF fallbacks Fontsource lists.
+const woff2Only: Plugin = {
+  name: 'woff2-only',
+  enforce: 'pre',
+  transform(code, id) {
+    if (!id.includes('@fontsource/') || !id.endsWith('.css')) return;
+    return code.replace(/,\s*url\([^)]+\.woff\)\s*format\('woff'\)/g, '');
+  },
+};
+
+export default defineConfig({ base: './', plugins: [woff2Only, react()] });
