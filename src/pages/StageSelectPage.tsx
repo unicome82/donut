@@ -11,15 +11,17 @@ import { SoundButton } from '../components/SoundControls';
 const columns = 3;
 const rowHeight = 146;
 const overscan = 2;
-// Practice first, then every stage id; tiles need only the id, so no stage data is loaded here.
-const optionCount = STAGE_COUNT + 1;
-const rowCount = Math.ceil(optionCount / columns);
+// Locked stages listed past the last open one, as a short preview of what comes next.
+const LOCKED_PREVIEW = 12;
 const optionId = (index: number) => index === 0 ? practiceStage.id : index;
 
 export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
   const t = useMessages();
   const openThrough = unlockedThrough(stars, unlockAllStages);
   const currentStage = unlockedThrough(stars);
+  // Practice first, then stage ids up to the preview; tiles need only the id, so no stage data loads here.
+  const optionCount = Math.min(STAGE_COUNT, openThrough + LOCKED_PREVIEW) + 1;
+  const rowCount = Math.ceil(optionCount / columns);
   const currentRow = Math.floor(currentStage / columns);
   const scrollArea = useRef<HTMLDivElement>(null);
   const [viewport, setViewport] = useState({ top: currentRow * rowHeight, height: 0 });
