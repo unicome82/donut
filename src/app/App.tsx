@@ -74,7 +74,7 @@ export function App() {
       : screen === 'stages'
         ? <StageSelectPage stars={stars} hearts={session.hearts} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} unlockAllStages={session.unlockAllStages} onGame={start} />
         : <GamePage key={game.stageId} soundEnabled={soundEnabled} onToggleSound={toggleSound} state={game} dispatch={action => dispatch({ type: 'GAME', action, now: Date.now() })} onStages={() => dispatch({ type: 'STAGES' })} onNext={next}
-          canRestart={() => canAffordAttempt(session, game.stageId)} onOutOfHearts={() => setOutOfHearts(true)} />
+          canRestart={() => canAffordAttempt(session, game.stageId)} onOutOfHearts={() => setOutOfHearts(true)} hearts={session.hearts} />
     }
     {outOfHearts && <NoHeartsDialog hearts={session.hearts} onClose={closeOutOfHearts} />}
     {loadingStage !== undefined && <p className="stage-loading" role="status">Loading…</p>}

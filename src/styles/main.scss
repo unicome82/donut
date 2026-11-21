@@ -1012,24 +1012,43 @@
 .heart-icon { display: block; flex: none; width: 22px; height: 22px; fill: #e94873; filter: drop-shadow(0 1px 0 #ac204640); }
 .heart-icon--empty { fill: #d9c3b6; }
 .heart-counter {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   height: 40px;
-  padding: 0 12px 0 9px;
+  padding: 0 12px 0 6px;
   border: 1px solid #fff9f3;
   border-radius: 20px;
   background: linear-gradient(#fffaf4, #fceadc);
   color: #813f29;
   box-shadow: inset 0 1px #fff9, 0 3px #d5a184, 0 5px 8px #713d2b40;
-  font-size: 18px;
   line-height: 1;
   white-space: nowrap;
   pointer-events: auto;
 }
-.heart-counter-count, .heart-counter-timer { padding-top: 2.5px; }
-.heart-counter-extra { margin-left: 1px; color: #e94873; font-size: 15px; }
-.heart-counter-timer { padding-left: 6px; border-left: 1px solid #e7c9b6; color: #a0715a; font-size: 14px; font-variant-numeric: tabular-nums; }
+.heart-counter--full { padding-right: 6px; }
+.heart-counter-heart { display: grid; place-items: center; width: 30px; height: 30px; }
+.heart-counter-heart .heart-icon { grid-area: 1 / 1; width: 30px; height: 30px; }
+// Jua draws about 1px high, so the number is nudged down to sit in the heart's middle.
+.heart-counter-count { position: relative; grid-area: 1 / 1; padding-top: 2px; color: white; font-size: 15px; text-shadow: 0 1px 1px #ac2046; }
+.heart-counter-bonus {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 2px 4px 0;
+  border: 1.5px solid white;
+  border-radius: 9px;
+  background: #e5262f;
+  color: white;
+  font-size: 11px;
+  box-shadow: 0 1px 2px #7a1a1a59;
+}
+.heart-counter-timer { padding-top: 2.5px; color: #a0715a; font-size: 15px; font-variant-numeric: tabular-nums; }
 .top-hearts {
   position: absolute;
   top: calc(12px + var(--safe-top));
@@ -1037,6 +1056,7 @@
   z-index: 1;
 }
 .stage-navigation .heart-counter { margin-right: auto; }
+.game-hearts { position: absolute; top: calc(12px + var(--safe-top)); left: max(16px, env(safe-area-inset-left)); z-index: 4; }
 .result-heart {
   display: flex;
   margin-top: clamp(14px, 3dvh, 26px);

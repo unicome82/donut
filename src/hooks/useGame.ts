@@ -2,6 +2,7 @@ import { useEffect, useReducer } from 'react';
 import { createSession, reduceSession } from '../game/session';
 import { UNLOCK_ALL_STAGES_FOR_TESTING } from '../game/constants';
 import { isStageId } from '../game/stages';
+import { parseHearts } from '../game/hearts';
 
 const progressKey = 'sweet-order-progress-v1';
 
@@ -21,10 +22,8 @@ function loadSession() {
     }
     if (Number.isSafeInteger(saved.score) && saved.score >= 0) session.score = saved.score;
     // Saves from before the three-clear start (no clearsVersion) begin again with the new pool.
-    const hearts = saved.hearts;
-    if (hearts && Number.isSafeInteger(hearts.count) && hearts.count >= 0 && hearts.count <= 99 && Number.isFinite(hearts.refillFrom)) {
-      session.hearts = { count: hearts.count, refillFrom: hearts.refillFrom };
-    }
+    const hearts = parseHearts(saved.hearts);
+    if (hearts) session.hearts = hearts;
     if (saved.clearsVersion === 2 && Number.isSafeInteger(saved.trayClears) && saved.trayClears >= 0) session.trayClears = saved.trayClears;
   } catch {
     return session;

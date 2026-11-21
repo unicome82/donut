@@ -12,6 +12,8 @@ import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
 import { getStage, isBonusStage, STAGE_COUNT } from '../game/stages';
 import { HeartIcon } from '../components/HeartIcon';
+import { HeartCounter } from '../components/HeartCounter';
+import type { Hearts } from '../game/hearts';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -33,8 +35,9 @@ interface Props {
   soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void;
   /** Whether a heart is available for another attempt; when not, onOutOfHearts runs instead of the restart. */
   canRestart: () => boolean; onOutOfHearts: () => void;
+  hearts: Hearts;
 }
-export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound, canRestart, onOutOfHearts }: Props) {
+export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound, canRestart, onOutOfHearts, hearts }: Props) {
   const t = useMessages();
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
@@ -334,6 +337,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }, [showResult, status, urgent]);
   useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
+    {!showResult && <HeartCounter hearts={hearts} className="game-hearts" />}
     {!showResult && <GameHeader stage={state.stageId} title={bonus ? 'Bonus Stage' : undefined} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>

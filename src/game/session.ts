@@ -1,7 +1,7 @@
 import { createGame, getStars } from './engine';
 import { getStage, isBonusStage, isStageId, practiceStage, prepareBonusStage, STAGE_COUNT } from './stages';
 import { reduceGame, type GameAction } from './reducer';
-import { addHearts, fullHearts, MAX_HEARTS, refillHearts, spendHeart, type Hearts } from './hearts';
+import { addHeart, fullHearts, refillHearts, spendHeart, totalHearts, type HeartSource, type Hearts } from './hearts';
 import type { DonutType, GameState } from './types';
 
 const POINTS_PER_ORDER = 100;
@@ -15,8 +15,8 @@ export interface SessionState {
   /** Tray clears carried between stages; each stage clear earns one more. */
   trayClears: number;
   hearts: Hearts;
-  /** Hearts held before paying for the attempt in play; a clear refunds up to this. Unset when the attempt was free. */
-  heartsBeforeAttempt?: number;
+  /** Which pool paid for the attempt in play, so a clear can give the heart back; unset when it was free. */
+  heartPaidFrom?: HeartSource;
   /** The bonus stage in play and the campaign stage it leads on to. */
   bonus?: { dessert: DonutType; nextStageId: number };
 }
@@ -40,14 +40,13 @@ function createSessionGame(stageId: number, trayClears: number): GameState {
 export const isFreeStage = (id: number) => id === practiceStage.id || isBonusStage(id);
 /** Whether a paid attempt can start now. */
 export function canAffordAttempt(state: SessionState, stageId: number, now = Date.now()): boolean {
-  return isFreeStage(stageId) || refillHearts(state.hearts, now).count >= 1;
+  return isFreeStage(stageId) || totalHearts(refillHearts(state.hearts, now)) >= 1;
 }
 /** Pays one heart for an attempt at a campaign stage; null when no heart is left. */
-function payForAttempt(state: SessionState, stageId: number, now: number): Pick<SessionState, 'hearts' | 'heartsBeforeAttempt'> | null {
-  if (isFreeStage(stageId)) return { hearts: state.hearts, heartsBeforeAttempt: undefined };
-  const before = refillHearts(state.hearts, now);
-  const hearts = spendHeart(before, now);
-  return hearts ? { hearts, heartsBeforeAttempt: before.count } : null;
+function payForAttempt(state: SessionState, stageId: number, now: number): Pick<SessionState, 'hearts' | 'heartPaidFrom'> | null {
+  if (isFreeStage(stageId)) return { hearts: state.hearts, heartPaidFrom: undefined };
+  const paid = spendHeart(state.hearts, now);
+  return paid ? { hearts: paid.hearts, heartPaidFrom: paid.from } : null;
 }
 
 /** The highest stage id that has stars; 0 before the first clear. */
@@ -81,7 +80,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
     }
     case 'START_BONUS': {
       const game = createGame(prepareBonusStage(action.dessert));
-      return { ...state, screen: 'game', heartsBeforeAttempt: undefined, bonus: { dessert: action.dessert, nextStageId: action.nextStageId },
+      return { ...state, screen: 'game', heartPaidFrom: undefined, bonus: { dessert: action.dessert, nextStageId: action.nextStageId },
         game: { ...game, trayClearsLeft: state.trayClears } };
     }
     case 'GAME': {
@@ -97,11 +96,11 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       const newlyCleared = game.status === 'clear' && state.game.status !== 'clear';
       if (isBonusStage(game.stageId)) {
         // A bonus clear adds a heart that may go past the usual five; it leaves stars and tray clears alone.
-        return { ...state, game, trayClears: game.trayClearsLeft, hearts: newlyCleared ? addHearts(state.hearts, now) : state.hearts };
+        return { ...state, game, trayClears: game.trayClearsLeft, hearts: newlyCleared ? addHeart(state.hearts, now, 'bonus') : state.hearts };
       }
-      const paid = payment ?? { hearts: state.hearts, heartsBeforeAttempt: state.heartsBeforeAttempt };
-      const refund = newlyCleared && paid.heartsBeforeAttempt !== undefined
-        ? { hearts: addHearts(paid.hearts, now, 1, Math.max(paid.heartsBeforeAttempt, MAX_HEARTS)), heartsBeforeAttempt: undefined }
+      const paid = payment ?? { hearts: state.hearts, heartPaidFrom: state.heartPaidFrom };
+      const refund = newlyCleared && paid.heartPaidFrom
+        ? { hearts: addHeart(paid.hearts, now, paid.heartPaidFrom), heartPaidFrom: undefined }
         : paid;
       const trayClears = game.trayClearsLeft + (newlyCleared ? 1 : 0);
       const stars = game.status === 'clear'
