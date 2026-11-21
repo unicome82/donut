@@ -212,6 +212,7 @@
 }
 .stage-scroll {
   height: 100%;
+  mask-image: linear-gradient(#000 calc(100% - 34px), transparent);
   overflow-y: auto;
   touch-action: manipulation;
   overflow-anchor: none;
@@ -358,11 +359,10 @@
   top: 50%;
   translate: -50% -50%;
   z-index: 1;
-  transition: scale 200ms ease-out;
+  transition: scale 320ms cubic-bezier(.5,0,.75,0), opacity 320ms ease-in;
 }
 .stage-clock-star img { display: block; width: var(--stage-clock-star); height: var(--stage-clock-star); object-fit: contain; filter: drop-shadow(0 1px 1px #88552888); }
-.stage-clock-star.star--unearned { scale: .82; }
-.stage-clock-star.star--unearned img { filter: grayscale(.85) brightness(.85) drop-shadow(0 1px 1px #88552855); }
+.stage-clock-star.star--unearned { scale: 0; opacity: 0; }
 .stage-clock-time {
   min-width: 3.2em;
   color: #7a4a33;
@@ -385,16 +385,16 @@
 @property --stage-clock-start-color {
   syntax: "<color>";
   inherits: false;
-  initial-value: #ffdf46;
+  initial-value: #ff8fb3;
 }
 @property --stage-clock-end-color {
   syntax: "<color>";
   inherits: false;
-  initial-value: #51ce71;
+  initial-value: #7fbcff;
 }
 .stage-clock-fill {
-  --stage-clock-start-color: #ffdf46;
-  --stage-clock-end-color: #51ce71;
+  --stage-clock-start-color: #ff8fb3;
+  --stage-clock-end-color: #7fbcff;
   display: block;
   height: 100%;
   border-radius: inherit;
@@ -404,8 +404,6 @@
   box-shadow: inset 0 1px #ffffff8c, inset 0 -1px #52344b30, 1px 0 2px #653c744a;
   transition: width 100ms linear, --stage-clock-start-color 600ms ease-in-out, --stage-clock-end-color 600ms ease-in-out;
 }
-.stage-clock-fill--2 { --stage-clock-start-color: #ff9638; --stage-clock-end-color: #ffdf46; }
-.stage-clock-fill--1 { --stage-clock-start-color: #ef4b49; --stage-clock-end-color: #ff9638; }
 .game-board {
   display: grid;
   flex: 1;
@@ -421,7 +419,8 @@
   align-items: end;
   gap: clamp(2px, 1vw, 8px);
   height: 100%;
-  padding-bottom: clamp(25px, 6dvh, 49px);
+  // Rest the portraits' cut-off edge behind the wooden counter, not the clear glass case.
+  padding-bottom: calc(clamp(52px, 18vw, 88px) * .36);
 }
 .order-card {
   position: relative;
@@ -458,9 +457,9 @@
   place-items: center;
   min-width: min(100%, 48px);
   max-width: 100%;
-  padding: 5px 5px 6px;
+  padding: 1px 4px 2px;
   border: 1px solid #e4c8b5;
-  border-radius: 13px;
+  border-radius: 11px;
   background: #fffdf9;
   box-shadow: 0 1px #eed3bd80;
 }
@@ -486,29 +485,25 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 3px 2px;
+  gap: 0 2px;
 }
-.order-items li { position: relative; display: flex; flex: none; align-items: center; padding: 5px 7px 0 0; }
+.order-items li { position: relative; display: flex; flex: none; align-items: center; padding: 3px 4px 0 0; }
 .order-items .donut { width: clamp(30px, 8.6vw, 40px); }
-// Three-item bubbles are the tallest; keep them clear of the time bar.
-.order-items:has(> li:nth-child(3)) { gap: 0 2px; }
-.order-items:has(> li:nth-child(3)) li { padding-top: 3px; }
-.order-items:has(> li:nth-child(3)) .donut { width: clamp(26px, 7.2vw, 32px); }
 .order-items strong {
   position: absolute;
   top: 0;
   right: 0;
   display: grid;
   place-items: center;
-  min-width: 23px;
-  height: 23px;
-  padding-inline: 5px;
+  min-width: 18px;
+  height: 18px;
+  padding-inline: 4px;
   border: 1.5px solid #dcc0a8;
   border-radius: 999px;
   background: #fff;
   color: #6b3a26;
-  font-size: 15px;
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 1px 2px #8c3f3d40;
@@ -559,48 +554,22 @@
   --tray-border: 1px;
   --tray-padding: 6px;
   --tray-slot-padding: 7px;
-  --tray-insets: calc(2 * (var(--tray-border) + var(--tray-padding) + var(--tray-slot-padding)));
-  width: calc(var(--tray-insets) + (100% - var(--tray-insets)) * var(--tray-width-ratio));
-  justify-self: center;
+  justify-self: stretch;
   border-width: var(--tray-border);
   position: relative;
   z-index: 4;
-  padding: 4px var(--tray-padding) 8px;
+  padding: 3px var(--tray-padding) 6px;
 }
 .tray-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
   align-items: stretch;
-  gap: 4px 8px;
+  gap: 8px;
   position: relative;
   z-index: 4;
 }
-.tray-row .tray-section { min-width: 0; grid-row: 2; }
-.tray-row .tray-clear-shortcut { grid-row: 2; }
-.tray-meta {
-  grid-column: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 22px;
-  padding-inline: 4px;
-}
-.tray-meta .stage-difficulty { position: static; padding: 3px 9px; font-size: 12px; }
-.tray-count {
-  padding: 2px 9px;
-  border-radius: 999px;
-  background: #fffaf3e6;
-  box-shadow: 0 1px 3px #8a553a30;
-  color: #7a4a33;
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  transition: background-color 200ms, color 200ms;
-}
-.tray-count strong { font-weight: 900; }
-.tray-row--warn .tray-count { background: #ffe9b8; color: #9a5a0c; }
-.tray-row--danger .tray-count { background: #e94873; color: #fff; animation: urgent-pulse .9s ease-in-out infinite; }
+.tray-row .tray-section { min-width: 0; }
+.tray-section .stage-difficulty { top: -9px; left: 8px; z-index: 2; padding: 2px 8px; font-size: 11px; }
 .tray-clear-shortcut {
   position: relative;
   display: grid;
@@ -641,21 +610,31 @@
   box-shadow: 0 1px 3px #8c3f3d50;
 }
 .tray-section { transition: background-color 200ms, border-color 200ms, box-shadow 200ms; }
-.tray-section--warn { background: linear-gradient(#fff8e6, #ffe8bf); border-color: #e8b25e; }
+.tray-section--warn {
+  --tray-blink: #f0a73c;
+  background: linear-gradient(#fff8e6, #ffe8bf);
+  animation: tray-blink 1.2s ease-in-out infinite;
+}
 .tray-section--danger {
+  --tray-blink: #e94873;
   background: linear-gradient(#fff1ef, #ffdcdc);
-  border-color: #e06a83;
-  box-shadow: inset 0 -4px #f0b5bd, 0 0 0 2px #e9487355, 0 2px 3px #aa6b3b15;
+  animation: tray-blink .7s ease-in-out infinite;
+}
+@keyframes tray-blink {
+  0%, 100% { border-color: #e8c099; box-shadow: inset 0 -4px #ecd2a9, 0 2px 3px #aa6b3b15; }
+  50% { border-color: var(--tray-blink); box-shadow: inset 0 -4px #ecd2a9, 0 0 0 2px var(--tray-blink), 0 2px 3px #aa6b3b15; }
 }
 .tray-slots {
+  container-type: inline-size;
   display: grid;
   row-gap: 2px;
   padding-inline: var(--tray-slot-padding);
 }
-.tray-slots li { display: grid; place-items: center; min-width: 0; height: clamp(30px, 5.2dvh, 46px); }
+.tray-slots li { display: grid; place-items: center; min-width: 0; height: clamp(24px, 4.2dvh, 36px); }
 .tray-slots li:empty::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #dfbd99; }
 .tray-donut {
-  width: min(140%, 44px);
+  // Size against a 12-slot row so desserts look the same at every capacity.
+  width: min(calc(100cqw / 12 * 1.4), 44px);
   justify-self: center;
   position: relative;
   z-index: 1;
@@ -679,7 +658,6 @@
   background: #fff5e76e;
   touch-action: none;
 }
-.queue-column[aria-disabled='true'] .queue-front { opacity: .55; }
 .queue-column--returning { border-color: #d38c76; background: #ffe2c7; }
 .queue-column:not(:disabled):active .queue-front .donut { transform: translateY(2px); }
 .queue-front, .queue-back { display: grid; place-items: center; pointer-events: none; width: 100%; min-width: 0; }
@@ -727,6 +705,9 @@
 .popup-cat { width: min(54%, 174px); }
 .popup-ribbon { width: min(40%, 126px); translate: -50% -45%; }
 .pause-dialog { padding-top: 28px; }
+.pause-dialog .result-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; }
+.pause-dialog .popup-primary-button { grid-column: 1 / -1; }
+.pause-dialog .secondary-button { gap: 5px; padding-inline: 6px; }
 .tray-full-dialog h2 { margin-bottom: 20px; }
 .glass-popup h2 { color: var(--secondary-text); font-size: clamp(20px, 6vw, 26px); font-weight: 400; line-height: 1.2; }
 .tray-full-dialog .result-actions { width: 100%; }
@@ -874,11 +855,6 @@
 
 @media (max-width: 360px) {
   .order-items { column-gap: 2px; }
-}
-@media (max-height: 700px) {
-  .order-items:has(> li:nth-child(3)) li { padding-top: 2px; }
-  .order-items:has(> li:nth-child(3)) .donut { width: 23px; }
-  .order-items:has(> li:nth-child(3)) strong { min-width: 20px; height: 20px; font-size: 13px; }
 }
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
   :root { --shell-width: 820px; }

@@ -246,7 +246,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     paused: t.tryAgain,
     clear: 'Stage Clear!',
     blocked: t.trayFull,
-    gameover: state.timeExpired ? t.timeUp : state.trayClearsLeft > 0 ? t.tryAgain : t.outOfClears,
+    gameover: state.timeExpired ? t.timeUp : state.trayClearsLeft > 0 ? t.tryAgain : t.trayFull,
   };
   const failed = status === 'gameover';
   const boardVisible = playing || status === 'blocked' || status === 'paused';
