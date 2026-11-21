@@ -4,6 +4,8 @@ import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { Icon } from '../components/Icon';
 import { stages, practiceStage } from '../game/stages';
 import { getCurrentStage, isUnlocked } from '../game/session';
+import { useMessages } from '../i18n/language';
+import { LanguageButton } from '../components/LanguageButton';
 
 const columns = 3;
 const rowHeight = 146;
@@ -11,7 +13,8 @@ const overscan = 2;
 const stageOptions = [practiceStage, ...stages];
 const rowCount = Math.ceil(stageOptions.length / columns);
 
-export function StageSelectPage({ onBack, onGame, stars, unlockAllStages, soundEnabled, onToggleSound }: { onBack: () => void; onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void }) {
+export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
+  const t = useMessages();
   const currentStage = getCurrentStage(stars);
   const currentRow = Math.floor(stageOptions.findIndex(stage => stage.id === currentStage) / columns);
   const scrollArea = useRef<HTMLDivElement>(null);
@@ -38,13 +41,13 @@ export function StageSelectPage({ onBack, onGame, stars, unlockAllStages, soundE
   }, [currentRow, endPadding]);
 
   return <main className="stage-page">
-    <nav className="stage-navigation" aria-label="스테이지 선택 메뉴">
-      <button type="button" className="icon-button back-button" onClick={onBack} aria-label="시작 화면으로 돌아가기"><Icon name="back" /></button>
-      <button type="button" className="icon-button" onClick={onToggleSound} aria-label="게임 소리" aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>
+    <nav className="stage-navigation" aria-label={t.stageMenu}>
+      <LanguageButton onToggle={onToggleLanguage} />
+      <button type="button" className="icon-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>
     </nav>
     <div className="stage-hero" aria-hidden="true" />
     <div className="stage-list-frame" data-scrolled={viewport.top > 0}>
-      <div ref={scrollArea} className="stage-scroll" tabIndex={0} aria-label="스테이지 목록" role="region"
+      <div ref={scrollArea} className="stage-scroll" tabIndex={0} aria-label={t.stageList} role="region"
         onScroll={event => setViewport({ top: event.currentTarget.scrollTop, height: event.currentTarget.clientHeight })}>
         <div className="stage-list"
           style={{ gridAutoRows: rowHeight, paddingTop: firstRow * rowHeight, paddingBottom: (rowCount - lastRow) * rowHeight + endPadding }}>
@@ -53,16 +56,16 @@ export function StageSelectPage({ onBack, onGame, stars, unlockAllStages, soundE
             const unlocked = isUnlocked(stage.id, stars, unlockAllStages);
             const score = stars[stage.id] ?? 0;
             const current = stage.id === currentStage;
-            const description = unlocked ? (score ? `별 ${score}개` : '도전 가능') : '잠김';
+            const description = unlocked ? (score ? t.starsCount(score) : t.available) : t.locked;
             return <button type="button" key={stage.id} className={`stage-option${current ? ' stage-option--next' : ''}`}
-              aria-current={current ? 'step' : undefined} aria-label={practice ? '스테이지 0, 연습' : `스테이지 ${stage.id}, ${stage.difficulty}, ${description}`}
+              aria-current={current ? 'step' : undefined} aria-label={practice ? t.practiceLabel : t.stageLabel(stage.id, stage.difficulty ?? '', description)}
               onClick={() => onGame(stage.id)} disabled={!unlocked}>
               <span className="stage-index" lang="en">
                 <span className="stage-index-label">Stage</span>
                 <span className="stage-index-number">{String(stage.id).padStart(2, '0')}</span>
               </span>
               <StageDifficultyRibbon difficulty={stage.difficulty} />
-              {practice ? <span className="stage-practice-label">연습</span> : unlocked ? <span className="stage-stars" aria-hidden="true">
+              {practice ? <span className="stage-practice-label">{t.practice}</span> : unlocked ? <span className="stage-stars" aria-hidden="true">
                 {[0, 1, 2].map(index => <span key={index} className={index < score ? undefined : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
               </span> : <span className="stage-lock"><Icon name="lock" /></span>}
             </button>;

@@ -25,6 +25,11 @@ const cues = {
     strikes: [[0.03, 523.25, 0.22, 0.12], [0.03, 659.25, 0.22, 0.085], [0.03, 783.99, 0.25, 0.065]],
     texture: [[0, 1800, 0.08, 0.075, 0.015]],
   },
+  // A soft, low double knock: clearly "not now" without sounding like a failure.
+  denied: {
+    strikes: [[0, 196, 0.11, 0.13, 0.003], [0.075, 164.81, 0.13, 0.11, 0.003]],
+    texture: [[0, 260, 0.045, 0.32, 0.0015]],
+  },
   departure: {
     strikes: [],
     texture: [[0, 1700, 0.22, 0.19, 0.048, 430]],
@@ -63,6 +68,7 @@ let audio: AudioContext | undefined;
 let output: GainNode | undefined;
 let noise: AudioBuffer | undefined;
 let selectedAt = -Infinity;
+let deniedAt = -Infinity;
 let resuming: Promise<void> | undefined;
 let soundEnabled = readSoundPreference();
 
@@ -165,6 +171,10 @@ export function playSound(sound: SoundName) {
   if (sound === 'select') {
     if (now - selectedAt < 0.035) return;
     selectedAt = now;
+  }
+  if (sound === 'denied') {
+    if (now - deniedAt < 0.18) return;
+    deniedAt = now;
   }
 
   try {

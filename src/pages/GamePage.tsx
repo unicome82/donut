@@ -18,6 +18,8 @@ import type { GameAction } from '../game/reducer';
 import { getStageTimeLimit } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
 import { playSound } from '../effects/sound';
+import { haptic } from '../effects/haptics';
+import { useMessages } from '../i18n/language';
 import { createEffects } from '../effects/turnEffects';
 
 // Keep the standard pickup cadence independent of visual effect duration.
@@ -28,6 +30,7 @@ interface Delivery { orderId: string; type: DonutType }
 
 interface Props { soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
 export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound }: Props) {
+  const t = useMessages();
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -181,7 +184,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     const completed = new Set(result.events.flatMap(event => event.type === 'orderCompleted' ? [event.orderId] : []));
     const feedback = effects.play(root.current, current, result.events, orderId => {
       flushSync(() => revealDeliveries(orderId));
-      if (soundEnabled) playSound(completed.delete(orderId) ? 'order' : 'delivery');
+      const orderDone = completed.delete(orderId);
+      if (orderDone) haptic('order');
+      if (soundEnabled) playSound(orderDone ? 'order' : 'delivery');
     });
     flushSync(() => {
       if (action.type === 'CLEAR_TRAY' && remaining !== undefined) {
@@ -196,6 +201,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       }
       dispatch({ ...committedAction, remainingTimeMs: remaining });
     });
+    if (moved) haptic('select');
     if (soundEnabled && moved) playSound('select');
     if (moved) {
       const timer = setTimeout(() => {
@@ -236,11 +242,11 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }, [status]);
   const showGoodbye = status === 'clear';
   const resultTitles = {
-    ready: '다시 도전해요',
-    paused: '다시 도전해요',
+    ready: t.tryAgain,
+    paused: t.tryAgain,
     clear: 'Stage Clear!',
-    blocked: '트레이가 가득 찼어요',
-    gameover: state.timeExpired ? '시간이 다 됐어요' : state.trayClearsLeft > 0 ? '다시 도전해요' : '트레이 비우기 횟수를 모두 사용했어요',
+    blocked: t.trayFull,
+    gameover: state.timeExpired ? t.timeUp : state.trayClearsLeft > 0 ? t.tryAgain : t.outOfClears,
   };
   const failed = status === 'gameover';
   const boardVisible = playing || status === 'blocked' || status === 'paused';
@@ -248,6 +254,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !boardVisible && !waitingForGoodbye;
   const playTrayFullSound = useEffectEvent(() => {
+    haptic('blocked');
     if (soundEnabled) playSound('blocked');
   });
   useEffect(() => {
@@ -257,11 +264,24 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   useEffect(() => {
     const newlyShown = showResult && !resultWasShown.current;
     resultWasShown.current = showResult;
-    if (!soundEnabled || !newlyShown) return;
+    if (!newlyShown) return;
+    if (status === 'clear') haptic('clear');
+    else if (status === 'gameover') haptic('failed');
+    if (!soundEnabled) return;
     if (status === 'clear') playSound('clear');
     else if (status === 'gameover') playSound('failed');
   }, [showResult, soundEnabled, status]);
   const stars = status === 'clear' ? getStars(state) : 0;
+  const stage = getStage(state.stageId);
+  const trayFull = state.tray.length >= state.trayCapacity;
+  function rejectSelection(element: HTMLElement) {
+    haptic('denied');
+    if (soundEnabled) playSound('denied');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const shake = [{ translate: '0' }, { translate: '-3px' }, { translate: '3px' }, { translate: '-2px' }, { translate: '0' }];
+    const target = trayFull ? root.current?.querySelector('.tray-section') ?? element : element;
+    target.animate(shake, { duration: 220, easing: 'ease-out' });
+  }
   const lastStage = state.stageId === stages[stages.length - 1]?.id;
   useEffect(() => {
     if (!showGoodbye) return;
@@ -273,25 +293,29 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}`} ref={root}>
-    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
+    {!showResult && <GameHeader stage={state.stageId} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
-    <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
+    <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <img className="popup-ribbon" src={popupRibbon} alt="" draggable={false} />}
-      {status === 'clear' && <div className="result-stars" role="img" aria-label={`별 ${stars}개`}>
+      {status === 'clear' && <div className="result-stars" role="img" aria-label={t.starsCount(stars)}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'result-display-title' : undefined}>
         {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
-      {failed && state.tray.length > 0 && <div className="result-tray" aria-label={`트레이 ${state.tray.length} / ${state.trayCapacity}칸`}>
+      {failed && <div className="result-progress" role="img" aria-label={t.ordersDoneLabel(state.completedOrders, stage.targetOrders)}>
+        <span className="result-progress-label" aria-hidden="true">{t.ordersDone} <strong>{state.completedOrders}</strong> / {stage.targetOrders}</span>
+        <span className="result-progress-track" aria-hidden="true"><span style={{ width: `${state.completedOrders / stage.targetOrders * 100}%` }} /></span>
+      </div>}
+      {failed && state.tray.length > 0 && <div className="result-tray" aria-label={t.tray(state.tray.length, state.trayCapacity)}>
         {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       <div className="result-actions">
-        {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>다음 스테이지</button>}
-        <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시하기</button>
-        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />스테이지 선택</button>
+        {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>{t.nextStage}</button>}
+        <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />{t.retry}</button>
+        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />{t.stageSelect}</button>
       </div>
     </section>}
     {(boardVisible || waitingForGoodbye) && <div className="game-board">
@@ -303,27 +327,27 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       }
       return { ...order, remaining };
     }) : state.orders} stageId={state.stageId} onOrderReady={onOrderReady} />
-    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} clearsLeft={state.trayClearsLeft}
+    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} difficulty={stage.difficulty} clearsLeft={state.trayClearsLeft}
       canClear={playing && !waitingForGoodbye && state.tray.length > 0 && !state.pendingMatchIds?.length && inFlight.size === 0 && returning.size === 0}
       onClear={() => act({ type: 'CLEAR_TRAY' })} />
-    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
+    <DonutQueue queues={state.queues} returning={returning} disabled={!playing || waitingForGoodbye || returning.size > 0} locked={trayFull} onReject={(_, element) => rejectSelection(element)} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>
-      <h2 id="pause-heading">일시정지</h2>
+      <h2 id="pause-heading">{t.pause}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button popup-primary-button" onClick={() => act({ type: 'RESUME' })}><Icon name="play" />계속하기</button>
-        <button type="button" className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시하기</button>
-        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />스테이지 선택</button>
+        <button type="button" className="primary-button popup-primary-button" onClick={() => act({ type: 'RESUME' })}><Icon name="play" />{t.resume}</button>
+        <button type="button" className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />{t.retry}</button>
+        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />{t.stageSelect}</button>
       </div>
     </dialog>
     <dialog className="glass-popup tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
       <img className="popup-cat" src={popupCat} alt="" draggable={false} />
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button popup-primary-button tray-clear-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={`트레이 비우기, 남은 횟수 ${state.trayClearsLeft}`}>
-          <Icon name="basket" />트레이 비우기 <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
+        <button type="button" className="primary-button popup-primary-button tray-clear-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={t.clearTrayLabel(state.trayClearsLeft)}>
+          <Icon name="basket" />{t.clearTray} <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
         </button>
-        <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>포기하기</button>
+        <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>{t.giveUp}</button>
       </div>
     </dialog>
     {showResult && status === 'clear' && <div className="confetti" aria-hidden="true">{Array.from({ length: 36 }, (_, i) => <span key={i} style={{ left: `${(i * 29) % 100}%`, background: ['#ed96a6', '#a8d8c8', '#f5c66b', '#af9aca'][i % 4], animationDelay: `${(i % 9) * 55}ms`, transform: `rotate(${i * 37}deg)` }} />)}</div>}

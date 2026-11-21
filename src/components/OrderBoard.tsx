@@ -4,7 +4,7 @@ import { MOVE_DURATION } from '../effects/turnEffects';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
-import { itemNames } from './Donut/donutThemes';
+import { useMessages } from '../i18n/language';
 import { stages } from '../game/stages';
 import { ORDER_SLOTS } from '../game/constants';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
@@ -24,6 +24,7 @@ function canAnimate() {
 function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
   order: ActiveOrder; slot: number; portraitOffset: number; onOrderReady: (id: string) => void;
 }) {
+  const t = useMessages();
   const root = useRef<HTMLElement>(null);
   const { definitionId: orderId, sequence } = order;
 
@@ -73,9 +74,9 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
   }, [onOrderReady, orderId, sequence]);
 
   return <article ref={root} className="order-card" style={{ gridColumn: slot + 1, gridRow: 1 }}
-    data-order-id={orderId} data-order-slot={slot} aria-label={`${sequence}번 손님 주문`}>
+    data-order-id={orderId} data-order-slot={slot} aria-label={t.orderLabel(sequence)}>
     <div className="customer-visit"><div className="customer-scene"><Customer sequence={order.sequence + portraitOffset} />
-      <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} data-order-item={type} aria-label={`${itemNames[type]} ${order.remaining[type]}개`}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
+      <span className="order-delivery" aria-hidden="true" /></div><div className="speech-bubble"><ul className="order-items">{DONUT_TYPES.filter(type => (order.remaining[type] ?? 0) > 0).map(type => <li key={type} data-order-item={type} aria-label={t.orderItem(t.items[type], order.remaining[type] ?? 0)}><Donut type={type} /><strong>{order.remaining[type]}</strong></li>)}</ul>
     </div></div>
   </article>;
 }
@@ -114,6 +115,7 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot) {
 }
 
 export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<ActiveOrder | null>; stageId: number; onOrderReady: (id: string) => void }) {
+  const t = useMessages();
   const grid = useRef<HTMLDivElement>(null);
   const snapshots = useRef(new Map<string, CardSnapshot>());
   const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
@@ -138,7 +140,7 @@ export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<Ac
     snapshots.current = current;
   }, [orders]);
 
-  return <section className="order-section" aria-label="손님 주문">
+  return <section className="order-section" aria-label={t.orders}>
     <div ref={grid} className="order-grid">
       {arranged.map(({ order, slot }) => <CustomerOrder key={order.definitionId} slot={slot} order={order} portraitOffset={portraitOffset} onOrderReady={onOrderReady} />)}
     </div>

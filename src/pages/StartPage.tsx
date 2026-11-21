@@ -2,6 +2,8 @@ import { Icon } from '../components/Icon';
 import { stagesById } from '../game/stages';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { useState } from 'react';
+import { useMessages } from '../i18n/language';
+import { LanguageButton } from '../components/LanguageButton';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
   eager: true, import: 'default', query: '?url&no-inline',
@@ -21,19 +23,23 @@ const posters = Object.entries(posterSources).map(([path, src]) => ({
   background: posterBackgrounds[path.split('/').at(-1)?.replace('.webp', '') ?? ''],
 }));
 
-export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound }: {
-  stage: number; onGame: () => void; onStages: () => void; soundEnabled: boolean; onToggleSound: () => void;
+export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound, onToggleLanguage }: {
+  stage: number; onGame: () => void; onStages: () => void; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void;
 }) {
+  const t = useMessages();
   const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
   return <main className="start-page" style={{ backgroundImage: poster?.background }}>
     <h1 className="sr-only">Sweet Order</h1>
     <img className="start-poster" src={poster?.src} width={800} height={1800} alt="" draggable={false} fetchPriority="high" />
-    <button type="button" className="icon-button sound-button" onClick={onToggleSound} aria-label="게임 소리" aria-pressed={soundEnabled}>
-      <Icon name={soundEnabled ? 'sound' : 'sound-off'} />
-    </button>
+    <div className="top-actions">
+      <LanguageButton onToggle={onToggleLanguage} />
+      <button type="button" className="icon-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}>
+        <Icon name={soundEnabled ? 'sound' : 'sound-off'} />
+      </button>
+    </div>
     <div className="start-actions">
       <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>
-      <button className="secondary-button" onClick={onStages}>스테이지 선택</button>
+      <button className="secondary-button" onClick={onStages}>{t.stageSelect}</button>
     </div>
   </main>;
 }
