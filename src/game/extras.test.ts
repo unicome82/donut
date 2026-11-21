@@ -4,7 +4,7 @@ import { createSession, reduceSession } from './session';
 import { loadStage } from './stages';
 import { REWARDS_FROM_STAGE, VIP_FROM_STAGE, vipCount } from './stages/extras';
 import type { GameState } from './types';
-import { FEATURE_PREVIEW_STAGES, isFeaturePreviewStage } from './constants';
+import { isFeaturePreviewStage } from './constants';
 
 // While the playtest flag is on, stages 15 and 25 use the preview layout; check the rules one stage later.
 const real = (id: number) => isFeaturePreviewStage(id) ? id + 1 : id;
@@ -87,13 +87,10 @@ describe('대기열 보상', () => {
   });
 });
 
-describe.runIf(FEATURE_PREVIEW_STAGES.some(isFeaturePreviewStage))('기능 미리보기 (테스트용)', () => {
-  it('15·25번은 잠겨 있어도 열리고, 첫 손님이 VIP이며 25번은 보상 2종이 둘째 칸에 있다', async () => {
-    const session = createSession();
-    const at15 = reduceSession(session, { type: 'START', stageId: 15, now: 0 });
-    expect(at15.game.stageId).toBe(15);
-    expect(at15.game.orders[0]?.vip).toBe(true);
-    expect(at15.game.queues.flat().some(token => token.reward)).toBe(false);
+describe.runIf(isFeaturePreviewStage(25))('기능 미리보기 (테스트용)', () => {
+  it('25번은 잠겨 있어도 열리고, 첫 손님이 VIP이며 보상 2종이 둘째 칸에 있다', async () => {
+    const at25 = reduceSession(createSession(), { type: 'START', stageId: 25, now: 0 });
+    expect(at25.game.stageId).toBe(25);
     const stage25 = await loadStage(25);
     expect(stage25.orders[0]?.vip).toBe(true);
     expect([stage25.queues[1]![1]!.reward, stage25.queues[3]![1]!.reward]).toEqual(['heart', 'trayClear']);

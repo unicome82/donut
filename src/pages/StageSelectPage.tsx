@@ -8,7 +8,7 @@ import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
 import { SoundButton } from '../components/SoundControls';
 import { HeartCounter } from '../components/HeartCounter';
-import { BONUS_AT_STAGE_00_FOR_TESTING, isFeaturePreviewStage } from '../game/constants';
+import { BONUS_AT_STAGE_00_FOR_TESTING, FEATURE_PREVIEW_FOR_TESTING, FEATURE_PREVIEW_STAGES, isFeaturePreviewStage } from '../game/constants';
 import type { Hearts } from '../game/hearts';
 
 const columns = 3;
@@ -26,7 +26,9 @@ export function StageSelectPage({ onGame, onChargeHearts, stars, hearts, unlockA
   const openThrough = unlockedThrough(stars, unlockAllStages);
   const currentStage = unlockedThrough(stars);
   // Practice first, then stage ids up to the preview; tiles need only the id, so no stage data loads here.
-  const optionCount = Math.min(STAGE_COUNT, openThrough + LOCKED_PREVIEW) + 1;
+  // Playtest stages stay in the list even when they lie beyond the preview.
+  const previewEnd = FEATURE_PREVIEW_FOR_TESTING ? Math.max(0, ...FEATURE_PREVIEW_STAGES) : 0;
+  const optionCount = Math.min(STAGE_COUNT, Math.max(openThrough + LOCKED_PREVIEW, previewEnd)) + 1;
   const rowCount = Math.ceil(optionCount / columns);
   const currentRow = Math.floor(currentStage / columns);
   const scrollArea = useRef<HTMLDivElement>(null);

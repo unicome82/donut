@@ -1134,11 +1134,12 @@
   top: 50%;
   right: 4px;
   z-index: 6;
-  color: #2f9a5b;
+  color: #6fa3cf;
   font-family: Jua, sans-serif;
-  font-size: 20px;
-  font-weight: 900;
-  text-shadow: 0 1px 0 #fff, 0 0 6px #fff;
+  font-size: 16px;
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px #3b5a7a40);
   pointer-events: none;
   animation: float-pop 1000ms ease-out both;
 }
@@ -1165,12 +1166,17 @@
   color: #ec6a86;
   font-family: Jua, sans-serif;
   font-size: 17px;
-  text-shadow: 0 1px 0 #fff, 0 0 6px #fff;
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 1px 2px #aa3b5a40);
   pointer-events: none;
   animation: float-pop 1000ms ease-out both;
 }
-.reward-pop .heart-icon { width: 22px; height: 22px; fill: #ec6a86; }
-.reward-pop .material-symbol { width: 21px; height: 21px; background: #ec6a86; }
+.reward-pop .heart-icon { width: 22px; height: 22px; fill: #ec6a86; stroke: #fff; stroke-width: 2.5px; paint-order: stroke fill; filter: none; }
+.reward-pop .material-symbol {
+  width: 21px; height: 21px; background: #ec6a86;
+  filter: drop-shadow(1.5px 0 #fff) drop-shadow(-1.5px 0 #fff) drop-shadow(0 1.5px #fff) drop-shadow(0 -1.5px #fff);
+}
 @keyframes float-pop {
   0% { opacity: 0; transform: translateY(6px) scale(.6); }
   20% { opacity: 1; transform: translateY(0) scale(1.15); }
