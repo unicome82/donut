@@ -956,7 +956,8 @@
   box-shadow: 0 2px 4px #85384050;
 }
 .sound-credit { margin: 0; color: #9a6a52; font-size: 10px; line-height: 1.35; text-align: center; }
-.sound-dialog { padding-top: 28px; }
+// The stage page nav disables pointer events for everything but its buttons; the dialog inherits that.
+.sound-dialog { padding-top: 28px; pointer-events: auto; }
 .sound-dialog .result-actions { margin: 18px auto 0; }
 .pause-dialog .sound-controls { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e9c9b3; }
 .sound-track { grid-template-columns: 4.5em 1fr; }
