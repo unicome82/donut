@@ -299,6 +299,8 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const bonus = isBonusStage(state.stageId);
   // A bonus stage opens with its title in the middle; taps wait until it has gone.
   const [bonusIntro, setBonusIntro] = useState(bonus);
+  const playBonusIntroSound = useEffectEvent(() => { if (soundEnabled) playSound('bonusStart'); });
+  useEffect(() => { if (bonus) playBonusIntroSound(); }, [bonus]);
   useEffect(() => {
     if (!bonusIntro) return;
     const timer = setTimeout(() => setBonusIntro(false), BONUS_INTRO_MS);

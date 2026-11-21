@@ -165,6 +165,20 @@ const cueBuilders = {
     ],
     echo: true,
   }),
+  // Bonus stage opening: a quick sparkling C–E–G–C climb that lands as the title pops.
+  bonusStart: (): Cue => ({
+    tones: [
+      { at: 0, freq: 523.25, dur: 0.32, level: 0.11, attack: 0.008, partials: bell },
+      { at: 0.08, freq: 659.25, dur: 0.32, level: 0.115, attack: 0.008, partials: bell },
+      { at: 0.16, freq: 783.99, dur: 0.34, level: 0.12, attack: 0.008, partials: bell },
+      { at: 0.26, freq: 1046.5, dur: 0.75, level: 0.14, attack: 0.01, partials: bell },
+      { at: 0.26, freq: 523.25, dur: 0.7, level: 0.07, attack: 0.02, partials: bell },
+      { at: 0.34, freq: 2093, dur: 0.4, level: 0.035, attack: 0.006, partials: pure },
+      { at: 0.42, freq: 2637.02, dur: 0.35, level: 0.025, attack: 0.006, partials: pure },
+    ],
+    noises: [{ at: 0.24, freq: 7000, dur: 0.3, level: 0.06, attack: 0.02, q: 0.8, filter: 'highpass' }],
+    echo: true,
+  }),
   clear: (): Cue => ({
     tones: [
       { at: 0, freq: 440, dur: 0.54, level: 0.115, attack: 0.012, partials: bell },

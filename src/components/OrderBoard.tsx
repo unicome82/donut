@@ -88,7 +88,9 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot) {
   node.removeAttribute('data-order-id');
   node.removeAttribute('data-order-slot');
   node.setAttribute('aria-hidden', 'true');
-  Object.assign(node.style, { left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
+  // Drop the grid placement: an absolutely placed grid item with a column measures left/top from that
+  // column, which pushed every customer but the first one column further right as they left.
+  Object.assign(node.style, { gridColumn: '', gridRow: '', left: `${left}px`, top: `${top}px`, width: `${width}px`, height: `${height}px` });
 
   const scene = node.querySelector('.customer-scene');
   if (scene) {
