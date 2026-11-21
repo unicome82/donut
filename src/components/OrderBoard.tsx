@@ -36,7 +36,7 @@ function CustomerOrder({ order, slot, portraitOffset, onOrderReady }: {
       const remaining = order.remaining[type] ?? 0;
       if (remaining > 0 && remaining < (previous[type] ?? 0)) {
         root.current?.querySelector(`[data-order-item="${type}"] strong`)?.animate(
-          [{ scale: '1.22', color: '#b94164' }, { scale: '1', color: 'inherit' }],
+          [{ scale: '1.3' }, { scale: '1' }],
           { duration: 180, easing: 'ease-out' },
         );
       }

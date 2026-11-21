@@ -31,6 +31,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const deferredMatches = useRef<string[]>([]);
   useLayoutEffect(() => { latest.current = state; }, [state]);
   const activeEffects = useRef(new Set<ReturnType<typeof createEffects>>());
   const mounted = useRef(true);
@@ -41,7 +42,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   const [pausedTimeMs, setPausedTimeMs] = useState<number>();
   const [remainingTimeMs, setRemainingTimeMs] = useState(timeLimit);
   const timerRunning = timeLimit > 0 && state.status === 'playing';
-  const showClock = timerRunning || (timeLimit > 0 && state.status === 'blocked');
+  const showClock = timerRunning || (timeLimit > 0 && (state.status === 'blocked' || state.status === 'paused'));
   const expireStage = useEffectEvent(() => dispatch({ type: 'TIME_EXPIRED' }));
   useLayoutEffect(() => {
     if (!timerRunning) return;
@@ -104,14 +105,38 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       setRemainingTimeMs(timeLimit);
       setPausedTimeMs(undefined);
       nextPickupAt.current.clear();
+      deferredMatches.current = [];
     }
     const current = latest.current;
     const now = performance.now();
     const remaining = timeLimit > 0
-      ? (current.status === 'blocked' ? pausedTimeMs : undefined) ?? Math.max(0, deadline - now)
+      ? (current.status === 'blocked' || current.status === 'paused' ? pausedTimeMs : undefined) ?? Math.max(0, deadline - now)
       : undefined;
     if (action.type !== 'RESTART' && remaining === 0) {
       dispatch({ type: 'TIME_EXPIRED' });
+      return;
+    }
+    if (action.type === 'TRAY_READY' && current.status === 'paused') {
+      deferredMatches.current.push(action.donutId);
+      return;
+    }
+    if (action.type === 'PAUSE') {
+      if (current.status !== 'playing') return;
+      setPausedTimeMs(remaining);
+      dispatch(action);
+      return;
+    }
+    if (action.type === 'RESUME') {
+      if (current.status !== 'paused') return;
+      if (remaining !== undefined) {
+        setDeadline(now + remaining);
+        setRemainingTimeMs(remaining);
+      }
+      setPausedTimeMs(undefined);
+      const deferred = deferredMatches.current;
+      deferredMatches.current = [];
+      flushSync(() => dispatch(action));
+      for (const donutId of deferred) act({ type: 'TRAY_READY', donutId });
       return;
     }
     const currentStage = getStage(current.stageId);
@@ -195,6 +220,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   }
 
   const trayDialog = useRef<HTMLDialogElement>(null);
+  const pauseDialog = useRef<HTMLDialogElement>(null);
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const { status } = state;
   const playing = status === 'playing';
@@ -203,6 +229,10 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     if (!dialog) return;
     if (status === 'blocked' && !dialog.open) dialog.showModal();
     else if (status !== 'blocked' && dialog.open) dialog.close();
+    const pause = pauseDialog.current;
+    if (!pause) return;
+    if (status === 'paused' && !pause.open) pause.showModal();
+    else if (status !== 'paused' && pause.open) pause.close();
   }, [status]);
   const showGoodbye = status === 'clear';
   const resultTitles = {
@@ -213,7 +243,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     gameover: state.timeExpired ? '시간이 다 됐어요' : state.trayClearsLeft > 0 ? '다시 도전해요' : '트레이 비우기 횟수를 모두 사용했어요',
   };
   const failed = status === 'gameover';
-  const boardVisible = playing || status === 'blocked';
+  const boardVisible = playing || status === 'blocked' || status === 'paused';
   const [presentedResult, setPresentedResult] = useState<GameState | null>(null);
   const waitingForGoodbye = showGoodbye && presentedResult !== state;
   const showResult = !boardVisible && !waitingForGoodbye;
@@ -242,8 +272,8 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
   useEffect(() => {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
-  return <main className={`game-page game-status--${waitingForGoodbye ? 'playing' : status}`} ref={root}>
-    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} />}
+  return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}`} ref={root}>
+    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
@@ -276,6 +306,14 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
     <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
+    <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>
+      <h2 id="pause-heading">일시정지</h2>
+      <div className="result-actions">
+        <button type="button" className="primary-button popup-primary-button" onClick={() => act({ type: 'RESUME' })}><Icon name="play" />계속하기</button>
+        <button type="button" className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />다시하기</button>
+        <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />스테이지 선택</button>
+      </div>
+    </dialog>
     <dialog className="glass-popup tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
       <img className="popup-cat" src={popupCat} alt="" draggable={false} />
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
