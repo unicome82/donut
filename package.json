@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "stages:generate": "node scripts/generate-stages.mjs"
+    "stages:generate": "node scripts/generate-stages.mjs",
+    "stages:verify": "STAGES_FULL=1 vitest run src/game/engine.test.ts"
   },
   "dependencies": {
     "@fontsource/jua": "^5.3.0",

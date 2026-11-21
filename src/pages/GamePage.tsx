@@ -10,7 +10,7 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getStage, stages } from '../game/stages';
+import { getStage, STAGE_COUNT } from '../game/stages';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -288,7 +288,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     const target = trayFull ? root.current?.querySelector('.tray-section') ?? element : element;
     target.animate(shake, { duration: 220, easing: 'ease-out' });
   }
-  const lastStage = state.stageId === stages[stages.length - 1]?.id;
+  const lastStage = state.stageId === STAGE_COUNT;
   useEffect(() => {
     if (!showGoodbye) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

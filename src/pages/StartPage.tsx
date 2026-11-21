@@ -1,4 +1,4 @@
-import { stagesById } from '../game/stages';
+import { stageDifficulty } from '../game/stages';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { useState } from 'react';
 import { useMessages } from '../i18n/language';
@@ -36,7 +36,7 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
       <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </div>
     <div className="start-actions">
-      <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>
+      <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stageDifficulty(stage)} /></button>
       <button className="secondary-button" onClick={onStages}>{t.stageSelect}</button>
     </div>
   </main>;

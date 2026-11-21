@@ -1,5 +1,5 @@
 import { createGame, getStars } from './engine';
-import { getStage, stages, stagesById, practiceStage } from './stages';
+import { getStage, isStageId, practiceStage, STAGE_COUNT } from './stages';
 import { reduceGame, type GameAction } from './reducer';
 import type { GameState } from './types';
 
@@ -29,12 +29,23 @@ function createSessionGame(stageId: number, trayClears: number): GameState {
   const game = createGame(getStage(stageId));
   return stageId === practiceStage.id ? game : { ...game, trayClearsLeft: trayClears };
 }
+/** The highest stage id that has stars; 0 before the first clear. */
+export function highestCleared(stars: Record<number, number>): number {
+  let highest = 0;
+  for (const [key, count] of Object.entries(stars)) if (count > 0) highest = Math.max(highest, Number(key));
+  return highest;
+}
+/** Stages 1 through this id are open: everything cleared so far plus the next stage. */
+export function unlockedThrough(stars: Record<number, number>, unlockAllStages = false): number {
+  return unlockAllStages ? STAGE_COUNT : Math.min(STAGE_COUNT, highestCleared(stars) + 1);
+}
 export function isUnlocked(id: number, stars: Record<number, number>, unlockAllStages = false): boolean {
   if (id === practiceStage.id) return true;
-  return stagesById.has(id) && (unlockAllStages || id === 1 || (stars[id - 1] ?? 0) > 0);
+  return isStageId(id) && id <= unlockedThrough(stars, unlockAllStages);
 }
+/** The stage in progress: the one after the highest clear. */
 export function getCurrentStage(stars: Record<number, number>): number {
-  return stages.find(stage => isUnlocked(stage.id, stars) && !stars[stage.id])?.id ?? stages.at(-1)?.id ?? 1;
+  return unlockedThrough(stars);
 }
 
 export function reduceSession(state: SessionState, action: SessionAction): SessionState {

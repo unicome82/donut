@@ -1,7 +1,6 @@
-import { solutions as generatedSolutions } from './generated.json';
+// Test-only zero-based queue choices: generated chunks plus the authored first stage.
+const chunks = import.meta.glob<Record<string, number[]>>('./solutions/*.json', { eager: true, import: 'default' });
 
-// Test-only zero-based queue choices.
-export const solutions: Record<number, number[]> = {
-  ...generatedSolutions,
-  "1": [2,4,2,0,1,3,4,2,0,5,7,1,4,0,4,0,7,0,6,2,1,3,2,1,5,0,3,0,1,7,6,5,6,1,2,1,7,0,5,3,5,4,2,6,5,5,2,3,5,1,4,1,5,7,2,3,3,5,7,1,2,1,2,0,3,4,7,0,2,0,4,2,2,3,4,0,6,1,7,7,4,1,0,1,2,1,2,1,0,1,4,3,0,7,0,1,1,7,0,0,4,4,4,0,0,7,7,1,6,4,4,0,7,2,2,6,6,0,0,7,6,2,2,6,6,6]
-};
+export const solutions: Record<number, number[]> = Object.assign({}, ...Object.values(chunks), {
+  "1": [2,4,2,0,1,3,4,2,0,5,7,1,4,0,4,0,7,0,6,2,1,3,2,1,5,0,3,0,1,7,6,5,6,1,2,1,7,0,5,3,5,4,2,6,5,5,2,3,5,1,4,1,5,7,2,3,3,5,7,1,2,1,2,0,3,4,7,0,2,0,4,2,2,3,4,0,6,1,7,7,4,1,0,1,2,1,2,1,0,1,4,3,0,7,0,1,1,7,0,0,4,4,4,0,0,7,7,1,6,4,4,0,7,2,2,6,6,0,0,7,6,2,2,6,6,6],
+});

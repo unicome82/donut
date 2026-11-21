@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { stage01 } from './stages/stage01';
-import { stages } from './stages';
+import { loadAllStages } from './stages';
 import { validateStage } from './validation';
 import { difficultyForStage, hiddenDessertCount } from './stages/schedule';
 import { clearTray, createGame } from './engine';
+
+const stages = await loadAllStages();
 describe('고정 스테이지 데이터 계약', () => {
   it.each([['easy', 10, 12, 126, 140], ['normal', 15, 10, 160, 176], ['hard', 20, 8, 200, 216]] as const)(
     '%s는 종류별 준비량과 주문량이 같고 지정된 트레이를 사용한다', (difficulty, variety, capacity, minDesserts, maxDesserts) => {

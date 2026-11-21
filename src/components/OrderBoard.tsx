@@ -6,7 +6,6 @@ import { playSound } from '../effects/sound';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
 import { useMessages } from '../i18n/language';
-import { stages } from '../game/stages';
 import { ORDER_SLOTS } from '../game/constants';
 import { DONUT_TYPES, type ActiveOrder } from '../game/types';
 
@@ -121,7 +120,8 @@ export function OrderBoard({ orders, stageId, onOrderReady }: { orders: Array<Ac
   const t = useMessages();
   const grid = useRef<HTMLDivElement>(null);
   const snapshots = useRef(new Map<string, CardSnapshot>());
-  const portraitOffset = stages.filter(stage => stage.id < stageId).reduce((total, stage) => total + stage.targetOrders, 0);
+  // Each stage starts further along the portrait cycle, so consecutive stages open with new faces.
+  const portraitOffset = (stageId - 1) * 13;
   const arranged = orders.flatMap((order, slot) => order ? [{ order, slot }] : []);
 
   useLayoutEffect(() => {

@@ -272,11 +272,24 @@ function writeJson(url, entries, open, close, format) {
   renameSync(temporary, url);
 }
 
+// Stages up to here were tuned with bot success bands; later stages come straight from the
+// layout formula and are only checked to be clearable, which takes milliseconds instead of seconds.
+const calibratedThrough = 101;
+function formulaStage(id, difficulty, progress, random) {
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    const candidate = makeCandidate(id, difficulty, progress, random);
+    const solution = findSolution(candidate, random);
+    if (solution) return { stage: candidate, solution };
+  }
+  throw new Error(`No clearable ${difficulty} layout for stage ${id}.`);
+}
+
 function generateStage(id) {
   const difficulty = difficultyForStage(id);
   const progress = campaignProgress(id);
-  const targets = targetsFor(difficulty, progress);
   const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
+  if (id > calibratedThrough) return formulaStage(id, difficulty, progress, random);
+  const targets = targetsFor(difficulty, progress);
   let best;
   for (let attempt = 0; attempt < 3000 && !(best && best.miss === 0); attempt += 1) {
     const candidate = makeCandidate(id, difficulty, progress, random);

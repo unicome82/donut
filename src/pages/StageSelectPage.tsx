@@ -2,8 +2,8 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import rewardStar from '../assets/game/reward-star.webp';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { Icon } from '../components/Icon';
-import { stages, practiceStage } from '../game/stages';
-import { getCurrentStage, isUnlocked } from '../game/session';
+import { practiceStage, STAGE_COUNT, stageDifficulty } from '../game/stages';
+import { unlockedThrough } from '../game/session';
 import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
 import { SoundButton } from '../components/SoundControls';
@@ -11,13 +11,16 @@ import { SoundButton } from '../components/SoundControls';
 const columns = 3;
 const rowHeight = 146;
 const overscan = 2;
-const stageOptions = [practiceStage, ...stages];
-const rowCount = Math.ceil(stageOptions.length / columns);
+// Practice first, then every stage id; tiles need only the id, so no stage data is loaded here.
+const optionCount = STAGE_COUNT + 1;
+const rowCount = Math.ceil(optionCount / columns);
+const optionId = (index: number) => index === 0 ? practiceStage.id : index;
 
 export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
   const t = useMessages();
-  const currentStage = getCurrentStage(stars);
-  const currentRow = Math.floor(stageOptions.findIndex(stage => stage.id === currentStage) / columns);
+  const openThrough = unlockedThrough(stars, unlockAllStages);
+  const currentStage = unlockedThrough(stars);
+  const currentRow = Math.floor(currentStage / columns);
   const scrollArea = useRef<HTMLDivElement>(null);
   const [viewport, setViewport] = useState({ top: currentRow * rowHeight, height: 0 });
   const firstRow = Math.min(rowCount - 1, Math.max(0, Math.floor(viewport.top / rowHeight) - overscan));
@@ -52,9 +55,11 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
         onScroll={event => setViewport({ top: event.currentTarget.scrollTop, height: event.currentTarget.clientHeight })}>
         <div className="stage-list"
           style={{ gridAutoRows: rowHeight, paddingTop: firstRow * rowHeight, paddingBottom: (rowCount - lastRow) * rowHeight + endPadding }}>
-          {stageOptions.slice(firstRow * columns, lastRow * columns).map(stage => {
-            const practice = stage.id === practiceStage.id;
-            const unlocked = isUnlocked(stage.id, stars, unlockAllStages);
+          {Array.from({ length: Math.min(optionCount, lastRow * columns) - firstRow * columns }, (_, offset) => {
+            const id = optionId(firstRow * columns + offset);
+            const stage = { id, difficulty: id === practiceStage.id ? practiceStage.difficulty : stageDifficulty(id) };
+            const practice = id === practiceStage.id;
+            const unlocked = practice || id <= openThrough;
             const score = stars[stage.id] ?? 0;
             const current = stage.id === currentStage;
             const description = unlocked ? (score ? t.starsCount(score) : t.available) : t.locked;

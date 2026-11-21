@@ -1,5 +1,5 @@
-// Temporarily enable direct access to every stage for playtesting.
-export const UNLOCK_ALL_STAGES_FOR_TESTING = true;
+// Set to true to open every stage for playtesting.
+export const UNLOCK_ALL_STAGES_FOR_TESTING = false;
 
 export const QUEUE_COUNT = 8;
 export const ORDER_SLOTS = 4;

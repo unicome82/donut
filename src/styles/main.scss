@@ -972,3 +972,11 @@
 .sound-dialog { padding-top: 28px; pointer-events: auto; }
 .sound-dialog .result-actions { margin: 18px auto 0; }
 .pause-dialog .sound-controls { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e9c9b3; }
+
+// Shown while a stage chunk downloads before entering a stage.
+.stage-loading {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 40;
+  transform: translateX(-50%); margin: 0; padding: 8px 18px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-weight: 700;
+  box-shadow: 0 6px 18px rgb(64 53 47 / 14%);
+}

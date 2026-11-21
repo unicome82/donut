@@ -2,13 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { createGame, clearTray, getReadyTrayPickupOrders, getStars, selectDonut, matchTray, pickupTray } from './engine';
 import { reduceGame } from './reducer';
 import { createSession, getCurrentStage, isUnlocked, reduceSession } from './session';
-import { authoredStages, stages, practiceStage } from './stages';
+import { authoredStages, loadAllStages, practiceStage, STAGE_COUNT } from './stages';
+import { encodeStars } from '../hooks/useGame';
 import { solutions } from './stages/solutions';
 import { BASE_TRAY_CAPACITY, QUEUE_COUNT } from './constants';
 import { TRAY_CAPACITY_BY_DIFFICULTY } from './trayCapacity';
 import { getStageTimeLimit, getTimeStars } from './stageTime';
 import { validateStage } from './validation';
 import type { DonutType, GameState, StageDefinition, OrderDefinition } from './types';
+
+const stages = await loadAllStages();
+// Replaying every witness path takes minutes; by default replay the tuned opening and a spread
+// sample. `npm run stages:verify` replays all of them.
+const replayed = process.env.STAGES_FULL === '1' ? stages : stages.filter(stage => stage.id <= 200 || stage.id % 97 === 0);
 
 function fixture(items: OrderDefinition['items'][]): StageDefinition {
   const types: DonutType[] = ['strawberry', 'chocolate', 'vanilla'];
@@ -319,7 +325,7 @@ describe('자동 매칭과 상태 전이', () => {
 });
 
 describe('스테이지 해법과 게임 불변식', () => {
-  for (const stage of stages) {
+  for (const stage of replayed) {
     it('스테이지 ' + stage.id + '는 확장 없이 클리어할 수 있다', () => {
       expect(validateStage(stage)).toEqual([]);
       const original = structuredClone(stage);
@@ -490,6 +496,18 @@ describe('세션 진행', () => {
     const session = createSession();
     expect(reduceSession(session, { type: 'START', stageId: 5 })).toBe(session);
     expect(isUnlocked((stages.at(-1)?.id ?? 0) + 1, { 5: 3 })).toBe(false);
+  });
+  it('가장 높이 클리어한 스테이지의 다음 스테이지까지만 열린다', () => {
+    expect(stages).toHaveLength(STAGE_COUNT);
+    expect(stages.map(stage => stage.id)).toEqual(Array.from({ length: STAGE_COUNT }, (_, index) => index + 1));
+    const stars = { 1: 3, 2: 1, 40: 2 };
+    expect(getCurrentStage(stars)).toBe(41);
+    expect(isUnlocked(10, stars)).toBe(true);
+    expect(isUnlocked(41, stars)).toBe(true);
+    expect(isUnlocked(42, stars)).toBe(false);
+    expect(getCurrentStage({ [STAGE_COUNT]: 1 })).toBe(STAGE_COUNT);
+    expect(encodeStars(stars)).toBe('31' + '0'.repeat(37) + '2');
+    expect(encodeStars({})).toBe('');
   });
   it('테스트 모드에서 모든 등록된 스테이지에 진입할 수 있다', () => {
     const session = createSession(true);
