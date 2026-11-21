@@ -680,7 +680,7 @@
   font-size: 18px;
   gap: 5px;
 }
-.start-actions .stage-button { min-height: 62px; font-size: clamp(32px, 9vw, 40px); }
+.start-actions .stage-button { min-height: 58px; font-size: var(--stage-script-size); }
 .glass-popup button .material-symbol { width: 1.25em; height: 1.25em; }
 .tray-clear-button { position: relative; }
 .tray-clear-count {
