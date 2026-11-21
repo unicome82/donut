@@ -1,9 +1,9 @@
-import { Icon } from '../components/Icon';
 import { stagesById } from '../game/stages';
 import { StageDifficultyRibbon } from '../components/StageDifficultyRibbon';
 import { useState } from 'react';
 import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
+import { SoundButton } from '../components/SoundControls';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
   eager: true, import: 'default', query: '?url&no-inline',
@@ -33,9 +33,7 @@ export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound
     <img className="start-poster" src={poster?.src} width={800} height={1800} alt="" draggable={false} fetchPriority="high" />
     <div className="top-actions">
       <LanguageButton onToggle={onToggleLanguage} />
-      <button type="button" className="icon-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}>
-        <Icon name={soundEnabled ? 'sound' : 'sound-off'} />
-      </button>
+      <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </div>
     <div className="start-actions">
       <button className="primary-button stage-button" onClick={onGame}><span>Stage {String(stage).padStart(2, '0')}</span><StageDifficultyRibbon difficulty={stagesById.get(stage)?.difficulty} /></button>

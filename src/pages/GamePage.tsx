@@ -16,10 +16,11 @@ import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
 import { getStageTimeLimit, getTimeStars } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
-import { playSound } from '../effects/sound';
+import { playSound, setMusicMood } from '../effects/sound';
 import { haptic } from '../effects/haptics';
 import { useMessages } from '../i18n/language';
 import { createEffects } from '../effects/turnEffects';
+import { SoundControls } from '../components/SoundControls';
 
 // Keep the standard pickup cadence independent of visual effect duration.
 const TRAY_READY_DELAY = 235;
@@ -125,11 +126,13 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     if (action.type === 'PAUSE') {
       if (current.status !== 'playing') return;
       setPausedTimeMs(remaining);
+      if (soundEnabled) playSound('pause');
       dispatch(action);
       return;
     }
     if (action.type === 'RESUME') {
       if (current.status !== 'paused') return;
+      if (soundEnabled) playSound('resume');
       if (remaining !== undefined) {
         setDeadline(now + remaining);
         setRemainingTimeMs(remaining);
@@ -150,6 +153,10 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       : action.type === 'CLEAR_TRAY' ? clearTray(current, currentStage) : null;
     if (!result) { dispatch(action); return; }
     if (result.state === current || !root.current) return;
+    if (action.type === 'CLEAR_TRAY') {
+      haptic('select');
+      if (soundEnabled) playSound('clearTray');
+    }
     if (result.state.status === 'blocked' && current.status !== 'blocked') {
       setPausedTimeMs(remaining);
     }
@@ -295,6 +302,30 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   const timed = playing && !waitingForGoodbye && timeLimit > 0;
   const danger = timed && getTimeStars(remainingTimeMs, timeLimit) === 1;
   const urgent = timed && remainingTimeMs <= 10_000;
+  // Tension cues: a falling chime when a star is lost, clock ticks through the last ten seconds.
+  const timeStars = timeLimit > 0 ? getTimeStars(remainingTimeMs, timeLimit) : 0;
+  const previousTimeStars = useRef(timeStars);
+  const lastTickSecond = useRef<number>(undefined);
+  useEffect(() => {
+    const lostStar = timeStars < previousTimeStars.current;
+    previousTimeStars.current = timeStars;
+    if (!timed) { lastTickSecond.current = undefined; return; }
+    if (lostStar && timeStars > 0) {
+      if (soundEnabled) playSound('starLost');
+      return;
+    }
+    // The 10-second practice stage would tick throughout, so ticks start only on longer stages.
+    if (timeLimit < 30_000 || remainingTimeMs > 10_000 || remainingTimeMs <= 0) return;
+    const second = Math.ceil(remainingTimeMs / 1000);
+    if (lastTickSecond.current === undefined) { lastTickSecond.current = second; return; }
+    if (second === lastTickSecond.current) return;
+    lastTickSecond.current = second;
+    if (soundEnabled) playSound(second <= 3 ? 'tickUrgent' : 'tick');
+  }, [remainingTimeMs, soundEnabled, timeLimit, timeStars, timed]);
+  useEffect(() => {
+    setMusicMood(status === 'paused' || status === 'blocked' || showResult ? 'dim' : urgent ? 'urgent' : 'normal');
+  }, [showResult, status, urgent]);
+  useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
     {!showResult && <GameHeader stage={state.stageId} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
@@ -335,16 +366,17 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>
       <h2 id="pause-heading">{t.pause}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button popup-primary-button" onClick={() => act({ type: 'RESUME' })}><Icon name="play" />{t.resume}</button>
+        <button type="button" data-sfx="none" className="primary-button popup-primary-button" onClick={() => act({ type: 'RESUME' })}><Icon name="play" />{t.resume}</button>
         <button type="button" className="secondary-button" onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />{t.retry}</button>
         <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />{t.stageSelect}</button>
       </div>
+      <SoundControls soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </dialog>
     <dialog className="glass-popup tray-full-dialog" ref={trayDialog} aria-labelledby="tray-full-heading" onCancel={event => event.preventDefault()}>
       <img className="popup-cat" src={popupCat} alt="" draggable={false} />
       <h2 id="tray-full-heading">{resultTitles.blocked}</h2>
       <div className="result-actions">
-        <button type="button" className="primary-button popup-primary-button tray-clear-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={t.clearTrayLabel(state.trayClearsLeft)}>
+        <button type="button" data-sfx="none" className="primary-button popup-primary-button tray-clear-button" onClick={() => act({ type: 'CLEAR_TRAY' })} aria-label={t.clearTrayLabel(state.trayClearsLeft)}>
           <Icon name="basket" />{t.clearTray} <span className="tray-clear-count" aria-hidden="true">{state.trayClearsLeft}</span>
         </button>
         <button type="button" className="secondary-button" onClick={() => act({ type: 'GIVE_UP' })}>{t.giveUp}</button>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LanguageContext, readLanguagePreference, saveLanguagePreference } from '../i18n/language';
-import { readSoundPreference, saveSoundPreference, unlockSound } from '../effects/sound';
+import type { MouseEvent } from 'react';
+import { playSound, readSoundPreference, saveSoundPreference, unlockSound } from '../effects/sound';
 import { getCurrentStage } from '../game/session';
 import { useGame } from '../hooks/useGame';
 import { StartPage } from '../pages/StartPage';
@@ -21,10 +22,18 @@ export function App() {
     if (enabled) unlockSound();
     saveSoundPreference(enabled);
     setSoundEnabled(enabled);
+    if (enabled) playSound('tap');
+  }
+  // Every button taps softly unless it plays its own cue (data-sfx="none").
+  function onClickCapture(event: MouseEvent) {
+    if (!soundEnabled) return;
+    unlockSound();
+    const button = (event.target as Element).closest?.('button');
+    if (button && !button.disabled && button.dataset.sfx !== 'none') playSound('tap');
   }
   const { screen, game, stars } = session;
   const currentStage = getCurrentStage(stars);
-  return <LanguageContext value={language}><div className="app-shell" lang={language} onPointerUpCapture={soundEnabled ? unlockSound : undefined} onClickCapture={soundEnabled ? unlockSound : undefined}>
+  return <LanguageContext value={language}><div className="app-shell" lang={language} onPointerUpCapture={soundEnabled ? unlockSound : undefined} onClickCapture={onClickCapture}>
     {screen === 'start'
       ? <StartPage stage={currentStage} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} onGame={() => dispatch({ type: 'START', stageId: currentStage })} onStages={() => dispatch({ type: 'STAGES' })} />
       : screen === 'stages'

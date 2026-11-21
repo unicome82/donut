@@ -20,7 +20,7 @@ export function DonutTray({ donuts, capacity, difficulty, inFlight, clearsLeft, 
     <StageDifficultyRibbon difficulty={difficulty} />
     <div className="tray"><ol className="tray-slots" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>{Array.from({ length: capacity }, (_, i) => <li key={i} data-tray-slot={i} data-token-id={donuts[i]?.id} aria-label={donuts[i] ? t.items[donuts[i].type] : t.emptySlot(i + 1)}>{donuts[i] ? <span className="tray-donut" style={{ visibility: inFlight?.has(donuts[i].id) ? 'hidden' : undefined }}><Donut type={donuts[i].type} /></span> : null}</li>)}</ol></div>
   </section>
-    <button type="button" className="tray-clear-shortcut" onClick={onClear} disabled={!canClear || clearsLeft <= 0} aria-label={t.clearTrayLabel(clearsLeft)}>
+    <button type="button" data-sfx="none" className="tray-clear-shortcut" onClick={onClear} disabled={!canClear || clearsLeft <= 0} aria-label={t.clearTrayLabel(clearsLeft)}>
       <Icon name="basket" /><span className="tray-clear-shortcut-count" aria-hidden="true">{clearsLeft}</span>
     </button>
   </div>;

@@ -2,6 +2,7 @@ import displayShelf from '../assets/game/display-shelf.webp';
 import { useLayoutEffect, useRef } from 'react';
 import { MOVE_DURATION } from '../effects/turnEffects';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
+import { playSound } from '../effects/sound';
 import { Donut } from './Donut/Donut';
 import { Customer } from './Customer';
 import { useMessages } from '../i18n/language';
@@ -111,6 +112,8 @@ function animateDeparture(grid: HTMLElement, snapshot: CardSnapshot) {
     { transform: 'translateX(0)', opacity: 1, offset: .28 },
     { transform: 'translateX(-24px)', opacity: 0 },
   ], { duration: CUSTOMER_GOODBYE_MS, easing: 'ease-out', fill: 'forwards' });
+  // The customer starts walking off 28% into the goodbye animation.
+  playSound('departure', CUSTOMER_GOODBYE_MS * 0.28);
   void animation.finished.then(() => node.remove(), () => node.remove());
 }
 

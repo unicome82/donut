@@ -4,7 +4,7 @@ export function GameHeader({ stage, onPause, canPause, soundEnabled, onToggleSou
   const t = useMessages();
   return <header className="game-header">
     <h1>Stage {String(stage).padStart(2, '0')}</h1>
-    {onToggleSound && <button type="button" className="icon-button header-sound-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>}
-    {onPause && <button type="button" className="icon-button pause-button" onClick={onPause} disabled={!canPause} aria-label={t.pause}><Icon name="pause" /></button>}
+    {onToggleSound && <button type="button" data-sfx="none" className="icon-button header-sound-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>}
+    {onPause && <button type="button" data-sfx="none" className="icon-button pause-button" onClick={onPause} disabled={!canPause} aria-label={t.pause}><Icon name="pause" /></button>}
   </header>;
 }

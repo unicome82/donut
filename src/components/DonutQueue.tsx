@@ -19,7 +19,7 @@ export function DonutQueue({ queues, disabled, locked = false, returning, onSele
 
   const depth = Math.max(1, ...queues.map(queue => queue.length));
   return <section className="queue-section" aria-label={t.queueSection}>
-    <div className="queue-grid">{queues.map((queue, i) => <button type="button" className={`queue-column${queue.some(donut => returning.has(donut.id)) ? ' queue-column--returning' : ''}`} key={i} data-queue-index={i}
+    <div className="queue-grid">{queues.map((queue, i) => <button type="button" data-sfx="none" className={`queue-column${queue.some(donut => returning.has(donut.id)) ? ' queue-column--returning' : ''}`} key={i} data-queue-index={i}
       style={{ gridTemplateRows: depth === 1 ? 'var(--queue-head)' : `var(--queue-head) repeat(${depth - 1}, var(--queue-step))` }}
       disabled={disabled}
       aria-disabled={locked || !queue.length || undefined}

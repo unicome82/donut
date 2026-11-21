@@ -6,6 +6,7 @@ import { stages, practiceStage } from '../game/stages';
 import { getCurrentStage, isUnlocked } from '../game/session';
 import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
+import { SoundButton } from '../components/SoundControls';
 
 const columns = 3;
 const rowHeight = 146;
@@ -43,7 +44,7 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
   return <main className="stage-page">
     <nav className="stage-navigation" aria-label={t.stageMenu}>
       <LanguageButton onToggle={onToggleLanguage} />
-      <button type="button" className="icon-button" onClick={onToggleSound} aria-label={t.sound} aria-pressed={soundEnabled}><Icon name={soundEnabled ? 'sound' : 'sound-off'} /></button>
+      <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </nav>
     <div className="stage-hero" aria-hidden="true" />
     <div className="stage-list-frame" data-scrolled={viewport.top > 0}>
