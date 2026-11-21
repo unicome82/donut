@@ -457,13 +457,12 @@
 }
 .order-items {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 0 2px;
 }
 .order-items li { position: relative; display: flex; flex: none; align-items: center; padding: 3px 4px 0 0; }
-.order-items:has(> li:nth-child(2):last-child) { flex-wrap: nowrap; min-width: 0; }
 .order-items .donut { width: clamp(30px, 8.6vw, 40px); }
 .order-items strong {
   position: absolute;
@@ -474,7 +473,7 @@
   min-width: 18px;
   height: 18px;
   padding-inline: 4px;
-  border: 1.5px solid #dcdcdc;
+  border: 1.5px solid #dcc0a8;
   border-radius: 999px;
   background: #fff;
   color: #6b3a26;
@@ -693,7 +692,7 @@
   padding-inline: 6px;
   border: 2px solid #fff;
   border-radius: 999px;
-  background: #ff2d87;
+  background: #e45471;
   color: #fff;
   font-size: 12px;
   font-weight: 900;
