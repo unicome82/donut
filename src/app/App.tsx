@@ -70,11 +70,11 @@ export function App() {
   useEffect(() => { if (screen === 'game') preloadStage(game.stageId + 1); }, [screen, game.stageId]);
   return <LanguageContext value={language}><div className="app-shell" lang={language} onPointerUpCapture={soundEnabled ? unlockSound : undefined} onClickCapture={onClickCapture}>
     {screen === 'start'
-      ? <StartPage stage={currentStage} hearts={session.hearts} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} onGame={() => start(currentStage)} onStages={() => dispatch({ type: 'STAGES' })} />
+      ? <StartPage stage={currentStage} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} onGame={() => start(currentStage)} onStages={() => dispatch({ type: 'STAGES' })} />
       : screen === 'stages'
         ? <StageSelectPage stars={stars} hearts={session.hearts} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} unlockAllStages={session.unlockAllStages} onGame={start} />
         : <GamePage key={game.stageId} soundEnabled={soundEnabled} onToggleSound={toggleSound} state={game} dispatch={action => dispatch({ type: 'GAME', action, now: Date.now() })} onStages={() => dispatch({ type: 'STAGES' })} onNext={next}
-          canRestart={() => canAffordAttempt(session, game.stageId)} onOutOfHearts={() => setOutOfHearts(true)} hearts={session.hearts} />
+          canRestart={() => canAffordAttempt(session, game.stageId)} onOutOfHearts={() => setOutOfHearts(true)} />
     }
     {outOfHearts && <NoHeartsDialog hearts={session.hearts} onClose={closeOutOfHearts} />}
     {loadingStage !== undefined && <p className="stage-loading" role="status">Loading…</p>}
