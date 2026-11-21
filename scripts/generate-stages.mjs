@@ -14,11 +14,11 @@ const { ORDER_SLOTS, QUEUE_COUNT } = await import('../src/game/constants.ts');
 const { TRAY_CAPACITY_BY_DIFFICULTY } = await import('../src/game/trayCapacity.ts');
 const { createGame, selectDonut } = await import('../src/game/engine.ts');
 const { DONUT_TYPES } = await import('../src/game/types.ts');
-const { difficultyForStage, campaignProgress, hasHiddenDesserts } = await import('../src/game/stages/schedule.ts');
+const { difficultyForStage, campaignProgress, hasHiddenDesserts, hiddenDessertCount } = await import('../src/game/stages/schedule.ts');
 
 const firstId = 2;
 // Bump a difficulty's revision to regenerate its stored layouts with the current rules.
-const layoutRevisions = { easy: 20, normal: 20, hard: 21 };
+const layoutRevisions = { easy: 20, normal: 20, hard: 22 };
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
@@ -119,10 +119,11 @@ function arrangeStage(id, difficulty, random, menu, orders, knobs) {
     id, difficulty, revision: layoutRevisions[difficulty], donutTypes: menu, targetOrders: orders.length,
     trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY[difficulty], queues, orders,
   };
-  if (hasHiddenDesserts(id, difficulty)) {
-    // Cover a share of the desserts behind each queue's first two; the share grows later on.
-    const share = lerp(0.25, 0.4, campaignProgress(id));
-    stage.hidden = queues.map(queue => queue.flatMap((_, index) => index >= 2 && random(1000) < share * 1000 ? [index] : []));
+  const count = hiddenDessertCount(id, difficulty);
+  if (count) {
+    // Cover a fixed number of desserts, never one of a queue's first two.
+    const spots = shuffle(queues.flatMap((queue, column) => queue.flatMap((_, index) => index >= 2 ? [[column, index]] : [])), random).slice(0, count);
+    stage.hidden = queues.map((_, column) => spots.filter(([spot]) => spot === column).map(([, index]) => index).sort((a, b) => a - b));
   }
   return stage;
 }
