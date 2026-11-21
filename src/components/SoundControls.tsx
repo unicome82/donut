@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from './Icon';
 import { useMessages } from '../i18n/language';
-import { MUSIC_CREDIT, placeSoundIds, playSound, readPlaceSound, readVolumes, setPlaceSound, setVolume, type PlaceSoundId, type VolumeKind } from '../effects/sound';
+import { MUSIC_CREDIT, playSound, readVolumes, setVolume, type VolumeKind } from '../effects/sound';
 
 interface Props { soundEnabled: boolean; onToggleSound: () => void }
 
@@ -9,7 +9,6 @@ interface Props { soundEnabled: boolean; onToggleSound: () => void }
 export function SoundControls({ soundEnabled, onToggleSound }: Props) {
   const t = useMessages();
   const [levels, setLevels] = useState(readVolumes);
-  const [place, setPlace] = useState(readPlaceSound);
   function change(kind: VolumeKind, percent: number) {
     setVolume(kind, percent / 100);
     setLevels(readVolumes());
@@ -28,17 +27,6 @@ export function SoundControls({ soundEnabled, onToggleSound }: Props) {
         onKeyUp={() => { if (kind === 'sfx') playSound('select'); }} />
       <output>{Math.round(levels[kind] * 100)}</output>
     </label>)}
-    <label className="sound-slider sound-select">
-      <span>{t.placeSound}</span>
-      <select value={place} disabled={!soundEnabled} onChange={event => {
-        const id = event.currentTarget.value as PlaceSoundId;
-        setPlaceSound(id);
-        setPlace(id);
-        playSound('select');
-      }}>
-        {placeSoundIds.map(id => <option key={id} value={id}>{t.placeSoundNames[id]}</option>)}
-      </select>
-    </label>
     <p className="sound-credit" lang="en">{t.musicCredit} {MUSIC_CREDIT}</p>
   </div>;
 }
