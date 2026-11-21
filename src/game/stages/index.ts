@@ -2,12 +2,8 @@ import { stages as generatedStages } from './generated.json';
 import type { DonutType, StageDefinition, StageDifficulty } from '../types';
 import { practiceStage } from './practice';
 import { stage01 } from './stage01';
-import { stage02 } from './stage02';
-import { stage03 } from './stage03';
-import { stage04 } from './stage04';
-import { stage05 } from './stage05';
 export { practiceStage };
-export const authoredStages = [stage01, stage02, stage03, stage04, stage05];
+export const authoredStages = [stage01];
 const generated: StageDefinition[] = generatedStages.map(stage => ({
   ...stage,
   difficulty: stage.difficulty as StageDifficulty,

@@ -28,11 +28,17 @@ function tray(type: DonutType, count: number) {
 }
 
 describe('스테이지 공용 시간', () => {
-  it('연습 제한 시간은 10초이고 난이도별 시간은 120초, 150초, 180초다', () => {
+  it('연습 제한 시간은 10초이고 스테이지 시간은 디저트 수에 비례한다', () => {
     expect(getStageTimeLimit(practiceStage)).toBe(10_000);
-    expect(['easy', 'normal', 'hard'].map(difficulty =>
-      getStageTimeLimit(stages.find(stage => stage.difficulty === difficulty)!)))
-      .toEqual([120_000, 150_000, 180_000]);
+    const rate = { easy: 1.0, normal: 1.1, hard: 1.2 };
+    for (const stage of stages) {
+      const desserts = stage.queues.flat().length;
+      const limit = getStageTimeLimit(stage);
+      expect(limit % 5_000).toBe(0);
+      expect(limit / 1000).toBeGreaterThanOrEqual(10 + desserts * rate[stage.difficulty ?? 'easy']);
+      expect(limit / 1000).toBeLessThan(15 + desserts * rate[stage.difficulty ?? 'easy']);
+    }
+    expect(getStageTimeLimit(stages[0]!)).toBe(140_000);
   });
 
   it.each([[60_000, 3], [59_999, 2], [30_000, 2], [29_999, 1], [1, 1], [0, 0]])(
@@ -52,7 +58,7 @@ describe('스테이지 공용 시간', () => {
     game.nextOrderIndex = stage.targetOrders;
     game.tray = tray(type, 1);
     const action = { type: 'PICKUP_TRAY', readyOrders: [order.definitionId], parallel: true } as const;
-    const cleared = reduceSession(session, { type: 'GAME', action: { ...action, remainingTimeMs: 30_000 } });
+    const cleared = reduceSession(session, { type: 'GAME', action: { ...action, remainingTimeMs: 35_000 } });
     expect(cleared.game.status).toBe('clear');
     expect(cleared.stars[stage.id]).toBe(2);
     const failed = reduceSession(session, { type: 'GAME', action: { ...action, remainingTimeMs: 0 } });

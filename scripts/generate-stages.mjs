@@ -1,5 +1,5 @@
 import { registerHooks } from 'node:module';
-import { mkdirSync, readFileSync, renameSync, rmdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmdirSync, renameSync, writeFileSync } from 'node:fs';
 
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -10,25 +10,39 @@ registerHooks({
   },
 });
 
-const { QUEUE_COUNT } = await import('../src/game/constants.ts');
+const { ORDER_SLOTS, QUEUE_COUNT } = await import('../src/game/constants.ts');
 const { TRAY_CAPACITY_BY_DIFFICULTY } = await import('../src/game/trayCapacity.ts');
-const { createGame, matchTray, pickupTray, selectDonut } = await import('../src/game/engine.ts');
+const { createGame, selectDonut } = await import('../src/game/engine.ts');
 const { DONUT_TYPES } = await import('../src/game/types.ts');
+const { difficultyForStage, campaignProgress } = await import('../src/game/stages/schedule.ts');
 
-const firstId = 6;
-const layoutRevisions = { easy: 10, normal: 9, hard: 8 };
+const firstId = 2;
+// Bump to regenerate every stored layout with the current rules.
+const layoutRevision = 20;
 const endId = Number(process.argv[2] ?? 101);
 const campaignSeed = Number(process.argv[3] ?? 2026);
 if (!Number.isSafeInteger(endId) || endId < firstId || !Number.isInteger(campaignSeed) || campaignSeed < 0 || campaignSeed > 0xffffffff) {
   throw new Error('Usage: npm run stages:generate -- <last-stage-id> [seed (0–4294967295)]');
 }
 
+// Layout knobs are sampled from these ranges; bot success bands decide which candidate is kept.
 const profiles = {
-  easy: { variety: 10, orders: 9, kinds: 2, batch: 3, runSize: 6, dessertTotal: 126, peakMin: 0, peakMax: 5 },
-  normal: { variety: 15, orders: 12, kinds: 3, batch: 6, runSize: 4, dessertTotal: 160, peakMin: 6, peakMax: 12 },
-  hard: { variety: 20, orders: 15, kinds: 3, batch: 7, runSize: 3, dessertTotal: 200, peakMin: 6, peakMax: 8 },
+  easy: { variety: 10, orders: 9, kinds: [2, 2], batch: [2, 5], runSize: [3, 7], dessertTotal: [126, 140], bonus: 2 },
+  normal: { variety: 15, orders: 12, kinds: [2, 3], batch: [3, 8], runSize: [2, 6], dessertTotal: [160, 176], bonus: 0 },
+  hard: { variety: 20, orders: 15, kinds: [3, 3], batch: [4, 9], runSize: [2, 5], dessertTotal: [200, 216], bonus: 0 },
 };
-const cadence = ['normal', 'easy', 'hard', 'normal', 'easy', 'normal', 'hard', 'easy'];
+const lerp = (from, to, progress) => from + (to - from) * progress;
+// Success-rate targets (percent) for a skilled bot (nearest needed dessert first) and a
+// novice bot (taps any needed front dessert). Targets tighten as the campaign advances.
+function targetsFor(difficulty, progress) {
+  if (difficulty === 'easy') return { skilled: [97, 100], novice: band(lerp(96, 72, progress), 6) };
+  if (difficulty === 'normal') return { skilled: band(lerp(98, 88, progress), 4), novice: band(lerp(50, 18, progress), 12) };
+  return { skilled: band(lerp(86, 68, progress), 5), novice: [0, lerp(20, 10, progress)] };
+}
+function band(center, tolerance) {
+  return [Math.max(0, center - tolerance), Math.min(100, center + tolerance)];
+}
+
 const file = new URL('../src/game/stages/generated.json', import.meta.url);
 
 function randomFor(seed) {
@@ -38,6 +52,7 @@ function randomFor(seed) {
     return Math.floor(state / 0x100000000 * size);
   };
 }
+const between = (random, [low, high]) => low + random(high - low + 1);
 
 function shuffle(values, random) {
   const shuffled = [...values];
@@ -48,156 +63,226 @@ function shuffle(values, random) {
   return shuffled;
 }
 
-function makeCandidate(id, difficulty, random, previous) {
+function makeCandidate(id, difficulty, progress, random) {
   const profile = profiles[difficulty];
+  const knobs = {
+    kinds: between(random, profile.kinds),
+    batch: between(random, profile.batch),
+    runSize: between(random, profile.runSize),
+    dessertTotal: Math.round(lerp(...profile.dessertTotal, progress)),
+  };
   const menuPool = difficulty === 'hard' ? DONUT_TYPES : DONUT_TYPES.slice(DONUT_TYPES.indexOf('croissant'));
-  const compatible = previous?.donutTypes.length === profile.variety ? previous : undefined;
-  const menu = compatible?.donutTypes ?? shuffle(menuPool, random).slice(0, profile.variety);
-  let orders = compatible?.orders ?? Array.from({ length: profile.orders }, (_, index) => {
+  const menu = shuffle(menuPool, random).slice(0, profile.variety);
+  const orders = Array.from({ length: profile.orders }, (_, index) => {
     const featured = menu[index % menu.length];
-    const required = [featured, ...menu.slice(profile.orders + index, profile.orders + index + 1)];
+    const required = [featured, ...menu.slice(profile.orders + index, profile.orders + index + 1)].slice(0, knobs.kinds);
     const alternatives = shuffle(menu.filter(type => !required.includes(type)), random);
-    const types = [...required, ...alternatives.slice(0, profile.kinds - required.length)];
+    const types = [...required, ...alternatives.slice(0, knobs.kinds - required.length)];
     return {
       id: `s${id}-o${index + 1}`,
       sequence: index + 1,
-      items: Object.fromEntries(types.map(type => [type, 2 + random(4)])),
+      items: Object.fromEntries(types.map(type => [type, 2 + random(4) + profile.bonus])),
     };
   });
-  if (difficulty === 'easy' && !compatible) {
-    orders = orders.map(order => ({
-      ...order,
-      items: Object.fromEntries(Object.entries(order.items).map(([type, quantity]) => [type, quantity + 2])),
-    }));
+  const dessertCount = orders.reduce((sum, order) =>
+    sum + Object.values(order.items).reduce((total, quantity) => total + quantity, 0), 0);
+  const additional = Math.max(0, knobs.dessertTotal - dessertCount);
+  const extraOrders = Math.ceil(additional / 13);
+  for (let extra = 0; extra < extraOrders; extra += 1) {
+    const quantity = Math.floor(additional / extraOrders) + Number(extra < additional % extraOrders);
+    const types = shuffle(menu, random).slice(0, Math.min(knobs.kinds, quantity));
+    const items = Object.fromEntries(types.map((type, index) => [
+      type, Math.floor(quantity / types.length) + Number(index < quantity % types.length),
+    ]));
+    const sequence = orders.length + 1;
+    orders.push({ id: `s${id}-extra-o${sequence}`, sequence, items });
   }
-  if (profile.dessertTotal) {
-    const dessertCount = orders.reduce((sum, order) =>
-      sum + Object.values(order.items).reduce((total, quantity) => total + quantity, 0), 0);
-    const additional = Math.max(0, profile.dessertTotal - dessertCount);
-    const extraOrders = Math.ceil(additional / 13);
-    orders = [...orders];
-    for (let extra = 0; extra < extraOrders; extra += 1) {
-      const quantity = Math.floor(additional / extraOrders) + Number(extra < additional % extraOrders);
-      const types = shuffle(menu, random).slice(0, Math.min(profile.kinds, quantity));
-      const items = Object.fromEntries(types.map((type, index) => [
-        type, Math.floor(quantity / types.length) + Number(index < quantity % types.length),
-      ]));
-      const sequence = orders.length + 1;
-      orders.push({ id: `s${id}-extra-o${sequence}`, sequence, items });
-    }
-  }
-  return arrangeStage(id, difficulty, random, menu, orders);
+  return arrangeStage(id, difficulty, random, menu, orders, knobs);
 }
 
-function arrangeStage(id, difficulty, random, menu, orders) {
-  const profile = profiles[difficulty];
+function arrangeStage(id, difficulty, random, menu, orders, knobs) {
   const queues = Array.from({ length: QUEUE_COUNT }, () => []);
   const columns = shuffle(queues.map((_, index) => index), random);
   let run = 0;
-  for (let start = 0; start < orders.length; start += profile.batch) {
-    const runs = orders.slice(start, start + profile.batch).flatMap(order =>
+  for (let start = 0; start < orders.length; start += knobs.batch) {
+    const runs = orders.slice(start, start + knobs.batch).flatMap(order =>
       Object.entries(order.items).flatMap(([type, quantity]) =>
-        Array.from({ length: Math.ceil(quantity / profile.runSize) }, (_, index) =>
-          [type, Math.min(quantity - index * profile.runSize, profile.runSize)])));
+        Array.from({ length: Math.ceil(quantity / knobs.runSize) }, (_, index) =>
+          [type, Math.min(quantity - index * knobs.runSize, knobs.runSize)])));
     for (const [type, quantity] of shuffle(runs, random)) {
-      const column = columns[run % QUEUE_COUNT];
-      const queue = queues[column];
-      for (let index = 0; index < quantity; index += 1) {
-        queue.push({ id: `s${id}-q${column}-${queue.length}`, type });
-      }
+      const queue = queues[columns[run % QUEUE_COUNT]];
+      for (let index = 0; index < quantity; index += 1) queue.push(menu.indexOf(type));
       run += 1;
     }
   }
   return {
-    id, difficulty, revision: layoutRevisions[difficulty], donutTypes: menu, targetOrders: orders.length,
+    id, difficulty, revision: layoutRevision, donutTypes: menu, targetOrders: orders.length,
     trayCapacity: TRAY_CAPACITY_BY_DIFFICULTY[difficulty], queues, orders,
   };
 }
 
-function sameTypeNeighborFraction(queues) {
-  let pairs = 0;
-  let matching = 0;
-  for (const queue of queues) {
-    for (let index = 1; index < queue.length; index += 1) {
-      pairs += 1;
-      if (queue[index] === queue[index - 1]) matching += 1;
+// Fast replica of the engine's instant-settle rules, used only to score candidates.
+function simulate(stage, policy, random) {
+  const kinds = stage.donutTypes.length;
+  const demand = stage.orders.map(order => {
+    const remaining = new Array(kinds).fill(0);
+    for (const [type, quantity] of Object.entries(order.items)) remaining[stage.donutTypes.indexOf(type)] = quantity;
+    return remaining;
+  });
+  const fronts = new Array(QUEUE_COUNT).fill(0);
+  const tray = new Array(kinds).fill(0);
+  let trayCount = 0;
+  let next = Math.min(ORDER_SLOTS, demand.length);
+  let completed = 0;
+  const active = demand.slice(0, next).map((remaining, index) => ({ sequence: index, remaining: [...remaining], left: remaining.reduce((a, b) => a + b, 0) }));
+  const needed = type => active.some(order => order.remaining[type] > 0);
+  const absorb = order => {
+    for (let type = 0; type < kinds; type += 1) {
+      const used = Math.min(tray[type], order.remaining[type]);
+      if (!used) continue;
+      tray[type] -= used; trayCount -= used; order.remaining[type] -= used; order.left -= used;
     }
+  };
+  while (completed < demand.length) {
+    let choice = -1;
+    if (policy === 'skilled') {
+      let best = Infinity;
+      for (let column = 0; column < QUEUE_COUNT; column += 1) {
+        const queue = stage.queues[column];
+        if (fronts[column] >= queue.length) continue;
+        let depth = 0;
+        while (fronts[column] + depth < queue.length && !needed(queue[fronts[column] + depth])) depth += 1;
+        const score = (fronts[column] + depth < queue.length ? depth : 1e6) + random(1000) / 1000;
+        if (score < best) { best = score; choice = column; }
+      }
+    } else {
+      const open = [];
+      const useful = [];
+      for (let column = 0; column < QUEUE_COUNT; column += 1) {
+        if (fronts[column] >= stage.queues[column].length) continue;
+        open.push(column);
+        if (needed(stage.queues[column][fronts[column]])) useful.push(column);
+      }
+      const pool = useful.length ? useful : open;
+      choice = pool.length ? pool[random(pool.length)] : -1;
+    }
+    if (choice < 0) return false;
+    const type = stage.queues[choice][fronts[choice]];
+    fronts[choice] += 1;
+    const order = active.filter(candidate => candidate.remaining[type] > 0).sort((a, b) => a.sequence - b.sequence)[0];
+    if (order) {
+      order.remaining[type] -= 1; order.left -= 1;
+    } else {
+      tray[type] += 1; trayCount += 1;
+    }
+    for (let changed = true; changed;) {
+      changed = false;
+      for (let slot = 0; slot < active.length; slot += 1) {
+        if (active[slot].left > 0) continue;
+        completed += 1;
+        changed = true;
+        if (next < demand.length) {
+          active[slot] = { sequence: next, remaining: [...demand[next]], left: demand[next].reduce((a, b) => a + b, 0) };
+          next += 1;
+          absorb(active[slot]);
+        } else {
+          active.splice(slot, 1);
+          slot -= 1;
+        }
+      }
+    }
+    if (trayCount >= stage.trayCapacity && completed < demand.length) return false;
   }
-  return pairs ? matching / pairs : 0;
+  return true;
 }
 
-function findSolution(stage, random) {
-  let state = createGame(stage);
-  const readyOrders = stage.orders.map(order => order.id);
-  const solution = [];
-  let peak = 0;
-  while (state.status === 'playing') {
-    const needed = type => state.orders.some(order => (order?.remaining[type] ?? 0) > 0);
-    const choices = [];
-    for (const [column, queue] of state.queues.entries()) {
-      if (!queue.length) continue;
-      const depth = queue.findIndex(token => needed(token.type));
-      choices.push({ column, priority: (depth < 0 ? Infinity : depth + random(100) / 100) });
+function successRate(stage, policy, runs, seed) {
+  const random = randomFor(seed);
+  let wins = 0;
+  for (let run = 0; run < runs; run += 1) wins += Number(simulate(stage, policy, random));
+  return 100 * wins / runs;
+}
+
+function measure(stage, runs, seed) {
+  return { skilled: successRate(stage, 'skilled', runs, seed), novice: successRate(stage, 'novice', runs, seed ^ 0x5bd1e995) };
+}
+const distance = (value, [low, high]) => value < low ? low - value : value > high ? value - high : 0;
+const miss = (rates, targets) => distance(rates.skilled, targets.skilled) * 2 + distance(rates.novice, targets.novice);
+
+function toStage(candidate) {
+  return {
+    ...candidate,
+    queues: candidate.queues.map((queue, column) => queue.map((menuIndex, index) => ({
+      id: `s${candidate.id}-q${column}-${index}`, type: candidate.donutTypes[menuIndex],
+    }))),
+  };
+}
+
+// Witness path replayed through the real engine, so tests can prove each stage is clearable.
+function findSolution(candidate, random) {
+  const stage = toStage(candidate);
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    let state = createGame(stage);
+    const solution = [];
+    while (state.status === 'playing') {
+      const needed = type => state.orders.some(order => (order?.remaining[type] ?? 0) > 0);
+      let best = Infinity;
+      let column = -1;
+      for (const [index, queue] of state.queues.entries()) {
+        if (!queue.length) continue;
+        const depth = queue.findIndex(token => needed(token.type));
+        const score = (depth < 0 ? 1e6 : depth) + random(1000) / 1000;
+        if (score < best) { best = score; column = index; }
+      }
+      if (column < 0) break;
+      const next = selectDonut(state, stage, column, state.queues[column][0].id).state;
+      if (next === state) break;
+      solution.push(column);
+      state = next;
     }
-    choices.sort((left, right) => left.priority - right.priority);
-    const choice = choices[0];
-    if (!choice || !Number.isFinite(choice.priority)) break;
-    const token = state.queues[choice.column][0];
-    const selected = selectDonut(state, stage, choice.column, token.id, true).state;
-    if (selected === state) break;
-    solution.push(choice.column);
-    peak = Math.max(peak, selected.tray.length);
-    state = matchTray(selected, stage, token.id, true).state;
-    while (true) {
-      const pickedUp = pickupTray(state, stage, readyOrders, true).state;
-      if (pickedUp === state) break;
-      state = pickedUp;
-    }
+    if (state.status === 'clear') return solution;
   }
-  const { peakMin, peakMax } = profiles[stage.difficulty];
-  return state.status === 'clear' && state.tray.length === 0 && peak >= peakMin && peak <= peakMax ? solution : undefined;
+  return undefined;
 }
 
 const lock = new URL('generated.lock/', file);
 mkdirSync(lock);
 try {
-  const { stages: generated, solutions } = JSON.parse(readFileSync(file, 'utf8'));
-  const lastId = generated.at(-1)?.id ?? firstId - 1;
-  const outdated = generated.filter(stage => stage.revision < layoutRevisions[stage.difficulty]);
-  const ids = [...outdated.map(stage => stage.id),
-    ...Array.from({ length: Math.max(0, endId - lastId) }, (_, index) => lastId + index + 1)];
-  const oldStages = new Map(outdated.map(stage => [stage.id, stage]));
-  for (const id of ids) {
-    const old = oldStages.get(id);
-    const difficulty = old?.difficulty ?? cadence[(id - firstId) % cadence.length];
+  const stored = JSON.parse(readFileSync(file, 'utf8'));
+  const keep = stored.stages.filter(stage => stage.id >= firstId && stage.revision === layoutRevision);
+  const kept = new Set(keep.map(stage => stage.id));
+  const generated = [...keep];
+  const solutions = Object.fromEntries(Object.entries(stored.solutions).filter(([id]) => kept.has(Number(id))));
+  const lastId = Math.max(endId, ...stored.stages.map(stage => stage.id));
+  for (let id = firstId; id <= lastId; id += 1) {
+    if (kept.has(id)) continue;
+    const difficulty = difficultyForStage(id);
+    const progress = campaignProgress(id);
+    const targets = targetsFor(difficulty, progress);
     const random = randomFor(campaignSeed ^ Math.imul(id, 0x9e3779b9));
-    const previousGrouping = old ? sameTypeNeighborFraction(old.queues) : 0;
-    let accepted = false;
-    for (let attempt = 0; attempt < 1000; attempt += 1) {
-      const candidate = makeCandidate(id, difficulty, random, old);
-      const queues = candidate.queues.map(queue => queue.map(token => candidate.donutTypes.indexOf(token.type)));
-      if (old && sameTypeNeighborFraction(queues) <= previousGrouping) continue;
-      const solution = findSolution(candidate, random);
-      if (!solution) continue;
-      if (old) generated[generated.indexOf(old)] = { ...candidate, queues };
-      else generated.push({ ...candidate, queues });
-      solutions[id] = solution;
-      accepted = true;
-      break;
+    let best;
+    for (let attempt = 0; attempt < 3000 && !(best && best.miss === 0); attempt += 1) {
+      const candidate = makeCandidate(id, difficulty, progress, random);
+      const quick = measure(candidate, 60, campaignSeed + attempt);
+      if (best && miss(quick, targets) > best.miss + 10) continue;
+      const rates = measure(candidate, 400, campaignSeed ^ id);
+      const score = miss(rates, targets);
+      if (!best || score < best.miss) best = { candidate, rates, miss: score };
     }
-    if (!accepted) throw new Error(`No verified ${difficulty} layout for stage ${id}.`);
+    const solution = findSolution(best.candidate, random);
+    if (!solution) throw new Error(`No verified ${difficulty} layout for stage ${id}.`);
+    generated.push(best.candidate);
+    solutions[id] = solution;
+    console.log(`stage ${id} ${difficulty}: skilled ${best.rates.skilled.toFixed(0)}% novice ${best.rates.novice.toFixed(0)}%`
+      + ` (target ${targets.skilled.map(Math.round).join('–')} / ${targets.novice.map(Math.round).join('–')})${best.miss ? ' *' : ''}`);
   }
-
-  if (ids.length) {
-    const format = entries => entries.map(entry => '    ' + JSON.stringify(entry)).join(',\n');
-    const data = `{\n  "stages": [\n${format(generated)}\n  ],\n  "solutions": {\n${Object.entries(solutions).map(([id, path]) => `    "${id}": ${JSON.stringify(path)}`).join(',\n')}\n  }\n}\n`;
-    const temporary = new URL('generated.json.tmp', file);
-    writeFileSync(temporary, data);
-    renameSync(temporary, file);
-    console.log(`Saved ${ids.length} verified stage layouts.`);
-  } else {
-    console.log(`Stages through ${endId} already exist.`);
-  }
+  generated.sort((left, right) => left.id - right.id);
+  const format = entries => entries.map(entry => '    ' + JSON.stringify(entry)).join(',\n');
+  const data = `{\n  "stages": [\n${format(generated)}\n  ],\n  "solutions": {\n${generated.map(({ id }) => `    "${id}": ${JSON.stringify(solutions[id])}`).join(',\n')}\n  }\n}\n`;
+  const temporary = new URL('generated.json.tmp', file);
+  writeFileSync(temporary, data);
+  renameSync(temporary, file);
+  console.log(`Saved ${generated.length} verified stage layouts.`);
 } finally {
   rmdirSync(lock);
 }

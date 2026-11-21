@@ -1,9 +1,14 @@
 import type { StageDefinition } from './types';
 
-const limitByDifficulty = { easy: 120_000, normal: 150_000, hard: 180_000 } as const;
+// Seconds granted per dessert in the queues; harder stages need more thinking per tap.
+const secondsPerDessert = { easy: 1.0, normal: 1.1, hard: 1.2 } as const;
+const baseSeconds = 10;
 
 export function getStageTimeLimit(stage: StageDefinition): number {
-  return stage.id === 0 ? 10_000 : limitByDifficulty[stage.difficulty ?? 'easy'];
+  if (stage.id === 0) return 10_000;
+  const desserts = stage.queues.reduce((sum, queue) => sum + queue.length, 0);
+  const seconds = baseSeconds + desserts * secondsPerDessert[stage.difficulty ?? 'easy'];
+  return Math.ceil(seconds / 5) * 5_000;
 }
 
 export function getTimeStars(remainingMs: number, limitMs: number): number {
