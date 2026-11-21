@@ -1162,16 +1162,15 @@
   align-items: center;
   gap: 2px;
   translate: -50% -100%;
-  color: #c2335c;
+  color: #ec6a86;
   font-family: Jua, sans-serif;
-  font-size: 20px;
+  font-size: 17px;
   text-shadow: 0 1px 0 #fff, 0 0 6px #fff;
   pointer-events: none;
   animation: float-pop 1000ms ease-out both;
 }
-.reward-pop .heart-icon { width: 28px; height: 28px; }
-.reward-pop .material-symbol { width: 26px; height: 26px; background: #3d7fb8; }
-.reward-pop--trayClear { color: #2f6e9f; }
+.reward-pop .heart-icon { width: 22px; height: 22px; fill: #ec6a86; }
+.reward-pop .material-symbol { width: 21px; height: 21px; background: #ec6a86; }
 @keyframes float-pop {
   0% { opacity: 0; transform: translateY(6px) scale(.6); }
   20% { opacity: 1; transform: translateY(0) scale(1.15); }
