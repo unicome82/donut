@@ -382,7 +382,7 @@ describe('세션 진행', () => {
   it('스테이지를 클리어할 때마다 트레이 비우기 기회가 1회 늘어나 다음 스테이지로 이어진다', () => {
     const stage = stages[0]!;
     const session = reduceSession(createSession(), { type: 'START', stageId: stage.id });
-    expect(session.game.trayClearsLeft).toBe(1);
+    expect(session.game.trayClearsLeft).toBe(3);
     const game = session.game;
     const order = game.orders[0]!;
     const type = stage.donutTypes[0]!;
@@ -392,28 +392,26 @@ describe('세션 진행', () => {
     game.tray = tray(type, 1);
     const cleared = reduceSession(session, { type: 'GAME', action: { type: 'PICKUP_TRAY', readyOrders: [order.definitionId], parallel: true } });
     expect(cleared.game.status).toBe('clear');
-    expect(cleared.trayClears).toBe(2);
+    expect(cleared.trayClears).toBe(4);
     const next = reduceSession(cleared, { type: 'START', stageId: stages[1]!.id });
-    expect(next.game.trayClearsLeft).toBe(2);
+    expect(next.game.trayClearsLeft).toBe(4);
     const retried = reduceSession(next, { type: 'GAME', action: { type: 'RESTART' } });
-    expect(retried.game.trayClearsLeft).toBe(2);
+    expect(retried.game.trayClearsLeft).toBe(4);
   });
 
-  it('무료 트레이 비우기는 스테이지에 들어올 때만 주고 재도전에는 주지 않는다', () => {
+  it('트레이 비우기는 처음 3회로 시작하고 재도전이나 새 스테이지에서 다시 채워지지 않는다', () => {
     const stage = stages[0]!;
-    const broke = { ...createSession(), trayClears: 0 };
-    const started = reduceSession(broke, { type: 'START', stageId: stage.id });
-    expect(started.game.trayClearsLeft).toBe(1);
-    expect(reduceSession(started, { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(0);
-
-    const carried = reduceSession(createSession(), { type: 'START', stageId: stage.id });
-    const game = structuredClone(carried.game);
+    const started = reduceSession(createSession(), { type: 'START', stageId: stage.id });
+    expect(started.game.trayClearsLeft).toBe(3);
+    const game = structuredClone(started.game);
     const queues = game.queues.map(queue => [...queue]);
     game.tray = queues[0]!.splice(0, 1);
-    const used = reduceSession({ ...carried, game: { ...game, queues } }, { type: 'GAME', action: { type: 'CLEAR_TRAY' } });
-    expect(used.game.trayClearsLeft).toBe(0);
-    expect(used.trayClears).toBe(0);
-    expect(reduceSession(used, { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(0);
+    const used = reduceSession({ ...started, game: { ...game, queues } }, { type: 'GAME', action: { type: 'CLEAR_TRAY' } });
+    expect(used.trayClears).toBe(2);
+    expect(reduceSession(used, { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(2);
+    const empty = { ...createSession(), trayClears: 0 };
+    expect(reduceSession(empty, { type: 'START', stageId: stage.id }).game.trayClearsLeft).toBe(0);
+    expect(reduceSession(reduceSession(empty, { type: 'START', stageId: stage.id }), { type: 'GAME', action: { type: 'RESTART' } }).game.trayClearsLeft).toBe(0);
   });
 
   it('게임 중에도 트레이를 비울 수 있지만 비어 있으면 비울 수 없다', () => {

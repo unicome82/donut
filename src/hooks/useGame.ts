@@ -17,7 +17,8 @@ function loadSession() {
       }
     }
     if (Number.isSafeInteger(saved.score) && saved.score >= 0) session.score = saved.score;
-    if (Number.isSafeInteger(saved.trayClears) && saved.trayClears >= 0) session.trayClears = saved.trayClears;
+    // Saves from before the three-clear start (no clearsVersion) begin again with the new pool.
+    if (saved.clearsVersion === 2 && Number.isSafeInteger(saved.trayClears) && saved.trayClears >= 0) session.trayClears = saved.trayClears;
   } catch {
     return session;
   }
@@ -29,7 +30,7 @@ export function useGame() {
   const { stars, score, trayClears } = session;
   useEffect(() => {
     try {
-      localStorage.setItem(progressKey, JSON.stringify({ stars, score, trayClears }));
+      localStorage.setItem(progressKey, JSON.stringify({ stars, score, trayClears, clearsVersion: 2 }));
     } catch {
       // Play can continue when browser storage is unavailable.
     }

@@ -4,7 +4,6 @@ import { useMessages } from '../i18n/language';
 
 // Each star sits where it is lost: the third at 50%, the second at 25%, the last at 0%.
 const starPositions = [0, 25, 50];
-const URGENT_MS = 10_000;
 
 function formatTime(ms: number) {
   const seconds = Math.ceil(ms / 1000);
@@ -15,8 +14,7 @@ export function StageClock({ remainingMs, limitMs }: { remainingMs: number; limi
   const t = useMessages();
   const remainingPercent = remainingMs / limitMs * 100;
   const stars = getTimeStars(remainingMs, limitMs);
-  const urgent = remainingMs > 0 && remainingMs <= URGENT_MS;
-  return <div className={`stage-clock${urgent ? ' stage-clock--urgent' : ''}`} role="progressbar" aria-label={t.timeLeft}
+  return <div className="stage-clock" role="progressbar" aria-label={t.timeLeft}
     aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(remainingPercent)}
     aria-valuetext={t.timeText(formatTime(remainingMs), stars)}>
     <span className="stage-clock-bar" aria-hidden="true">
