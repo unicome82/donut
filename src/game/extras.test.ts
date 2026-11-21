@@ -3,6 +3,10 @@ import { createSession, reduceSession } from './session';
 import { loadStage } from './stages';
 import { REWARDS_FROM_STAGE, VIP_FROM_STAGE, vipCount } from './stages/extras';
 import type { GameState } from './types';
+import { FEATURE_PREVIEW_STAGES, isFeaturePreviewStage } from './constants';
+
+// While the playtest flag is on, stages 15 and 25 use the preview layout; check the rules one stage later.
+const real = (id: number) => isFeaturePreviewStage(id) ? id + 1 : id;
 
 function rewardSpot(state: GameState) {
   for (const [column, queue] of state.queues.entries()) {
@@ -15,7 +19,7 @@ function rewardSpot(state: GameState) {
 describe('VIP 손님', () => {
   it(`${VIP_FROM_STAGE}번부터 나오고, 처음 네 손님은 VIP가 아니며 수가 점점 는다`, async () => {
     expect((await loadStage(VIP_FROM_STAGE - 1)).orders.some(order => order.vip)).toBe(false);
-    for (const id of [VIP_FROM_STAGE, 55, 95, 400]) {
+    for (const id of [real(VIP_FROM_STAGE), 55, 95, 400]) {
       const stage = await loadStage(id);
       const vips = stage.orders.flatMap((order, index) => order.vip ? [index] : []);
       expect(vips).toHaveLength(vipCount(id));
@@ -28,7 +32,7 @@ describe('VIP 손님', () => {
 describe('대기열 보상', () => {
   it(`${REWARDS_FROM_STAGE}번부터 스테이지마다 하나씩, 맨 앞 세 칸 밖의 보이는 디저트에 붙는다`, async () => {
     expect((await loadStage(REWARDS_FROM_STAGE - 1)).queues.flat().some(token => token.reward)).toBe(false);
-    for (const id of [REWARDS_FROM_STAGE, 51, 99, 777]) {
+    for (const id of [real(REWARDS_FROM_STAGE), 51, 99, 777]) {
       const stage = await loadStage(id);
       const rewarded = stage.queues.flatMap(queue => queue.flatMap((token, index) => token.reward ? [{ token, index }] : []));
       expect(rewarded).toHaveLength(1);
@@ -40,6 +44,7 @@ describe('대기열 보상', () => {
   it('보상 디저트를 1열에서 집으면 충전되고, 다시 하면 그 스테이지에는 보상이 없다', async () => {
     const ids: Partial<Record<string, number>> = {};
     for (let id = REWARDS_FROM_STAGE; !(ids.heart && ids.trayClear); id += 1) {
+      if (isFeaturePreviewStage(id)) continue;
       const spot = rewardSpot({ queues: (await loadStage(id)).queues } as GameState);
       if (spot && !ids[spot.reward]) ids[spot.reward] = id;
     }
@@ -68,8 +73,8 @@ describe('대기열 보상', () => {
   });
 
   it('하트가 가득하면 하트 보상은 보너스 하트로 간다', async () => {
-    let id = REWARDS_FROM_STAGE;
-    while (rewardSpot({ queues: (await loadStage(id)).queues } as GameState)?.reward !== 'heart') id += 1;
+    let id = real(REWARDS_FROM_STAGE);
+    while (isFeaturePreviewStage(id) || rewardSpot({ queues: (await loadStage(id)).queues } as GameState)?.reward !== 'heart') id += 1;
     let session = reduceSession(createSession(true), { type: 'START', stageId: id, now: 0 });
     session = { ...session, hearts: { count: 5, bonus: 0, refillFrom: 0 }, game: { ...session.game, trayCapacity: 99 } };
     const { column, index } = rewardSpot(session.game)!;
@@ -78,5 +83,18 @@ describe('대기열 보상', () => {
       session = reduceSession(session, { type: 'GAME', action: { type: 'SELECT_DONUT', queueIndex: column, expectedDonutId: front.id }, now: 0 });
     }
     expect(session.hearts).toMatchObject({ count: 5, bonus: 1 });
+  });
+});
+
+describe.runIf(FEATURE_PREVIEW_STAGES.some(isFeaturePreviewStage))('기능 미리보기 (테스트용)', () => {
+  it('15·25번은 잠겨 있어도 열리고, 첫 손님이 VIP이며 25번은 보상 2종이 둘째 칸에 있다', async () => {
+    const session = createSession();
+    const at15 = reduceSession(session, { type: 'START', stageId: 15, now: 0 });
+    expect(at15.game.stageId).toBe(15);
+    expect(at15.game.orders[0]?.vip).toBe(true);
+    expect(at15.game.queues.flat().some(token => token.reward)).toBe(false);
+    const stage25 = await loadStage(25);
+    expect(stage25.orders[0]?.vip).toBe(true);
+    expect([stage25.queues[1]![1]!.reward, stage25.queues[3]![1]!.reward]).toEqual(['heart', 'trayClear']);
   });
 });

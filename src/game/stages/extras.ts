@@ -1,4 +1,5 @@
 import type { RewardKind, StageDefinition } from '../types';
+import { isFeaturePreviewStage } from '../constants';
 
 // Features that join the campaign as it goes on. Both are laid over stored layouts at load time,
 // so the generator and its saved solutions stay unchanged.
@@ -23,6 +24,7 @@ export function vipCount(id: number): number {
 }
 
 export function decorateStage(stage: StageDefinition): StageDefinition {
+  if (isFeaturePreviewStage(stage.id)) return previewStage(stage);
   const random = randomFor(stage.id * 7919 + 17);
   // VIPs skip the opening four customers so the first one arrives mid-stage.
   const candidates = stage.orders.map((_, index) => index).filter(index => index >= 4);
@@ -40,5 +42,17 @@ export function decorateStage(stage: StageDefinition): StageDefinition {
       queues = queues.map((queue, c) => c !== column ? queue : queue.map((token, i) => i === index ? { ...token, reward } : token));
     }
   }
+  return { ...stage, orders, queues };
+}
+
+// Playtest layout: the first customer is a VIP and, from stage 25, both rewards sit second in a queue.
+function previewStage(stage: StageDefinition): StageDefinition {
+  const orders = stage.orders.map((order, index) => index === 0 ? { ...order, vip: true } : order);
+  if (stage.id < REWARDS_FROM_STAGE) return { ...stage, orders };
+  const rewards: Array<[number, RewardKind]> = [[1, 'heart'], [3, 'trayClear']];
+  const queues = stage.queues.map((queue, column) => {
+    const reward = rewards.find(([c]) => c === column)?.[1];
+    return reward ? queue.map((token, index) => index === 1 ? { ...token, reward } : token) : queue;
+  });
   return { ...stage, orders, queues };
 }

@@ -3,6 +3,7 @@ import { getStage, isBonusStage, isStageId, practiceStage, prepareBonusStage, ST
 import { reduceGame, type GameAction } from './reducer';
 import { addHeart, chargeFromBonus, fullHearts, MAX_HEARTS, refillHearts, spendHeart, type HeartSource, type Hearts } from './hearts';
 import type { DonutType, GameState } from './types';
+import { isFeaturePreviewStage } from './constants';
 
 const POINTS_PER_ORDER = 100;
 
@@ -41,7 +42,7 @@ function createSessionGame(stageId: number, trayClears: number, rewardedStages: 
 }
 /** A stage whose reward was already collected comes back without it, so retries can't farm it. */
 function withoutSpentRewards(game: GameState, rewardedStages: readonly number[]): GameState {
-  if (!rewardedStages.includes(game.stageId)) return game;
+  if (!rewardedStages.includes(game.stageId) || isFeaturePreviewStage(game.stageId)) return game;
   return { ...game, queues: game.queues.map(queue => queue.map(token => {
     if (!token.reward) return token;
     const { reward, ...rest } = token;
@@ -78,7 +79,7 @@ export function unlockedThrough(stars: Record<number, number>, unlockAllStages =
   return unlockAllStages ? STAGE_COUNT : Math.min(STAGE_COUNT, highestCleared(stars) + 1);
 }
 export function isUnlocked(id: number, stars: Record<number, number>, unlockAllStages = false): boolean {
-  if (id === practiceStage.id) return true;
+  if (id === practiceStage.id || isFeaturePreviewStage(id)) return true;
   return isStageId(id) && id <= unlockedThrough(stars, unlockAllStages);
 }
 /** The stage in progress: the one after the highest clear. */

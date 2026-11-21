@@ -8,7 +8,7 @@ import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
 import { SoundButton } from '../components/SoundControls';
 import { HeartCounter } from '../components/HeartCounter';
-import { BONUS_AT_STAGE_00_FOR_TESTING } from '../game/constants';
+import { BONUS_AT_STAGE_00_FOR_TESTING, isFeaturePreviewStage } from '../game/constants';
 import type { Hearts } from '../game/hearts';
 
 const columns = 3;
@@ -77,7 +77,7 @@ export function StageSelectPage({ onGame, onChargeHearts, stars, hearts, unlockA
             const id = optionId(firstRow * columns + offset);
             const stage = { id, difficulty: id === practiceStage.id ? practiceStage.difficulty : stageDifficulty(id) };
             const practice = id === practiceStage.id;
-            const unlocked = practice || id <= openThrough;
+            const unlocked = practice || id <= openThrough || isFeaturePreviewStage(id);
             const score = stars[stage.id] ?? 0;
             const current = stage.id === currentStage;
             const description = unlocked ? (score ? t.starsCount(score) : t.available) : t.locked;
