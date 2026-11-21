@@ -980,3 +980,26 @@
   background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-weight: 700;
   box-shadow: 0 6px 18px rgb(64 53 47 / 14%);
 }
+
+// 500-stage jump buttons, stacked at the bottom-right of the stage list within thumb reach.
+.stage-jump {
+  position: absolute; z-index: 3;
+  right: max(12px, env(safe-area-inset-right)); bottom: 18px;
+  display: grid; gap: 8px;
+}
+.stage-jump-button {
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  min-width: 64px; height: 40px; padding: 0 10px;
+  border: 1px solid #fff9f3; border-radius: 999px;
+  background: linear-gradient(#fffaf4, #fceadc); color: #813f29;
+  font-family: Jua, sans-serif; font-size: 15px; line-height: 1;
+  box-shadow: inset 0 1px #fff9, 0 3px #d5a184, 0 5px 8px #713d2b40;
+}
+.stage-jump-button:active:not(:disabled) { transform: translateY(2px); }
+.stage-jump-button:disabled { visibility: hidden; }
+.stage-jump-arrow {
+  width: 20px; height: 20px; background: currentColor;
+  mask: url('../assets/icons/chevron_left.svg') center / contain no-repeat;
+}
+.stage-jump-arrow--up { rotate: 90deg; }
+.stage-jump-arrow--down { rotate: -90deg; }

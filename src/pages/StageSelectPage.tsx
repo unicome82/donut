@@ -13,6 +13,9 @@ const rowHeight = 146;
 const overscan = 2;
 // Locked stages listed past the last open one, as a short preview of what comes next.
 const LOCKED_PREVIEW = 12;
+// The jump buttons move between stages 1, 501, 1001, … so long lists stay quick to cross.
+const JUMP_SIZE = 500;
+const blockStart = (block: number) => block * JUMP_SIZE + 1;
 const optionId = (index: number) => index === 0 ? practiceStage.id : index;
 
 export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
@@ -42,6 +45,15 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
   }, []);
 
   const endPadding = Math.max(0, (viewport.height - rowHeight) / 2);
+  // Option indexes equal stage ids (practice is 0), so the top row tells which stages are in view.
+  const topRow = Math.floor(viewport.top / rowHeight);
+  const firstShown = topRow * columns;
+  const upTarget = firstShown > 1 ? blockStart(Math.ceil((firstShown - 1) / JUMP_SIZE) - 1) : undefined;
+  const downCandidate = blockStart(Math.floor((firstShown + columns - 2) / JUMP_SIZE) + 1);
+  const downTarget = downCandidate < optionCount && (rowCount - topRow) * rowHeight > viewport.height ? downCandidate : undefined;
+  function jumpTo(stageId: number) {
+    if (scrollArea.current) scrollArea.current.scrollTop = Math.floor(stageId / columns) * rowHeight;
+  }
   useLayoutEffect(() => {
     if (scrollArea.current) scrollArea.current.scrollTop = currentRow * rowHeight - endPadding;
   }, [currentRow, endPadding]);
@@ -80,6 +92,16 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
           })}
         </div>
       </div>
+      {optionCount > JUMP_SIZE && <div className="stage-jump">
+        <button type="button" className="stage-jump-button" disabled={upTarget === undefined}
+          aria-label={upTarget === undefined ? t.jumpUp : t.jumpToStage(upTarget)} onClick={() => upTarget && jumpTo(upTarget)}>
+          <span className="stage-jump-arrow stage-jump-arrow--up" aria-hidden="true" /><span lang="en">{upTarget ?? '—'}</span>
+        </button>
+        <button type="button" className="stage-jump-button" disabled={downTarget === undefined}
+          aria-label={downTarget === undefined ? t.jumpDown : t.jumpToStage(downTarget)} onClick={() => downTarget && jumpTo(downTarget)}>
+          <span className="stage-jump-arrow stage-jump-arrow--down" aria-hidden="true" /><span lang="en">{downTarget ?? '—'}</span>
+        </button>
+      </div>}
     </div>
   </main>;
 }
