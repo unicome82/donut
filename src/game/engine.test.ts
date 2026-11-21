@@ -379,6 +379,37 @@ describe('스테이지 해법과 게임 불변식', () => {
 });
 
 describe('세션 진행', () => {
+  it('스테이지를 클리어할 때마다 트레이 비우기 기회가 1회 늘어나 다음 스테이지로 이어진다', () => {
+    const stage = stages[0]!;
+    const session = reduceSession(createSession(), { type: 'START', stageId: stage.id });
+    expect(session.game.trayClearsLeft).toBe(1);
+    const game = session.game;
+    const order = game.orders[0]!;
+    const type = stage.donutTypes[0]!;
+    game.orders = [{ ...order, remaining: { [type]: 1 } }, null, null, null];
+    game.completedOrders = stage.targetOrders - 1;
+    game.nextOrderIndex = stage.targetOrders;
+    game.tray = tray(type, 1);
+    const cleared = reduceSession(session, { type: 'GAME', action: { type: 'PICKUP_TRAY', readyOrders: [order.definitionId], parallel: true } });
+    expect(cleared.game.status).toBe('clear');
+    expect(cleared.trayClears).toBe(2);
+    const next = reduceSession(cleared, { type: 'START', stageId: stages[1]!.id });
+    expect(next.game.trayClearsLeft).toBe(2);
+    const retried = reduceSession(next, { type: 'GAME', action: { type: 'RESTART' } });
+    expect(retried.game.trayClearsLeft).toBe(2);
+  });
+
+  it('게임 중에도 트레이를 비울 수 있지만 비어 있으면 비울 수 없다', () => {
+    const stage = fixture([{ strawberry: 2 }]);
+    const empty = createGame(stage);
+    expect(clearTray(empty, stage).state).toBe(empty);
+    const queues = empty.queues.map(queue => [...queue]);
+    const taken = queues[1]!.splice(0, 2);
+    const result = clearTray({ ...empty, queues, tray: taken }, stage);
+    expect(result.state).toMatchObject({ status: 'playing', tray: [], trayClearsLeft: 0 });
+    expect(result.state.queues[1]!.slice(-2)).toEqual(taken);
+  });
+
   it('테스트 스테이지은 손님 한 명의 디저트 하나로 완료되며 일반 진행에 영향을 주지 않는다', () => {
     const initial = createSession();
     const practice = reduceSession(initial, { type: 'START', stageId: practiceStage.id });

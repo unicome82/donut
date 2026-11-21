@@ -303,7 +303,9 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
       }
       return { ...order, remaining };
     }) : state.orders} stageId={state.stageId} onOrderReady={onOrderReady} />
-    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} />
+    <DonutTray inFlight={inFlight} donuts={state.tray} capacity={state.trayCapacity} clearsLeft={state.trayClearsLeft}
+      canClear={playing && !waitingForGoodbye && state.tray.length > 0 && !state.pendingMatchIds?.length && inFlight.size === 0 && returning.size === 0}
+      onClear={() => act({ type: 'CLEAR_TRAY' })} />
     <DonutQueue queues={state.queues} returning={returning} disabled={!playing || returning.size > 0 || state.tray.length >= state.trayCapacity} onSelect={(queueIndex, expectedDonutId) => { void act({ type: 'SELECT_DONUT', queueIndex, expectedDonutId }); }} />
     </div>}
     <dialog className="glass-popup tray-full-dialog pause-dialog" ref={pauseDialog} aria-labelledby="pause-heading" onCancel={event => { event.preventDefault(); act({ type: 'RESUME' }); }}>

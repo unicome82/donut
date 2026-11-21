@@ -178,7 +178,9 @@ export function pickupTray(
 }
 
 export function clearTray(state: GameState, stage: StageDefinition): TransitionResult {
-  if (state.status !== 'blocked' || state.trayClearsLeft <= 0 || state.stageId !== stage.id) return { state, events: [] };
+  const canClear = state.status === 'blocked'
+    || (state.status === 'playing' && state.tray.length > 0 && !state.pendingMatchIds?.length);
+  if (!canClear || state.trayClearsLeft <= 0 || state.stageId !== stage.id) return { state, events: [] };
   const sources = new Map(stage.queues.flatMap((queue, index) => queue.map(token => [token.id, index] as const)));
   const queues = state.queues.map(queue => [...queue]);
   const events: GameEvent[] = [];

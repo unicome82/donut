@@ -17,6 +17,7 @@ function loadSession() {
       }
     }
     if (Number.isSafeInteger(saved.score) && saved.score >= 0) session.score = saved.score;
+    if (Number.isSafeInteger(saved.trayClears) && saved.trayClears >= 0) session.trayClears = saved.trayClears;
   } catch {
     return session;
   }
@@ -25,13 +26,13 @@ function loadSession() {
 
 export function useGame() {
   const [session, dispatch] = useReducer(reduceSession, undefined, loadSession);
-  const { stars, score } = session;
+  const { stars, score, trayClears } = session;
   useEffect(() => {
     try {
-      localStorage.setItem(progressKey, JSON.stringify({ stars, score }));
+      localStorage.setItem(progressKey, JSON.stringify({ stars, score, trayClears }));
     } catch {
       // Play can continue when browser storage is unavailable.
     }
-  }, [stars, score]);
+  }, [stars, score, trayClears]);
   return { session, dispatch };
 }
