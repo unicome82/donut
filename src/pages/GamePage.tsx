@@ -291,9 +291,10 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   useEffect(() => {
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
-  // Red edge at one star; it starts pulsing in the last 10 seconds.
-  const danger = playing && !waitingForGoodbye && timeLimit > 0 && getTimeStars(remainingTimeMs, timeLimit) === 1;
-  const urgent = danger && remainingTimeMs <= 10_000;
+  // Red edge from one star left; in the last 10 seconds it shows and pulses whatever the stars.
+  const timed = playing && !waitingForGoodbye && timeLimit > 0;
+  const danger = timed && getTimeStars(remainingTimeMs, timeLimit) === 1;
+  const urgent = timed && remainingTimeMs <= 10_000;
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
     {!showResult && <GameHeader stage={state.stageId} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}

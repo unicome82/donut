@@ -312,7 +312,7 @@
   padding-bottom: 0;
   overflow: clip;
 }
-.game-page--danger::after {
+.game-page--danger::after, .game-page--urgent::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -371,7 +371,7 @@
   z-index: 1;
 }
 .stage-clock-star img { display: block; width: var(--stage-clock-star); height: var(--stage-clock-star); object-fit: contain; filter: drop-shadow(0 1px 1px #88552888); }
-.stage-clock-star.star--unearned { animation: star-vanish 560ms cubic-bezier(.4,0,.6,1) both; }
+.stage-clock-star--lost { animation: star-vanish 560ms cubic-bezier(.4,0,.6,1) both; }
 @keyframes star-vanish {
   0% { scale: 1; opacity: 1; }
   25% { scale: 1.25; opacity: 1; }
@@ -906,5 +906,5 @@
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .glass-popup[open]::backdrop { animation: none; }
   .confetti, .effect-particle, .flying-donut { display: none; }
-  .stage-clock-star.star--unearned { opacity: 0; }
+  .stage-clock-star--lost { opacity: 0; }
 }

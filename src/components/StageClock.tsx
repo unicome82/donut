@@ -21,7 +21,7 @@ export function StageClock({ remainingMs, limitMs }: { remainingMs: number; limi
       <span className="stage-clock-track">
         <span className={`stage-clock-fill stage-clock-fill--${stars}`} style={{ width: `${remainingPercent}%` }} />
       </span>
-      {starPositions.map((position, index) => <span key={index} className={`stage-clock-star${index >= stars ? ' star--unearned' : ''}`}
+      {starPositions.map((position, index) => <span key={index} className={`stage-clock-star${index >= stars ? ' stage-clock-star--lost' : ''}`}
         style={{ left: `${position}%` }}>
         <img src={rewardStar} width={20} height={20} alt="" draggable={false} />
       </span>)}
