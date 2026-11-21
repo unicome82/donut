@@ -24,6 +24,7 @@ function loadSession() {
     // Saves from before the three-clear start (no clearsVersion) begin again with the new pool.
     const hearts = parseHearts(saved.hearts);
     if (hearts) session.hearts = hearts;
+    if (Array.isArray(saved.rewardedStages)) session.rewardedStages = saved.rewardedStages.filter((id: unknown) => typeof id === 'number' && isStageId(id));
     if (saved.clearsVersion === 2 && Number.isSafeInteger(saved.trayClears) && saved.trayClears >= 0) session.trayClears = saved.trayClears;
   } catch {
     return session;
@@ -39,13 +40,13 @@ export function encodeStars(stars: Record<number, number>): string {
 
 export function useGame() {
   const [session, dispatch] = useReducer(reduceSession, undefined, loadSession);
-  const { stars, score, trayClears, hearts } = session;
+  const { stars, score, trayClears, hearts, rewardedStages } = session;
   useEffect(() => {
     try {
-      localStorage.setItem(progressKey, JSON.stringify({ stars: encodeStars(stars), score, trayClears, hearts, clearsVersion: 2 }));
+      localStorage.setItem(progressKey, JSON.stringify({ stars: encodeStars(stars), score, trayClears, hearts, rewardedStages, clearsVersion: 2 }));
     } catch {
       // Play can continue when browser storage is unavailable.
     }
-  }, [stars, score, trayClears, hearts]);
+  }, [stars, score, trayClears, hearts, rewardedStages]);
   return { session, dispatch };
 }

@@ -13,7 +13,8 @@ import { DonutQueue } from '../components/DonutQueue';
 import { getStage, isBonusStage, practiceStage, STAGE_COUNT } from '../game/stages';
 import { HeartIcon } from '../components/HeartIcon';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
-import type { DonutType, GameState } from '../game/types';
+import type { DonutType, GameState, RewardKind } from '../game/types';
+import { VIP_BONUS_MS } from '../game/stages/extras';
 import type { GameAction } from '../game/reducer';
 import { getStageTimeLimit, getTimeStars } from '../game/stageTime';
 import { StageClock } from '../components/StageClock';
@@ -30,6 +31,9 @@ const PICKUP_INTERVAL = 100;
 const INTRO_MS = 1800;
 
 interface Delivery { orderId: string; type: DonutType }
+/** A reward icon floating up from the queue column it was picked from (viewport coordinates). */
+interface RewardPop { id: number; reward: RewardKind; x: number; y: number }
+const POP_MS = 1000;
 
 interface Props {
   soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void;
@@ -96,6 +100,15 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     return () => clearTimeout(timer);
   }, [state, readyOrders]);
   const [pendingDeliveries, setPendingDeliveries] = useState<Delivery[]>([]);
+  const [rewardPops, setRewardPops] = useState<RewardPop[]>([]);
+  const [timeBonusPops, setTimeBonusPops] = useState<number[]>([]);
+  const popId = useRef(0);
+  function showPop(add: (id: number) => void, remove: (id: number) => void) {
+    const id = popId.current += 1;
+    add(id);
+    const timer = setTimeout(() => { matchTimers.current.delete(timer); if (mounted.current) remove(id); }, POP_MS);
+    matchTimers.current.add(timer);
+  }
   const [returning, setReturning] = useState<ReadonlySet<string>>(new Set());
   const [inFlight, setInFlight] = useState<ReadonlySet<string>>(new Set());
   useEffect(() => {
@@ -114,6 +127,8 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       setInFlight(new Set());
       setReturning(new Set());
       setPendingDeliveries([]);
+      setRewardPops([]);
+      setTimeBonusPops([]);
       setReadyOrders([]);
       setRound(previous => previous + 1);
       setDeadline(performance.now() + timeLimit + introMs);
@@ -125,7 +140,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     }
     const current = latest.current;
     const now = performance.now();
-    const remaining = timeLimit > 0
+    let remaining = timeLimit > 0
       ? (current.status === 'blocked' || current.status === 'paused' ? pausedTimeMs : undefined) ?? Math.min(timeLimit, Math.max(0, deadline - now))
       : undefined;
     if (action.type !== 'RESTART' && remaining === 0) {
@@ -183,6 +198,26 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
         if (event.type === 'consumed') nextPickupAt.current.set(event.orderId, unlockTime);
         if (event.type === 'orderCompleted') nextPickupAt.current.delete(event.orderId);
       }
+    }
+    // Each VIP order finished in this step puts time back on the clock (up to the stage's limit).
+    const vipDone = result.events.filter(event => event.type === 'orderCompleted'
+      && current.orders.some(order => order?.definitionId === event.orderId && order.vip)).length;
+    const timeBonus = vipDone > 0 && remaining !== undefined && remaining > 0;
+    if (timeBonus) {
+      remaining = Math.min(timeLimit, remaining! + vipDone * VIP_BONUS_MS);
+      setDeadline(now + remaining);
+      setRemainingTimeMs(remaining);
+      if (soundEnabled) playSound('timeBonus');
+      showPop(id => setTimeBonusPops(previous => [...previous, id]), id => setTimeBonusPops(previous => previous.filter(pop => pop !== id)));
+    }
+    for (const event of result.events) {
+      if (event.type !== 'rewardCollected') continue;
+      const column = root.current.querySelector(`[data-queue-index="${event.queueIndex}"]`)?.getBoundingClientRect();
+      const x = column ? column.left + column.width / 2 : window.innerWidth / 2;
+      const y = column ? column.top : window.innerHeight / 2;
+      haptic('order');
+      if (soundEnabled) playSound('reward');
+      showPop(id => setRewardPops(previous => [...previous, { id, reward: event.reward, x, y }]), id => setRewardPops(previous => previous.filter(pop => pop.id !== id)));
     }
     const effects = createEffects();
     activeEffects.current.add(effects);
@@ -353,7 +388,14 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
     {!showResult && <GameHeader stage={state.stageId} title={bonus ? 'Bonus Stage' : undefined} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye && !showIntro} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
-    {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
+    {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <div className="stage-clock-wrap">
+      <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />
+      {timeBonusPops.map(id => <span key={id} className="time-bonus-pop" role="status">+5s<span className="sr-only">{t.timeBonus}</span></span>)}
+    </div>}
+    {rewardPops.map(pop => <span key={pop.id} className={`reward-pop reward-pop--${pop.reward}`} role="status" style={{ left: pop.x, top: pop.y }}>
+      {pop.reward === 'heart' ? <HeartIcon /> : <Icon name="basket" />}<span aria-hidden="true">+1</span>
+      <span className="sr-only">{pop.reward === 'heart' ? t.rewardHeart : t.rewardTrayClear}</span>
+    </span>)}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <img className="popup-ribbon" src={popupRibbon} alt="" draggable={false} />}

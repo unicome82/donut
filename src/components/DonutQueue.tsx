@@ -2,6 +2,8 @@ import { useRef } from 'react';
 import type { DonutToken } from '../game/types';
 import { Donut } from './Donut/Donut';
 import { useMessages } from '../i18n/language';
+import { HeartIcon } from './HeartIcon';
+import { Icon } from './Icon';
 export function DonutQueue({ queues, disabled, locked = false, returning, onSelect, onReject }: {
   queues: DonutToken[][]; disabled: boolean; locked?: boolean; returning: ReadonlySet<string>;
   onSelect: (queueIndex: number, expectedDonutId: string) => void;
@@ -46,6 +48,10 @@ export function DonutQueue({ queues, disabled, locked = false, returning, onSele
         data-token-id={donut.id}
         style={{ zIndex: position, visibility: returning.has(donut.id) ? 'hidden' : undefined }}>
         {donut.hidden && position > 0 ? <span className="donut donut--mystery">?</span> : <Donut type={donut.type} />}
+        {donut.reward && <span className={`queue-reward queue-reward--${donut.reward}`} role="img"
+          aria-label={t.rewardOnDessert(donut.reward === 'heart' ? t.rewardHeart : t.rewardTrayClear)}>
+          {donut.reward === 'heart' ? <HeartIcon /> : <Icon name="basket" />}
+        </span>}
       </span>)}
     </button>)}</div>
   </section>;

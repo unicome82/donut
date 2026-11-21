@@ -3,6 +3,7 @@ import { practiceStage } from './practice';
 import { CHUNK_SIZE, STAGE_COUNT, chunkOf, difficultyForStage, isStageId } from './schedule';
 import { stage01 } from './stage01';
 import { createBonusStage, isBonusStage } from './bonus';
+import { decorateStage } from './extras';
 import { BONUS_STAGE_ID } from '../constants';
 export { practiceStage, STAGE_COUNT, isStageId };
 
@@ -17,7 +18,7 @@ const chunkLoaders = import.meta.glob<StoredStage[]>('./chunks/*.json', { import
 const chunkPath = (chunk: number) => `./chunks/${String(chunk).padStart(4, '0')}.json`;
 
 function toStage({ hidden = [], ...stage }: StoredStage): StageDefinition {
-  return {
+  return decorateStage({
     ...stage,
     difficulty: stage.difficulty as StageDifficulty,
     donutTypes: stage.donutTypes as DonutType[],
@@ -29,7 +30,7 @@ function toStage({ hidden = [], ...stage }: StoredStage): StageDefinition {
         ...(covered.has(index) ? { hidden: true } : {}),
       }));
     }),
-  };
+  });
 }
 
 const loaded = new Map<number, StageDefinition>([[stage01.id, stage01]]);

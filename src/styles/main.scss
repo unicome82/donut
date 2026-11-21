@@ -1099,3 +1099,96 @@
   30%, 72% { opacity: 1; scale: 1; translate: 0 0; }
   100% { opacity: 0; scale: 1.05; translate: 0 -40px; }
 }
+
+// VIP customers wear a gold tag; finishing their order adds five seconds.
+.stage-clock-wrap { position: relative; flex: none; z-index: 5; }
+.vip-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  rotate: -10deg;
+  display: grid;
+  justify-items: center;
+  padding: 2px 5px 1px;
+  border: 1.5px solid #fff6d8;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe07a, #f0a92d);
+  box-shadow: 0 2px 4px #8a4d1040;
+  color: #7a3e0b;
+  font-family: Lobster, Jua, sans-serif;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  animation: vip-glow 1.6s ease-in-out infinite;
+}
+.vip-badge small { font-family: Jua, sans-serif; font-size: 9px; }
+.order-card--vip .customer { filter: drop-shadow(0 0 6px #ffd56acc); }
+@keyframes vip-glow {
+  0%, 100% { box-shadow: 0 2px 4px #8a4d1040, 0 0 0 #ffd56a00; }
+  50% { box-shadow: 0 2px 4px #8a4d1040, 0 0 10px #ffd56acc; }
+}
+.time-bonus-pop {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  z-index: 6;
+  color: #2f9a5b;
+  font-family: Jua, sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  text-shadow: 0 1px 0 #fff, 0 0 6px #fff;
+  pointer-events: none;
+  animation: float-pop 1000ms ease-out both;
+}
+
+// A reward rides on a queued dessert until it is picked from the front of its queue.
+.queue-front, .queue-back { position: relative; }
+.queue-reward {
+  position: absolute;
+  top: -3px;
+  right: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+  background: #fff4f6;
+  box-shadow: 0 1px 3px #6b2c2c55;
+  animation: reward-bob 1.4s ease-in-out infinite;
+}
+.queue-reward .heart-icon { width: 14px; height: 14px; filter: none; }
+.queue-reward--trayClear { background: #eaf6ff; }
+.queue-reward .material-symbol { width: 14px; height: 14px; background: #3d7fb8; }
+@keyframes reward-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -2px; }
+}
+.reward-pop {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  translate: -50% -100%;
+  color: #c2335c;
+  font-family: Jua, sans-serif;
+  font-size: 20px;
+  text-shadow: 0 1px 0 #fff, 0 0 6px #fff;
+  pointer-events: none;
+  animation: float-pop 1000ms ease-out both;
+}
+.reward-pop .heart-icon { width: 28px; height: 28px; }
+.reward-pop .material-symbol { width: 26px; height: 26px; background: #3d7fb8; }
+.reward-pop--trayClear { color: #2f6e9f; }
+@keyframes float-pop {
+  0% { opacity: 0; transform: translateY(6px) scale(.6); }
+  20% { opacity: 1; transform: translateY(0) scale(1.15); }
+  70% { opacity: 1; transform: translateY(-18px) scale(1); }
+  100% { opacity: 0; transform: translateY(-30px) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vip-badge, .queue-reward { animation: none; }
+}

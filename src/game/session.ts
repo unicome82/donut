@@ -1,7 +1,7 @@
 import { createGame, getStars } from './engine';
 import { getStage, isBonusStage, isStageId, practiceStage, prepareBonusStage, STAGE_COUNT } from './stages';
 import { reduceGame, type GameAction } from './reducer';
-import { addHeart, chargeFromBonus, fullHearts, refillHearts, spendHeart, type HeartSource, type Hearts } from './hearts';
+import { addHeart, chargeFromBonus, fullHearts, MAX_HEARTS, refillHearts, spendHeart, type HeartSource, type Hearts } from './hearts';
 import type { DonutType, GameState } from './types';
 
 const POINTS_PER_ORDER = 100;
@@ -17,6 +17,8 @@ export interface SessionState {
   hearts: Hearts;
   /** Which pool paid for the attempt in play, so a clear can give the heart back; unset when it was free. */
   heartPaidFrom?: HeartSource;
+  /** Campaign stages whose queue reward has been picked up; each pays out only once. */
+  rewardedStages: number[];
   /** The bonus stage in play and the campaign stage it leads on to. */
   bonus?: { dessert: DonutType; nextStageId: number };
 }
@@ -29,13 +31,28 @@ export type SessionAction =
   | { type: 'CHARGE_HEARTS'; amount?: number; now?: number };
 
 export function createSession(unlockAllStages = false): SessionState {
-  return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0, unlockAllStages, trayClears: STARTING_TRAY_CLEARS, hearts: fullHearts() };
+  return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0, unlockAllStages, trayClears: STARTING_TRAY_CLEARS, hearts: fullHearts(), rewardedStages: [] };
 }
 // Tray clears are a single pool: three at the very start, +1 per stage clear, never refilled otherwise.
 export const STARTING_TRAY_CLEARS = 3;
-function createSessionGame(stageId: number, trayClears: number): GameState {
-  const game = createGame(getStage(stageId));
+function createSessionGame(stageId: number, trayClears: number, rewardedStages: readonly number[]): GameState {
+  const game = withoutSpentRewards(createGame(getStage(stageId)), rewardedStages);
   return stageId === practiceStage.id ? game : { ...game, trayClearsLeft: trayClears };
+}
+/** A stage whose reward was already collected comes back without it, so retries can't farm it. */
+function withoutSpentRewards(game: GameState, rewardedStages: readonly number[]): GameState {
+  if (!rewardedStages.includes(game.stageId)) return game;
+  return { ...game, queues: game.queues.map(queue => queue.map(token => {
+    if (!token.reward) return token;
+    const { reward, ...rest } = token;
+    void reward;
+    return rest;
+  })) };
+}
+/** A heart reward fills the regular hearts first and spills into the bonus pool when they are full. */
+function grantHeart(hearts: Hearts, now: number): Hearts {
+  const current = refillHearts(hearts, now);
+  return addHeart(current, now, current.count < MAX_HEARTS ? 'regular' : 'bonus');
 }
 /** Practice and bonus stages cost no heart. */
 export const isFreeStage = (id: number) => id === practiceStage.id || isBonusStage(id);
@@ -77,7 +94,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       if (!isUnlocked(action.stageId, state.stars, state.unlockAllStages)) return state;
       const payment = payForAttempt(state, action.stageId, action.now ?? Date.now());
       if (!payment) return state;
-      return { ...state, ...payment, bonus: undefined, screen: 'game', game: createSessionGame(action.stageId, state.trayClears) };
+      return { ...state, ...payment, bonus: undefined, screen: 'game', game: createSessionGame(action.stageId, state.trayClears, state.rewardedStages) };
     }
     case 'CHARGE_HEARTS': return { ...state, hearts: chargeFromBonus(state.hearts, action.now ?? Date.now(), action.amount) };
     case 'START_BONUS': {
@@ -94,7 +111,15 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       let game = reduceGame(state.game, action.action, getStage(state.game.stageId));
       if (game === state.game) return state;
       if (game.stageId === practiceStage.id) return { ...state, game };
-      if (restart) game = { ...game, trayClearsLeft: state.trayClears };
+      if (restart) game = { ...withoutSpentRewards(game, state.rewardedStages), trayClearsLeft: state.trayClears };
+      const earned = restart ? [] : (game.collectedRewards ?? []).slice(state.game.collectedRewards?.length ?? 0);
+      let rewardedStages = state.rewardedStages;
+      let rewardHearts = state.hearts;
+      if (earned.length) {
+        if (!rewardedStages.includes(game.stageId)) rewardedStages = [...rewardedStages, game.stageId];
+        for (const reward of earned) if (reward === 'heart') rewardHearts = grantHeart(rewardHearts, now);
+      }
+      state = { ...state, hearts: rewardHearts, rewardedStages };
       const newlyCleared = game.status === 'clear' && state.game.status !== 'clear';
       if (isBonusStage(game.stageId)) {
         // A bonus clear adds a heart that may go past the usual five; it leaves stars and tray clears alone.

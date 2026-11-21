@@ -336,7 +336,8 @@ describe('스테이지 해법과 게임 불변식', () => {
         expect(state.status).toBe('playing');
         state = select(state, stage, queue).state;
         expect(state.tray.length).toBeLessThan(stage.trayCapacity);
-        expect(state.trayClearsLeft).toBe(1);
+        // No clear is spent; a tray-clear reward picked up on the way adds one.
+        expect(state.trayClearsLeft).toBe(1 + (state.collectedRewards ?? []).filter(reward => reward === 'trayClear').length);
       }
       expect(state.status).toBe('clear');
       expect(state.completedOrders).toBe(stage.targetOrders);
