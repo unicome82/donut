@@ -26,8 +26,8 @@ const PICKUP_INTERVAL = 100;
 
 interface Delivery { orderId: string; type: DonutType }
 
-interface Props { soundEnabled: boolean; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
-export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Props) {
+interface Props { soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
+export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound }: Props) {
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
   const matchTimers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -273,7 +273,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled }: Pr
     if (showResult) resultHeading.current?.focus();
   }, [showResult, status]);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}`} ref={root}>
-    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} />}
+    {(!showResult || status !== 'clear') && <GameHeader stage={state.stageId} onBack={onStages} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">주문 {state.completedOrders}개 완료. 트레이 {state.tray.length} / {state.trayCapacity}칸. {returning.size > 0 && '디저트를 원래 대기열 맨 뒤로 보냈어요.'}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">

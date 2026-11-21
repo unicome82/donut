@@ -22,7 +22,7 @@ export function App() {
       ? <StartPage stage={currentStage} soundEnabled={soundEnabled} onToggleSound={toggleSound} onGame={() => dispatch({ type: 'START', stageId: currentStage })} onStages={() => dispatch({ type: 'STAGES' })} />
       : screen === 'stages'
         ? <StageSelectPage stars={stars} soundEnabled={soundEnabled} onToggleSound={toggleSound} unlockAllStages={session.unlockAllStages} onBack={() => dispatch({ type: 'HOME' })} onGame={stageId => dispatch({ type: 'START', stageId })} />
-        : <GamePage key={game.stageId} soundEnabled={soundEnabled} state={game} dispatch={action => dispatch({ type: 'GAME', action })} onStages={() => dispatch({ type: 'STAGES' })} onNext={() => dispatch({ type: 'START', stageId: game.stageId + 1 })} />
+        : <GamePage key={game.stageId} soundEnabled={soundEnabled} onToggleSound={toggleSound} state={game} dispatch={action => dispatch({ type: 'GAME', action })} onStages={() => dispatch({ type: 'STAGES' })} onNext={() => dispatch({ type: 'START', stageId: game.stageId + 1 })} />
     }
   </div>;
 }
