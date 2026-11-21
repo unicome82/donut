@@ -936,13 +936,15 @@
 .glass-popup .sound-mute-button { min-height: 44px; font-size: 15px; }
 .sound-slider {
   display: grid;
-  grid-template-columns: 4.5em 1fr 2.2em;
+  grid-template-columns: 4.5em 1fr 34px;
   align-items: center;
   gap: 10px;
   color: var(--secondary-text);
   font-size: 15px;
 }
-.sound-slider output { text-align: right; font-variant-numeric: tabular-nums; font-size: 14px; }
+.sound-channel-mute { flex-basis: 34px; width: 34px; height: 34px; box-shadow: inset 0 1px #fff9, 0 2px #d5a184, 0 3px 5px #713d2b33; }
+.sound-channel-mute .material-symbol { width: 19px; height: 19px; }
+.sound-channel-mute[aria-pressed='true'] { color: #b9907b; }
 .sound-slider input {
   appearance: none;
   width: 100%;

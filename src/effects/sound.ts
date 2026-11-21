@@ -235,6 +235,25 @@ export function saveSoundPreference(enabled: boolean) {
   syncMusic();
 }
 
+// The level a channel returns to when unmuted; kept so muting doesn't lose the slider position.
+const unmuteKeys = { sfx: 'sweet-order-sfx-unmute', music: 'sweet-order-music-unmute' } as const;
+const DEFAULT_UNMUTE_LEVEL = 0.6;
+
+/** Mutes one channel (remembering its level) or brings it back to that level. */
+export function toggleVolumeMute(kind: VolumeKind) {
+  if (volumes[kind] > 0) {
+    try { localStorage.setItem(unmuteKeys[kind], String(volumes[kind])); } catch { /* the default level is used */ }
+    setVolume(kind, 0);
+    return;
+  }
+  let level = DEFAULT_UNMUTE_LEVEL;
+  try {
+    const saved = Number.parseFloat(localStorage.getItem(unmuteKeys[kind]) ?? '');
+    if (saved > 0 && saved <= 1) level = saved;
+  } catch { /* the default level is used */ }
+  setVolume(kind, level);
+}
+
 export function setVolume(kind: VolumeKind, value: number) {
   volumes[kind] = Math.min(1, Math.max(0, value));
   try {
