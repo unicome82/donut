@@ -1,3 +1,4 @@
+import { BONUS_STAGE_ID } from './constants';
 import type { StageDefinition } from './types';
 
 // Seconds granted per dessert in the queues; harder stages need more thinking per tap.
@@ -6,6 +7,8 @@ const baseSeconds = 10;
 
 export function getStageTimeLimit(stage: StageDefinition): number {
   if (stage.id === 0) return 10_000;
+  // Bonus stages can't be lost, so they get plenty of time.
+  if (stage.id === BONUS_STAGE_ID) return 300_000;
   const desserts = stage.queues.reduce((sum, queue) => sum + queue.length, 0);
   const seconds = baseSeconds + desserts * secondsPerDessert[stage.difficulty ?? 'easy'];
   return Math.ceil(seconds / 5) * 5_000;

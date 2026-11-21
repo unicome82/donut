@@ -7,6 +7,9 @@ import { unlockedThrough } from '../game/session';
 import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
 import { SoundButton } from '../components/SoundControls';
+import { HeartCounter } from '../components/HeartCounter';
+import { BONUS_AT_STAGE_00_FOR_TESTING } from '../game/constants';
+import type { Hearts } from '../game/hearts';
 
 const columns = 3;
 const rowHeight = 146;
@@ -18,7 +21,7 @@ const JUMP_SIZE = 500;
 const blockStart = (block: number) => block * JUMP_SIZE + 1;
 const optionId = (index: number) => index === 0 ? practiceStage.id : index;
 
-export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
+export function StageSelectPage({ onGame, stars, hearts, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; hearts: Hearts; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
   const t = useMessages();
   const openThrough = unlockedThrough(stars, unlockAllStages);
   const currentStage = unlockedThrough(stars);
@@ -60,6 +63,7 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
 
   return <main className="stage-page">
     <nav className="stage-navigation" aria-label={t.stageMenu}>
+      <HeartCounter hearts={hearts} />
       <LanguageButton onToggle={onToggleLanguage} />
       <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </nav>
@@ -78,14 +82,14 @@ export function StageSelectPage({ onGame, stars, unlockAllStages, soundEnabled, 
             const current = stage.id === currentStage;
             const description = unlocked ? (score ? t.starsCount(score) : t.available) : t.locked;
             return <button type="button" key={stage.id} className={`stage-option${current ? ' stage-option--next' : ''}`}
-              aria-current={current ? 'step' : undefined} aria-label={practice ? t.practiceLabel : t.stageLabel(stage.id, stage.difficulty ?? '', description)}
+              aria-current={current ? 'step' : undefined} aria-label={practice ? (BONUS_AT_STAGE_00_FOR_TESTING ? t.bonusTestLabel : t.practiceLabel) : t.stageLabel(stage.id, stage.difficulty ?? '', description)}
               onClick={() => onGame(stage.id)} disabled={!unlocked}>
               <span className="stage-index" lang="en">
                 <span className="stage-index-label">Stage</span>
                 <span className="stage-index-number">{String(stage.id).padStart(2, '0')}</span>
               </span>
               <StageDifficultyRibbon difficulty={stage.difficulty} />
-              {practice ? <span className="stage-practice-label">{t.practice}</span> : unlocked ? <span className="stage-stars" aria-hidden="true">
+              {practice ? <span className="stage-practice-label">{BONUS_AT_STAGE_00_FOR_TESTING ? t.bonusTest : t.practice}</span> : unlocked ? <span className="stage-stars" aria-hidden="true">
                 {[0, 1, 2].map(index => <span key={index} className={index < score ? undefined : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
               </span> : <span className="stage-lock"><Icon name="lock" /></span>}
             </button>;

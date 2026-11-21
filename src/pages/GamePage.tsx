@@ -10,7 +10,8 @@ import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
 import { DonutQueue } from '../components/DonutQueue';
-import { getStage, STAGE_COUNT } from '../game/stages';
+import { getStage, isBonusStage, STAGE_COUNT } from '../game/stages';
+import { HeartIcon } from '../components/HeartIcon';
 import { getReadyTrayPickupOrders, getStars, selectDonut, clearTray, matchTray, pickupTray } from '../game/engine';
 import type { DonutType, GameState } from '../game/types';
 import type { GameAction } from '../game/reducer';
@@ -28,8 +29,12 @@ const PICKUP_INTERVAL = 100;
 
 interface Delivery { orderId: string; type: DonutType }
 
-interface Props { soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void }
-export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound }: Props) {
+interface Props {
+  soundEnabled: boolean; onToggleSound: () => void; state: GameState; dispatch: (action: GameAction) => void; onStages: () => void; onNext: () => void;
+  /** Whether a heart is available for another attempt; when not, onOutOfHearts runs instead of the restart. */
+  canRestart: () => boolean; onOutOfHearts: () => void;
+}
+export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onToggleSound, canRestart, onOutOfHearts }: Props) {
   const t = useMessages();
   const root = useRef<HTMLElement>(null);
   const latest = useRef(state);
@@ -94,6 +99,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     return () => { mounted.current = false; for (const effect of active) effect.cleanup(); active.clear(); for (const timer of timers) clearTimeout(timer); timers.clear(); };
   }, []);
   function act(action: GameAction) {
+    if (action.type === 'RESTART' && !canRestart()) { onOutOfHearts(); return; }
     if (action.type === 'RESTART') {
       for (const timer of matchTimers.current) clearTimeout(timer);
       matchTimers.current.clear();
@@ -289,6 +295,7 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
     target.animate(shake, { duration: 220, easing: 'ease-out' });
   }
   const lastStage = state.stageId === STAGE_COUNT;
+  const bonus = isBonusStage(state.stageId);
   useEffect(() => {
     if (!showGoodbye) return;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -327,16 +334,19 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
   }, [showResult, status, urgent]);
   useEffect(() => () => setMusicMood('normal'), []);
   return <main className={`game-page game-status--${waitingForGoodbye || status === 'paused' ? 'playing' : status}${danger ? ' game-page--danger' : ''}${urgent ? ' game-page--urgent' : ''}`} ref={root}>
-    {!showResult && <GameHeader stage={state.stageId} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
+    {!showResult && <GameHeader stage={state.stageId} title={bonus ? 'Bonus Stage' : undefined} onPause={() => act({ type: 'PAUSE' })} canPause={playing && !waitingForGoodbye} soundEnabled={soundEnabled} onToggleSound={onToggleSound} />}
     {(showClock || (timeLimit > 0 && waitingForGoodbye)) && <StageClock limitMs={timeLimit} remainingMs={pausedTimeMs ?? remainingTimeMs} />}
     <p className="sr-only" role="status" aria-live="polite">{t.status(state.completedOrders, state.tray.length, state.trayCapacity)} {returning.size > 0 && t.returned}</p>
     {showResult && <section className="glass-popup result-panel" aria-labelledby="result-heading">
       {status === 'clear' && <img className="popup-ribbon" src={popupRibbon} alt="" draggable={false} />}
-      {status === 'clear' && <div className="result-stars" role="img" aria-label={t.starsCount(stars)}>
+      {status === 'clear' && bonus && <div className="result-heart" role="img" aria-label={t.heartGained}>
+        <HeartIcon /><span lang="en">+1</span>
+      </div>}
+      {status === 'clear' && !bonus && <div className="result-stars" role="img" aria-label={t.starsCount(stars)}>
         {[0, 1, 2].map(index => <span key={index} className={index < stars ? 'result-star--earned' : 'star--unearned'}><img src={rewardStar} alt="" draggable={false} /></span>)}
       </div>}
       <h2 id="result-heading" ref={resultHeading} tabIndex={-1} className={status === 'clear' ? 'result-display-title' : undefined}>
-        {status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
+        {status === 'clear' && bonus ? 'Bonus Clear!' : status === 'clear' && lastStage ? 'All Stages Clear!' : resultTitles[status]}
       </h2>
       {status === 'clear' && <img className="result-desserts" src={clearDesserts} alt="" draggable={false} />}
       {failed && <div className="result-progress" role="img" aria-label={t.ordersDoneLabel(state.completedOrders, stage.targetOrders)}>
@@ -345,7 +355,8 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       </div>}
       <div className="result-actions">
         {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>{t.nextStage}</button>}
-        <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />{t.retry}</button>
+        {/* A bonus stage pays out once, so its clear offers no replay. */}
+        {!(bonus && status === 'clear') && <button type="button" className={failed ? 'primary-button popup-primary-button' : 'secondary-button'} onClick={() => act({ type: 'RESTART' })}><Icon name="retry" />{t.retry}</button>}
         <button type="button" className="secondary-button" onClick={onStages}><Icon name="grid" />{t.stageSelect}</button>
       </div>
     </section>}

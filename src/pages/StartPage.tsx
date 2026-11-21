@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useMessages } from '../i18n/language';
 import { LanguageButton } from '../components/LanguageButton';
 import { SoundButton } from '../components/SoundControls';
+import { HeartCounter } from '../components/HeartCounter';
+import type { Hearts } from '../game/hearts';
 
 const posterSources = import.meta.glob<string>('../assets/home/*.webp', {
   eager: true, import: 'default', query: '?url&no-inline',
@@ -23,14 +25,15 @@ const posters = Object.entries(posterSources).map(([path, src]) => ({
   background: posterBackgrounds[path.split('/').at(-1)?.replace('.webp', '') ?? ''],
 }));
 
-export function StartPage({ stage, onGame, onStages, soundEnabled, onToggleSound, onToggleLanguage }: {
-  stage: number; onGame: () => void; onStages: () => void; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void;
+export function StartPage({ stage, hearts, onGame, onStages, soundEnabled, onToggleSound, onToggleLanguage }: {
+  stage: number; hearts: Hearts; onGame: () => void; onStages: () => void; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void;
 }) {
   const t = useMessages();
   const [poster] = useState(() => posters[Math.floor(Math.random() * posters.length)]);
   return <main className="start-page" style={{ backgroundImage: poster?.background }}>
     <h1 className="sr-only">Sweet Order</h1>
     <img className="start-poster" src={poster?.src} width={800} height={1800} alt="" draggable={false} fetchPriority="high" />
+    <div className="top-hearts"><HeartCounter hearts={hearts} /></div>
     <div className="top-actions">
       <LanguageButton onToggle={onToggleLanguage} />
       <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />

@@ -2,6 +2,8 @@ import type { DonutType, StageDefinition, StageDifficulty } from '../types';
 import { practiceStage } from './practice';
 import { CHUNK_SIZE, STAGE_COUNT, chunkOf, difficultyForStage, isStageId } from './schedule';
 import { stage01 } from './stage01';
+import { createBonusStage, isBonusStage } from './bonus';
+import { BONUS_STAGE_ID } from '../constants';
 export { practiceStage, STAGE_COUNT, isStageId };
 
 // Stored layouts use menu indexes; hidden dessert positions per queue are kept apart from them.
@@ -49,7 +51,7 @@ function loadChunk(chunk: number): Promise<void> {
 }
 
 export function isStageLoaded(id: number): boolean {
-  return id === practiceStage.id || loaded.has(id);
+  return id === practiceStage.id || loaded.has(id) || (isBonusStage(id) && bonusStage !== undefined);
 }
 
 /** Loads the chunk holding a stage; resolves at once when it is already in memory. */
@@ -77,8 +79,17 @@ export const stageDifficulty = (id: number): StageDifficulty => difficultyForSta
 
 export const authoredStages = [stage01];
 export const stageNames: Record<number, string> = { 1: '처음 한 입', 2: '달콤한 리듬', 3: '새로운 맛', 4: '차곡차곡', 5: '도넛 마스터' };
+// The bonus stage in play; its dessert is drawn when it appears.
+let bonusStage: StageDefinition | undefined;
+export function prepareBonusStage(type: DonutType): StageDefinition {
+  if (bonusStage?.donutTypes[0] !== type) bonusStage = createBonusStage(type);
+  return bonusStage;
+}
+export { BONUS_STAGE_ID, isBonusStage };
+
 export function getStage(id: number) {
   if (id === practiceStage.id) return practiceStage;
+  if (isBonusStage(id) && bonusStage) return bonusStage;
   const stage = loaded.get(id);
   if (!stage) throw new Error('존재하지 않는 스테이지입니다.');
   return stage;
