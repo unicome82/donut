@@ -6,7 +6,6 @@ import rewardStar from '../assets/game/reward-star.webp';
 import { useCallback, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { CUSTOMER_GOODBYE_MS } from '../effects/customerTiming';
-import { Donut } from '../components/Donut/Donut';
 import { GameHeader } from '../components/GameHeader';
 import { OrderBoard } from '../components/OrderBoard';
 import { DonutTray } from '../components/DonutTray';
@@ -308,9 +307,6 @@ export function GamePage({ state, dispatch, onStages, onNext, soundEnabled, onTo
       {failed && <div className="result-progress" role="img" aria-label={t.ordersDoneLabel(state.completedOrders, stage.targetOrders)}>
         <span className="result-progress-label" aria-hidden="true">{t.ordersDone} <strong>{state.completedOrders}</strong> / {stage.targetOrders}</span>
         <span className="result-progress-track" aria-hidden="true"><span style={{ width: `${state.completedOrders / stage.targetOrders * 100}%` }} /></span>
-      </div>}
-      {failed && state.tray.length > 0 && <div className="result-tray" aria-label={t.tray(state.tray.length, state.trayCapacity)}>
-        {state.tray.slice(-6).map(donut => <Donut key={donut.id} type={donut.type} />)}
       </div>}
       <div className="result-actions">
         {status === 'clear' && !lastStage && <button type="button" className="primary-button popup-primary-button next-stage-button" onClick={onNext}>{t.nextStage}</button>}

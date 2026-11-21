@@ -359,10 +359,14 @@
   top: 50%;
   translate: -50% -50%;
   z-index: 1;
-  transition: scale 320ms cubic-bezier(.5,0,.75,0), opacity 320ms ease-in;
 }
 .stage-clock-star img { display: block; width: var(--stage-clock-star); height: var(--stage-clock-star); object-fit: contain; filter: drop-shadow(0 1px 1px #88552888); }
-.stage-clock-star.star--unearned { scale: 0; opacity: 0; }
+.stage-clock-star.star--unearned { animation: star-vanish 560ms cubic-bezier(.4,0,.6,1) both; }
+@keyframes star-vanish {
+  0% { scale: 1; opacity: 1; }
+  25% { scale: 1.25; opacity: 1; }
+  100% { scale: 0; opacity: 0; }
+}
 .stage-clock-time {
   min-width: 3.2em;
   color: #7a4a33;
@@ -457,9 +461,9 @@
   place-items: center;
   min-width: min(100%, 48px);
   max-width: 100%;
-  padding: 1px 4px 2px;
+  padding: 4px 4px 5px;
   border: 1px solid #e4c8b5;
-  border-radius: 11px;
+  border-radius: 12px;
   background: #fffdf9;
   box-shadow: 0 1px #eed3bd80;
 }
@@ -495,14 +499,15 @@
   right: 0;
   display: grid;
   place-items: center;
-  min-width: 18px;
-  height: 18px;
-  padding-inline: 4px;
+  min-width: 20px;
+  height: 20px;
+  // Jua's digits sit high in their line box; nudge them to the optical center.
+  padding: 2.5px 4px 0;
   border: 1.5px solid #dcc0a8;
   border-radius: 999px;
   background: #fff;
   color: #6b3a26;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -544,7 +549,7 @@
 }
 .customer-hearts .customer-heart--spark-left { --heart-x: -37px; }
 .customer-hearts .customer-heart--spark-right { --heart-x: 37px; }
-.tray-section, .result-tray {
+.tray-section {
   border: 1px solid #e8c099;
   border-radius: 15px;
   background: linear-gradient(#fffcf2, #ffefd8);
@@ -611,18 +616,18 @@
 }
 .tray-section { transition: background-color 200ms, border-color 200ms, box-shadow 200ms; }
 .tray-section--warn {
-  --tray-blink: #f0a73c;
+  --tray-blink: #f5c66b;
   background: linear-gradient(#fff8e6, #ffe8bf);
   animation: tray-blink 1.2s ease-in-out infinite;
 }
 .tray-section--danger {
-  --tray-blink: #e94873;
+  --tray-blink: #f58fa3;
   background: linear-gradient(#fff1ef, #ffdcdc);
   animation: tray-blink .7s ease-in-out infinite;
 }
 @keyframes tray-blink {
-  0%, 100% { border-color: #e8c099; box-shadow: inset 0 -4px #ecd2a9, 0 2px 3px #aa6b3b15; }
-  50% { border-color: var(--tray-blink); box-shadow: inset 0 -4px #ecd2a9, 0 0 0 2px var(--tray-blink), 0 2px 3px #aa6b3b15; }
+  0%, 100% { box-shadow: inset 0 -4px #ecd2a9, 0 2px 3px #aa6b3b15; }
+  50% { box-shadow: inset 0 -4px #ecd2a9, 0 0 10px 3px var(--tray-blink), 0 2px 3px #aa6b3b15; }
 }
 .tray-slots {
   container-type: inline-size;
@@ -633,6 +638,7 @@
 .tray-slots li { display: grid; place-items: center; min-width: 0; height: clamp(24px, 4.2dvh, 36px); }
 .tray-slots li:empty::after { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #dfbd99; }
 .tray-donut {
+  translate: 0 -2px;
   // Size against a 12-slot row so desserts look the same at every capacity.
   width: min(calc(100cqw / 12 * 1.4), 44px);
   justify-self: center;
@@ -836,8 +842,6 @@
 .result-progress strong { color: #d83261; font-size: 18px; font-weight: 900; }
 .result-progress-track { display: block; height: 10px; overflow: hidden; border-radius: 999px; background: #f3dccd; box-shadow: inset 0 1px 2px #8a553a30; }
 .result-progress-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(to right, #f58fa3, #e94873); }
-.result-tray { display: flex; align-items: center; justify-content: center; gap: 3px; width: min(100%, 205px); min-height: 38px; padding: 4px 6px 7px; }
-.result-tray .donut { width: min(15%, 25px); }
 .result-actions { display: grid; width: min(100%, 260px); gap: var(--button-stack-gap); }
 
 .flying-donut { position: fixed; z-index: 100; pointer-events: none; filter: drop-shadow(0 3px 3px #72502b44); }
@@ -855,6 +859,10 @@
 
 @media (max-width: 360px) {
   .order-items { column-gap: 2px; }
+}
+// Very short screens (iPhone SE) need the tight bubble to clear the time bar.
+@media (max-height: 600px) {
+  .speech-bubble { padding-block: 1px 2px; }
 }
 @media (orientation: landscape) and (max-height: 520px) and (min-width: 600px) {
   :root { --shell-width: 820px; }
