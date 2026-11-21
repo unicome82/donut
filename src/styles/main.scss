@@ -1064,6 +1064,10 @@
 // Jua sits about 1px high; the padding lines the title up with the heart.
 .no-hearts-dialog h2 > span { padding-top: 3px; line-height: 1; }
 .no-hearts-dialog .result-actions { margin-top: 18px; }
+.charge-stepper { display: flex; align-items: center; justify-content: center; gap: 22px; margin-top: 14px; }
+.charge-stepper-button { font-family: Jua, sans-serif; font-size: 26px; line-height: 1; }
+.charge-stepper-button span { padding-top: 2px; }
+.charge-stepper-value { min-width: 2ch; color: var(--secondary-text); font-family: Jua, sans-serif; font-size: 40px; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; padding-top: 3px; }
 .charge-hearts-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; }
 .heart-counter--chargeable { cursor: pointer; font: inherit; }
 .heart-counter--chargeable:active { transform: translateY(2px); }

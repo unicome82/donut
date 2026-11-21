@@ -26,6 +26,9 @@ describe('하트', () => {
     expect(chargeFromBonus(hearts, 0)).toMatchObject({ count: 5, bonus: 2 });
     expect(chargeFromBonus({ count: 3, bonus: 1, refillFrom: 0 }, 0)).toMatchObject({ count: 4, bonus: 0 });
     expect(chargeFromBonus({ count: 5, bonus: 3, refillFrom: 0 }, 0)).toMatchObject({ count: 5, bonus: 3 });
+    // A chosen amount is moved as asked, but never past five.
+    expect(chargeFromBonus(hearts, 0, 2)).toMatchObject({ count: 2, bonus: 5 });
+    expect(chargeFromBonus({ count: 4, bonus: 3, refillFrom: 0 }, 0, 3)).toMatchObject({ count: 5, bonus: 2 });
     expect(refillHearts({ count: 0, bonus: 2, refillFrom: 0 }, minutes(500))).toMatchObject({ count: 5, bonus: 2 });
   });
 

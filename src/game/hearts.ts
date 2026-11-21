@@ -36,10 +36,10 @@ export function chargeAmount(hearts: Hearts, now: number): number {
   return Math.min(current.bonus, Math.max(0, MAX_HEARTS - current.count));
 }
 
-/** Moves bonus hearts into the regular hearts, filling them up to five. */
-export function chargeFromBonus(hearts: Hearts, now: number): Hearts {
+/** Moves bonus hearts into the regular hearts: `requested` of them (all that fit when left out), never past five. */
+export function chargeFromBonus(hearts: Hearts, now: number, requested = Infinity): Hearts {
   const current = refillHearts(hearts, now);
-  const amount = chargeAmount(current, now);
+  const amount = Math.max(0, Math.min(Math.floor(requested), chargeAmount(current, now)));
   return amount ? { ...current, count: current.count + amount, bonus: current.bonus - amount } : current;
 }
 

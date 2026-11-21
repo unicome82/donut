@@ -83,7 +83,7 @@ export function App() {
     }
     {outOfHearts && <NoHeartsDialog hearts={session.hearts} onClose={closeOutOfHearts} onCharge={openCharge} />}
     {chargeOpen && <ChargeHeartsDialog hearts={session.hearts} onClose={() => setChargeOpen(false)}
-      onCharge={() => { dispatch({ type: 'CHARGE_HEARTS', now: Date.now() }); setChargeOpen(false); }} />}
+      onCharge={amount => { dispatch({ type: 'CHARGE_HEARTS', amount, now: Date.now() }); setChargeOpen(false); }} />}
     {loadingStage !== undefined && <p className="stage-loading" role="status">Loading…</p>}
   </div></LanguageContext>;
 }

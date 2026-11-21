@@ -26,7 +26,7 @@ export type SessionAction =
   | { type: 'START'; stageId: number; now?: number }
   | { type: 'START_BONUS'; dessert: DonutType; nextStageId: number }
   | { type: 'GAME'; action: GameAction; now?: number }
-  | { type: 'CHARGE_HEARTS'; now?: number };
+  | { type: 'CHARGE_HEARTS'; amount?: number; now?: number };
 
 export function createSession(unlockAllStages = false): SessionState {
   return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0, unlockAllStages, trayClears: STARTING_TRAY_CLEARS, hearts: fullHearts() };
@@ -79,7 +79,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       if (!payment) return state;
       return { ...state, ...payment, bonus: undefined, screen: 'game', game: createSessionGame(action.stageId, state.trayClears) };
     }
-    case 'CHARGE_HEARTS': return { ...state, hearts: chargeFromBonus(state.hearts, action.now ?? Date.now()) };
+    case 'CHARGE_HEARTS': return { ...state, hearts: chargeFromBonus(state.hearts, action.now ?? Date.now(), action.amount) };
     case 'START_BONUS': {
       const game = createGame(prepareBonusStage(action.dessert));
       return { ...state, screen: 'game', heartPaidFrom: undefined, bonus: { dessert: action.dessert, nextStageId: action.nextStageId },
