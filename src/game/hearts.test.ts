@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addHeart, describeHearts, fullHearts, HEART_REFILL_MS, MAX_HEARTS, parseHearts, refillHearts, spendHeart, type Hearts } from './hearts';
+import { addHeart, chargeAmount, chargeFromBonus, describeHearts, fullHearts, HEART_REFILL_MS, MAX_HEARTS, parseHearts, refillHearts, spendHeart, type Hearts } from './hearts';
 import { createSession, reduceSession } from './session';
 import { BONUS_STAGE_ID } from './constants';
 import { getStage, loadStage } from './stages';
@@ -19,16 +19,23 @@ describe('하트', () => {
     expect(spendHeart({ count: 0, bonus: 0, refillFrom: 0 }, minutes(29))).toBeNull();
   });
 
-  it('보너스 하트는 일반 하트가 다 떨어진 뒤에 쓰고, 충전으로는 늘지 않는다', () => {
-    let hearts: Hearts = { count: 1, bonus: 2, refillFrom: 0 };
-    const first = spendHeart(hearts, 0)!;
-    expect(first.from).toBe('regular');
-    hearts = first.hearts;
-    expect(hearts).toMatchObject({ count: 0, bonus: 2 });
-    const second = spendHeart(hearts, 0)!;
-    expect(second.from).toBe('bonus');
-    expect(second.hearts).toMatchObject({ count: 0, bonus: 1 });
-    expect(refillHearts(second.hearts, minutes(500))).toMatchObject({ count: 5, bonus: 1 });
+  it('보너스 하트는 바로 쓰이지 않고, 충전하면 일반 하트를 최대 5개까지 채운다', () => {
+    const hearts: Hearts = { count: 0, bonus: 7, refillFrom: 0 };
+    expect(spendHeart(hearts, 0)).toBeNull();
+    expect(chargeAmount(hearts, 0)).toBe(5);
+    expect(chargeFromBonus(hearts, 0)).toMatchObject({ count: 5, bonus: 2 });
+    expect(chargeFromBonus({ count: 3, bonus: 1, refillFrom: 0 }, 0)).toMatchObject({ count: 4, bonus: 0 });
+    expect(chargeFromBonus({ count: 5, bonus: 3, refillFrom: 0 }, 0)).toMatchObject({ count: 5, bonus: 3 });
+    expect(refillHearts({ count: 0, bonus: 2, refillFrom: 0 }, minutes(500))).toMatchObject({ count: 5, bonus: 2 });
+  });
+
+  it('일반 하트가 0개면 보너스 하트가 있어도 시작할 수 없고, 충전한 뒤에 시작된다', async () => {
+    await loadStage(1);
+    const session = { ...createSession(), hearts: { count: 0, bonus: 3, refillFrom: 0 } };
+    expect(reduceSession(session, { type: 'START', stageId: 1, now: 0 })).toBe(session);
+    const charged = reduceSession(session, { type: 'CHARGE_HEARTS', now: 0 });
+    expect(charged.hearts).toMatchObject({ count: 3, bonus: 0 });
+    expect(reduceSession(charged, { type: 'START', stageId: 1, now: 0 }).hearts.count).toBe(2);
   });
 
   it('충전 대기 시간과 보너스 하트 수를 따로 보여 준다', () => {

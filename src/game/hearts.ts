@@ -1,6 +1,7 @@
-// Hearts gate stage attempts: each attempt costs one and a clear gives it back. Regular hearts
-// refill one every 30 minutes while there are fewer than five. Bonus hearts, earned in bonus
-// stages, sit apart from them, never refill, and are only spent once the regular ones run out.
+// Hearts gate stage attempts: each attempt costs one regular heart and a clear gives it back.
+// Regular hearts refill one every 30 minutes while there are fewer than five. Bonus hearts, earned
+// in bonus stages, sit apart: they never refill and are never spent directly. The player moves
+// them into the regular hearts (up to five) when they choose to.
 export const MAX_HEARTS = 5;
 export const HEART_REFILL_MS = 30 * 60_000;
 
@@ -20,18 +21,26 @@ export function refillHearts(hearts: Hearts, now: number): Hearts {
   return { ...hearts, count, refillFrom: hearts.refillFrom + gained * HEART_REFILL_MS };
 }
 
-export const totalHearts = (hearts: Hearts) => hearts.count + hearts.bonus;
-
-/** Takes one heart for an attempt, regular hearts first; null when none is left. */
+/** Takes one regular heart for an attempt; null when none is left (bonus hearts are not used). */
 export function spendHeart(hearts: Hearts, now: number): { hearts: Hearts; from: HeartSource } | null {
   const current = refillHearts(hearts, now);
-  if (current.count > 0) {
-    // Dropping below five starts the 30-minute refill clock.
-    const refillFrom = current.count >= MAX_HEARTS ? now : current.refillFrom;
-    return { hearts: { ...current, count: current.count - 1, refillFrom }, from: 'regular' };
-  }
-  if (current.bonus > 0) return { hearts: { ...current, bonus: current.bonus - 1 }, from: 'bonus' };
-  return null;
+  if (current.count < 1) return null;
+  // Dropping below five starts the 30-minute refill clock.
+  const refillFrom = current.count >= MAX_HEARTS ? now : current.refillFrom;
+  return { hearts: { ...current, count: current.count - 1, refillFrom }, from: 'regular' };
+}
+
+/** How many bonus hearts a charge would move into the regular hearts. */
+export function chargeAmount(hearts: Hearts, now: number): number {
+  const current = refillHearts(hearts, now);
+  return Math.min(current.bonus, Math.max(0, MAX_HEARTS - current.count));
+}
+
+/** Moves bonus hearts into the regular hearts, filling them up to five. */
+export function chargeFromBonus(hearts: Hearts, now: number): Hearts {
+  const current = refillHearts(hearts, now);
+  const amount = chargeAmount(current, now);
+  return amount ? { ...current, count: current.count + amount, bonus: current.bonus - amount } : current;
 }
 
 /** Gives a heart back to where it came from (a cleared attempt), or adds a bonus heart. */
@@ -49,7 +58,8 @@ export function describeHearts(hearts: Hearts, now: number) {
     count: current.count,
     bonus: current.bonus,
     nextInMs: current.count < MAX_HEARTS ? Math.max(0, HEART_REFILL_MS - (now - current.refillFrom)) : null,
-    available: totalHearts(current),
+    available: current.count,
+    chargeable: chargeAmount(current, now),
   };
 }
 

@@ -1060,10 +1060,13 @@
 }
 .result-heart .heart-icon { width: clamp(56px, 18vw, 78px); height: clamp(56px, 18vw, 78px); filter: drop-shadow(0 3px 2px #ac204640); }
 .no-hearts-dialog h2 { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.no-hearts-dialog .heart-icon { width: 26px; height: 26px; }
+.no-hearts-dialog h2 .heart-icon { width: 26px; height: 26px; }
 // Jua sits about 1px high; the padding lines the title up with the heart.
 .no-hearts-dialog h2 > span { padding-top: 3px; line-height: 1; }
 .no-hearts-dialog .result-actions { margin-top: 18px; }
+.charge-hearts-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 10px; }
+.heart-counter--chargeable { cursor: pointer; font: inherit; }
+.heart-counter--chargeable:active { transform: translateY(2px); }
 .no-hearts-wait { color: var(--muted); font-size: 15px; text-align: center; }
 
 // Bonus stage opening title: pops in, holds, then floats away before play starts (GamePage BONUS_INTRO_MS).

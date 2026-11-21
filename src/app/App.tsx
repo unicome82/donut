@@ -7,6 +7,7 @@ import { isBonusStage, isStageId, isStageLoaded, loadStage, practiceStage, prelo
 import { randomBonusDessert } from '../game/stages/bonus';
 import { BONUS_AT_STAGE_00_FOR_TESTING } from '../game/constants';
 import { NoHeartsDialog } from '../components/NoHeartsDialog';
+import { ChargeHeartsDialog } from '../components/ChargeHeartsDialog';
 import { useGame } from '../hooks/useGame';
 import { StartPage } from '../pages/StartPage';
 import { GamePage } from '../pages/GamePage';
@@ -44,6 +45,8 @@ export function App() {
   const [loadingStage, setLoadingStage] = useState<number>();
   const [outOfHearts, setOutOfHearts] = useState(false);
   const closeOutOfHearts = useCallback(() => setOutOfHearts(false), []);
+  const [chargeOpen, setChargeOpen] = useState(false);
+  function openCharge() { setOutOfHearts(false); setChargeOpen(true); }
   // Stage data arrives in 100-stage chunks; fetch the one a START needs before entering it.
   function start(stageId: number) {
     if (BONUS_AT_STAGE_00_FOR_TESTING && stageId === practiceStage.id) {
@@ -72,11 +75,13 @@ export function App() {
     {screen === 'start'
       ? <StartPage stage={currentStage} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} onGame={() => start(currentStage)} onStages={() => dispatch({ type: 'STAGES' })} />
       : screen === 'stages'
-        ? <StageSelectPage stars={stars} hearts={session.hearts} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} unlockAllStages={session.unlockAllStages} onGame={start} />
+        ? <StageSelectPage stars={stars} hearts={session.hearts} onChargeHearts={openCharge} onToggleLanguage={toggleLanguage} soundEnabled={soundEnabled} onToggleSound={toggleSound} unlockAllStages={session.unlockAllStages} onGame={start} />
         : <GamePage key={game.stageId} soundEnabled={soundEnabled} onToggleSound={toggleSound} state={game} dispatch={action => dispatch({ type: 'GAME', action, now: Date.now() })} onStages={() => dispatch({ type: 'STAGES' })} onNext={next}
           canRestart={() => canAffordAttempt(session, game.stageId)} onOutOfHearts={() => setOutOfHearts(true)} />
     }
-    {outOfHearts && <NoHeartsDialog hearts={session.hearts} onClose={closeOutOfHearts} />}
+    {outOfHearts && <NoHeartsDialog hearts={session.hearts} onClose={closeOutOfHearts} onCharge={openCharge} />}
+    {chargeOpen && <ChargeHeartsDialog hearts={session.hearts} onClose={() => setChargeOpen(false)}
+      onCharge={() => { dispatch({ type: 'CHARGE_HEARTS', now: Date.now() }); setChargeOpen(false); }} />}
     {loadingStage !== undefined && <p className="stage-loading" role="status">Loading…</p>}
   </div></LanguageContext>;
 }

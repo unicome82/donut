@@ -21,7 +21,7 @@ const JUMP_SIZE = 500;
 const blockStart = (block: number) => block * JUMP_SIZE + 1;
 const optionId = (index: number) => index === 0 ? practiceStage.id : index;
 
-export function StageSelectPage({ onGame, stars, hearts, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; stars: Record<number, number>; hearts: Hearts; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
+export function StageSelectPage({ onGame, onChargeHearts, stars, hearts, unlockAllStages, soundEnabled, onToggleSound, onToggleLanguage }: { onGame: (id: number) => void; onChargeHearts: () => void; stars: Record<number, number>; hearts: Hearts; unlockAllStages: boolean; soundEnabled: boolean; onToggleSound: () => void; onToggleLanguage: () => void }) {
   const t = useMessages();
   const openThrough = unlockedThrough(stars, unlockAllStages);
   const currentStage = unlockedThrough(stars);
@@ -63,7 +63,7 @@ export function StageSelectPage({ onGame, stars, hearts, unlockAllStages, soundE
 
   return <main className="stage-page">
     <nav className="stage-navigation" aria-label={t.stageMenu}>
-      <HeartCounter hearts={hearts} />
+      <HeartCounter hearts={hearts} onCharge={onChargeHearts} />
       <LanguageButton onToggle={onToggleLanguage} />
       <SoundButton soundEnabled={soundEnabled} onToggleSound={onToggleSound} />
     </nav>

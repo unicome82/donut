@@ -1,7 +1,7 @@
 import { createGame, getStars } from './engine';
 import { getStage, isBonusStage, isStageId, practiceStage, prepareBonusStage, STAGE_COUNT } from './stages';
 import { reduceGame, type GameAction } from './reducer';
-import { addHeart, fullHearts, refillHearts, spendHeart, totalHearts, type HeartSource, type Hearts } from './hearts';
+import { addHeart, chargeFromBonus, fullHearts, refillHearts, spendHeart, type HeartSource, type Hearts } from './hearts';
 import type { DonutType, GameState } from './types';
 
 const POINTS_PER_ORDER = 100;
@@ -25,7 +25,8 @@ export type SessionAction =
   | { type: 'STAGES' }
   | { type: 'START'; stageId: number; now?: number }
   | { type: 'START_BONUS'; dessert: DonutType; nextStageId: number }
-  | { type: 'GAME'; action: GameAction; now?: number };
+  | { type: 'GAME'; action: GameAction; now?: number }
+  | { type: 'CHARGE_HEARTS'; now?: number };
 
 export function createSession(unlockAllStages = false): SessionState {
   return { screen: 'start', game: createGame(getStage(1)), stars: {}, score: 0, unlockAllStages, trayClears: STARTING_TRAY_CLEARS, hearts: fullHearts() };
@@ -40,7 +41,7 @@ function createSessionGame(stageId: number, trayClears: number): GameState {
 export const isFreeStage = (id: number) => id === practiceStage.id || isBonusStage(id);
 /** Whether a paid attempt can start now. */
 export function canAffordAttempt(state: SessionState, stageId: number, now = Date.now()): boolean {
-  return isFreeStage(stageId) || totalHearts(refillHearts(state.hearts, now)) >= 1;
+  return isFreeStage(stageId) || refillHearts(state.hearts, now).count >= 1;
 }
 /** Pays one heart for an attempt at a campaign stage; null when no heart is left. */
 function payForAttempt(state: SessionState, stageId: number, now: number): Pick<SessionState, 'hearts' | 'heartPaidFrom'> | null {
@@ -78,6 +79,7 @@ export function reduceSession(state: SessionState, action: SessionAction): Sessi
       if (!payment) return state;
       return { ...state, ...payment, bonus: undefined, screen: 'game', game: createSessionGame(action.stageId, state.trayClears) };
     }
+    case 'CHARGE_HEARTS': return { ...state, hearts: chargeFromBonus(state.hearts, action.now ?? Date.now()) };
     case 'START_BONUS': {
       const game = createGame(prepareBonusStage(action.dessert));
       return { ...state, screen: 'game', heartPaidFrom: undefined, bonus: { dessert: action.dessert, nextStageId: action.nextStageId },
