@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LanguageContext, readLanguagePreference, saveLanguagePreference } from '../i18n/language';
 import type { MouseEvent } from 'react';
-import { playSound, readSoundPreference, saveSoundPreference, unlockSound } from '../effects/sound';
+import { playSound, readSoundPreference, saveSoundPreference, setMusicScene, unlockSound } from '../effects/sound';
 import { getCurrentStage } from '../game/session';
 import { useGame } from '../hooks/useGame';
 import { StartPage } from '../pages/StartPage';
@@ -32,6 +32,7 @@ export function App() {
     if (button && !button.disabled && button.dataset.sfx !== 'none') playSound('tap');
   }
   const { screen, game, stars } = session;
+  useEffect(() => setMusicScene(screen === 'game' ? 'game' : 'menu'), [screen]);
   const currentStage = getCurrentStage(stars);
   return <LanguageContext value={language}><div className="app-shell" lang={language} onPointerUpCapture={soundEnabled ? unlockSound : undefined} onClickCapture={onClickCapture}>
     {screen === 'start'

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from './Icon';
 import { useMessages } from '../i18n/language';
-import { musicCredit, musicTracks, playSound, readMusicTrack, readVolumes, setMusicTrack, setVolume, type MusicTrackId, type VolumeKind } from '../effects/sound';
+import { MUSIC_CREDIT, playSound, readVolumes, setVolume, type VolumeKind } from '../effects/sound';
 
 interface Props { soundEnabled: boolean; onToggleSound: () => void }
 
@@ -9,7 +9,6 @@ interface Props { soundEnabled: boolean; onToggleSound: () => void }
 export function SoundControls({ soundEnabled, onToggleSound }: Props) {
   const t = useMessages();
   const [levels, setLevels] = useState(readVolumes);
-  const [track, setTrack] = useState(readMusicTrack);
   function change(kind: VolumeKind, percent: number) {
     setVolume(kind, percent / 100);
     setLevels(readVolumes());
@@ -28,17 +27,7 @@ export function SoundControls({ soundEnabled, onToggleSound }: Props) {
         onKeyUp={() => { if (kind === 'sfx') playSound('select'); }} />
       <output>{Math.round(levels[kind] * 100)}</output>
     </label>)}
-    <label className="sound-slider sound-track">
-      <span>{t.musicTrack}</span>
-      <select value={track} disabled={!soundEnabled} onChange={event => {
-        const id = event.currentTarget.value as MusicTrackId;
-        setMusicTrack(id);
-        setTrack(id);
-      }}>
-        {musicTracks.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
-      </select>
-    </label>
-    <p className="sound-credit" lang="en">{t.musicCredit} {musicCredit(track)}</p>
+    <p className="sound-credit" lang="en">{t.musicCredit} {MUSIC_CREDIT}</p>
   </div>;
 }
 

@@ -960,16 +960,3 @@
 .sound-dialog { padding-top: 28px; pointer-events: auto; }
 .sound-dialog .result-actions { margin: 18px auto 0; }
 .pause-dialog .sound-controls { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e9c9b3; }
-.sound-track { grid-template-columns: 4.5em 1fr; }
-.sound-track select {
-  min-width: 0;
-  min-height: 36px;
-  padding: 4px 10px;
-  border: 1px solid #ecc9b4;
-  border-radius: 12px;
-  background: #fffaf5;
-  color: var(--text);
-  font: inherit;
-  font-size: 14px;
-}
-.sound-track select:disabled { opacity: .45; }
