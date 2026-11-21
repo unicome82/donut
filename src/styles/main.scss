@@ -1059,4 +1059,7 @@
 .result-heart .heart-icon { width: clamp(56px, 18vw, 78px); height: clamp(56px, 18vw, 78px); filter: drop-shadow(0 3px 2px #ac204640); }
 .no-hearts-dialog h2 { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .no-hearts-dialog .heart-icon { width: 26px; height: 26px; }
+// Jua sits about 1px high; the padding lines the title up with the heart.
+.no-hearts-dialog h2 > span { padding-top: 3px; line-height: 1; }
+.no-hearts-dialog .result-actions { margin-top: 18px; }
 .no-hearts-wait { color: var(--muted); font-size: 15px; text-align: center; }

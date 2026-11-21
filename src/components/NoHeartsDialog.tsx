@@ -18,7 +18,7 @@ export function NoHeartsDialog({ hearts, onClose }: { hearts: Hearts; onClose: (
   useLayoutEffect(() => { if (available > 0) onClose(); }, [available, onClose]);
   return <dialog className="glass-popup tray-full-dialog no-hearts-dialog" ref={dialog} aria-labelledby="no-hearts-heading" onCancel={event => { event.preventDefault(); onClose(); }}>
     <img className="popup-cat" src={popupCat} alt="" draggable={false} />
-    <h2 id="no-hearts-heading"><HeartIcon className="heart-icon--empty" />{t.noHearts}</h2>
+    <h2 id="no-hearts-heading"><HeartIcon className="heart-icon--empty" /><span>{t.noHearts}</span></h2>
     {nextInMs !== null && <p className="no-hearts-wait">{t.nextHeart(formatWait(nextInMs))}</p>}
     <div className="result-actions">
       <button type="button" className="primary-button popup-primary-button" onClick={onClose}>{t.ok}</button>
