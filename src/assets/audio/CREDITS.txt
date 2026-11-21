@@ -1,5 +1,9 @@
-bgm-bossa-antigua.mp3
-"Bossa Antigua" Kevin MacLeod (incompetech.com)
+Background music candidates (all by Kevin MacLeod, incompetech.com)
 Licensed under Creative Commons: By Attribution 4.0 License
 http://creativecommons.org/licenses/by/4.0/
 Re-encoded (80 kbps, loudness-normalized) for the game.
+
+bgm-summer-day.mp3              "Summer Day"
+bgm-teddy-bear-waltz.mp3        "Teddy Bear Waltz"
+bgm-sheep-may-safely-graze.mp3  "Sheep May Safely Graze" (J. S. Bach, BWV 208, arr. Kevin MacLeod)
+bgm-dreamy-flashback.mp3        "Dreamy Flashback"

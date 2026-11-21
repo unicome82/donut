@@ -1,6 +1,34 @@
-import musicUrl from '../assets/audio/bgm-bossa-antigua.mp3?url';
+import summerDay from '../assets/audio/bgm-summer-day.mp3?url';
+import teddyBearWaltz from '../assets/audio/bgm-teddy-bear-waltz.mp3?url';
+import sheepMaySafelyGraze from '../assets/audio/bgm-sheep-may-safely-graze.mp3?url';
+import dreamyFlashback from '../assets/audio/bgm-dreamy-flashback.mp3?url';
 
-export const MUSIC_CREDIT = '"Bossa Antigua" Kevin MacLeod (incompetech.com) · CC BY 4.0';
+// Temporary: all four candidates are selectable in the sound settings until one is chosen.
+export const musicTracks = [
+  { id: 'summer-day', title: 'Summer Day', url: summerDay },
+  { id: 'teddy-bear-waltz', title: 'Teddy Bear Waltz', url: teddyBearWaltz },
+  { id: 'sheep-may-safely-graze', title: 'Sheep May Safely Graze', url: sheepMaySafelyGraze },
+  { id: 'dreamy-flashback', title: 'Dreamy Flashback', url: dreamyFlashback },
+] as const;
+export type MusicTrackId = typeof musicTracks[number]['id'];
+const defaultTrack: MusicTrackId = 'teddy-bear-waltz';
+const trackKey = 'sweet-order-music-track';
+
+export function musicCredit(id: MusicTrackId) {
+  const track = musicTracks.find(item => item.id === id) ?? musicTracks[0];
+  return `"${track.title}" Kevin MacLeod (incompetech.com) · CC BY 4.0`;
+}
+
+export function readMusicTrack(): MusicTrackId {
+  try {
+    const saved = localStorage.getItem(trackKey);
+    const track = musicTracks.find(item => item.id === saved);
+    if (track) return track.id;
+  } catch {
+    // Fall back to the default track.
+  }
+  return defaultTrack;
+}
 
 const preferenceKey = 'sweet-order-sound';
 const volumeKeys = { sfx: 'sweet-order-sfx-volume', music: 'sweet-order-music-volume' } as const;
@@ -193,6 +221,7 @@ let resuming: Promise<void> | undefined;
 let soundEnabled = readSoundPreference();
 const volumes: Record<VolumeKind, number> = { sfx: readVolume('sfx'), music: readVolume('music') };
 let mood: MusicMood = 'normal';
+let currentTrack = readMusicTrack();
 const lastPlayed = new Map<SoundName, number>();
 let streak = 0;
 let streakAt = -Infinity;
@@ -250,9 +279,28 @@ export function setMusicMood(next: MusicMood) {
   syncMusic();
 }
 
+function trackUrl(id: MusicTrackId) {
+  return (musicTracks.find(track => track.id === id) ?? musicTracks[0]).url;
+}
+
+export function setMusicTrack(id: MusicTrackId) {
+  if (id === currentTrack) return;
+  currentTrack = id;
+  try {
+    localStorage.setItem(trackKey, id);
+  } catch {
+    // The choice still applies for the current session.
+  }
+  if (!music) return;
+  music.pause();
+  music.src = trackUrl(id);
+  music.currentTime = 0;
+  syncMusic();
+}
+
 function startMusic(context: AudioContext) {
   if (music || typeof Audio === 'undefined') return;
-  music = new Audio(musicUrl);
+  music = new Audio(trackUrl(currentTrack));
   music.loop = true;
   music.preload = 'auto';
   music.preservesPitch = true;
